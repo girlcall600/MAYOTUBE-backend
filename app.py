@@ -4,6 +4,8 @@ from yt_dlp import YoutubeDL
 import re
 import os
 import urllib.parse
+import urllib.request
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -517,6 +519,380 @@ def find_selected_format(
 
 
 # =========================================================
+# YOUTUBE INNERTUBE SEARCH
+# =========================================================
+
+def youtube_innertube_search(
+    query,
+    limit
+):
+    """
+    Uses YouTube's public web InnerTube search endpoint.
+
+    This is intentionally used only for SEARCH.
+    Video-info and download endpoints continue using yt-dlp.
+    """
+
+    url = (
+        "https://www.youtube.com/"
+        "youtubei/v1/search"
+        "?prettyPrint=false"
+    )
+
+    payload = {
+        "context": {
+            "client": {
+                "clientName": "WEB",
+                "clientVersion": "2.20260114.08.00",
+                "hl": "en",
+                "gl": "US"
+            }
+        },
+        "query": str(query),
+        "params": "EgIQAQ=="
+    }
+
+    body = json.dumps(
+        payload
+    ).encode("utf-8")
+
+    headers = {
+        "Content-Type":
+            "application/json",
+
+        "User-Agent": (
+            "Mozilla/5.0 "
+            "(Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 "
+            "(KHTML, like Gecko) "
+            "Chrome/140.0.0.0 "
+            "Safari/537.36"
+        ),
+
+        "Accept":
+            "application/json",
+
+        "Origin":
+            "https://www.youtube.com",
+
+        "Referer":
+            "https://www.youtube.com/",
+
+        "X-YouTube-Client-Name":
+            "1",
+
+        "X-YouTube-Client-Version":
+            "2.20260114.08.00"
+    }
+
+    request_object = urllib.request.Request(
+        url,
+        data=body,
+        headers=headers,
+        method="POST"
+    )
+
+    with urllib.request.urlopen(
+        request_object,
+        timeout=20
+    ) as response:
+
+        raw = response.read()
+
+    data = json.loads(
+        raw.decode("utf-8")
+    )
+
+    videos = []
+
+    def walk(value):
+
+        if len(videos) >= limit:
+            return
+
+        if isinstance(
+            value,
+            dict
+        ):
+
+            video_renderer = value.get(
+                "videoRenderer"
+            )
+
+            if isinstance(
+                video_renderer,
+                dict
+            ):
+
+                video_id = (
+                    video_renderer.get(
+                        "videoId"
+                    )
+                )
+
+                if video_id:
+
+                    videos.append(
+                        video_renderer
+                    )
+
+            for child in value.values():
+
+                if len(videos) >= limit:
+                    break
+
+                walk(child)
+
+        elif isinstance(
+            value,
+            list
+        ):
+
+            for child in value:
+
+                if len(videos) >= limit:
+                    break
+
+                walk(child)
+
+    walk(data)
+
+    return videos
+
+
+def innertube_video_text(
+    renderer,
+    field
+):
+    value = renderer.get(
+        field
+    )
+
+    if not isinstance(
+        value,
+        dict
+    ):
+        return None
+
+    simple_text = value.get(
+        "simpleText"
+    )
+
+    if simple_text:
+        return simple_text
+
+    runs = value.get(
+        "runs"
+    )
+
+    if isinstance(
+        runs,
+        list
+    ):
+
+        parts = []
+
+        for run in runs:
+
+            if isinstance(
+                run,
+                dict
+            ):
+
+                text_value = run.get(
+                    "text"
+                )
+
+                if text_value:
+                    parts.append(
+                        str(text_value)
+                    )
+
+        if parts:
+            return "".join(parts)
+
+    return None
+
+
+def innertube_thumbnail(
+    renderer
+):
+
+    thumbnails = (
+        renderer.get(
+            "thumbnail",
+            {}
+        )
+        .get(
+            "thumbnails",
+            []
+        )
+    )
+
+    if not thumbnails:
+        return None
+
+    best = thumbnails[-1]
+
+    return best.get(
+        "url"
+    )
+
+
+def parse_innertube_results(
+    renderers
+):
+
+    videos = []
+
+    for item in renderers:
+
+        if not isinstance(
+            item,
+            dict
+        ):
+            continue
+
+        video_id = item.get(
+            "videoId"
+        )
+
+        if not video_id:
+            continue
+
+        title = (
+            innertube_video_text(
+                item,
+                "title"
+            )
+            or "Untitled"
+        )
+
+        owner = (
+            innertube_video_text(
+                item,
+                "ownerText"
+            )
+        )
+
+        channel_id = None
+
+        owner_runs = (
+            item.get(
+                "ownerText",
+                {}
+            ).get(
+                "runs",
+                []
+            )
+        )
+
+        if owner_runs:
+
+            first_owner = (
+                owner_runs[0]
+                if isinstance(
+                    owner_runs[0],
+                    dict
+                )
+                else {}
+            )
+
+            navigation = (
+                first_owner.get(
+                    "navigationEndpoint",
+                    {}
+                )
+            )
+
+            browse_endpoint = (
+                navigation.get(
+                    "browseEndpoint",
+                    {}
+                )
+            )
+
+            channel_id = (
+                browse_endpoint.get(
+                    "browseId"
+                )
+            )
+
+        duration_text = (
+            innertube_video_text(
+                item,
+                "lengthText"
+            )
+            or "0:00"
+        )
+
+        view_count_text = (
+            innertube_video_text(
+                item,
+                "viewCountText"
+            )
+        )
+
+        published_text = (
+            innertube_video_text(
+                item,
+                "publishedTimeText"
+            )
+        )
+
+        webpage_url = (
+            "https://www.youtube.com/watch?v="
+            + str(video_id)
+        )
+
+        videos.append({
+
+            "id":
+                video_id,
+
+            "title":
+                title,
+
+            "thumbnail":
+                innertube_thumbnail(
+                    item
+                ),
+
+            "duration":
+                0,
+
+            "duration_text":
+                duration_text,
+
+            "uploader":
+                owner,
+
+            "channel":
+                owner,
+
+            "channel_id":
+                channel_id,
+
+            "view_count":
+                view_count_text,
+
+            "upload_date":
+                published_text,
+
+            "url":
+                webpage_url,
+
+            "webpage_url":
+                webpage_url,
+
+            "platform":
+                "YouTube"
+        })
+
+    return videos
+
+
+# =========================================================
 # HOME
 # =========================================================
 
@@ -970,196 +1346,189 @@ def search():
             )
         )
 
+        videos = []
+        search_method = None
+        diagnostic = {}
+
         # -----------------------------------------------------
         # SEARCH ATTEMPT 1
-        # Existing ytsearch extractor
+        # YouTube InnerTube
         # -----------------------------------------------------
 
-        search_query = (
-            f"ytsearch{limit}:{query}"
-        )
+        try:
 
-        options = get_ydl_options()
-
-        options["extract_flat"] = "in_playlist"
-
-        with YoutubeDL(
-            options
-        ) as ydl:
-
-            result = ydl.extract_info(
-                search_query,
-                download=False
-            )
-
-        entries = result.get(
-            "entries",
-            []
-        )
-
-        if entries is None:
-            entries = []
-
-        search_method = "ytsearch"
-
-        # -----------------------------------------------------
-        # SEARCH ATTEMPT 2
-        # Direct YouTube search URL
-        #
-        # This is only used when the normal ytsearch
-        # extractor returns zero entries.
-        # -----------------------------------------------------
-
-        if not entries:
-
-            encoded_query = (
-                urllib.parse.quote_plus(
-                    str(query)
+            inner_renderers = (
+                youtube_innertube_search(
+                    query,
+                    limit
                 )
             )
 
-            direct_search_url = (
-                "https://www.youtube.com/results"
-                "?search_query="
-                + encoded_query
+            videos = (
+                parse_innertube_results(
+                    inner_renderers
+                )
             )
 
-            fallback_options = get_ydl_options()
+            if videos:
+                search_method = (
+                    "youtube_innertube"
+                )
 
-            fallback_options[
+                diagnostic[
+                    "innertube_count"
+                ] = len(videos)
+
+            else:
+                diagnostic[
+                    "innertube_count"
+                ] = 0
+
+        except Exception as inner_error:
+
+            diagnostic[
+                "innertube_error"
+            ] = clean_error(
+                inner_error
+            )
+
+        # -----------------------------------------------------
+        # SEARCH ATTEMPT 2
+        # Existing ytsearch extractor
+        # -----------------------------------------------------
+
+        if not videos:
+
+            search_query = (
+                f"ytsearch{limit}:{query}"
+            )
+
+            options = get_ydl_options()
+
+            options[
                 "extract_flat"
             ] = "in_playlist"
 
             with YoutubeDL(
-                fallback_options
+                options
             ) as ydl:
 
-                fallback_result = (
-                    ydl.extract_info(
-                        direct_search_url,
-                        download=False
-                    )
+                result = ydl.extract_info(
+                    search_query,
+                    download=False
                 )
 
-            fallback_entries = (
-                fallback_result.get(
+            entries = (
+                result.get(
                     "entries",
                     []
                 )
+                or []
             )
 
-            if fallback_entries is None:
-                fallback_entries = []
+            search_method = "ytsearch"
 
-            if fallback_entries:
+            diagnostic[
+                "ytsearch_count"
+            ] = len(entries)
 
-                result = fallback_result
-                entries = fallback_entries
-                search_method = "youtube_search_url"
+            for item in entries:
 
-        # -----------------------------------------------------
-        # CONVERT RESULTS
-        # -----------------------------------------------------
+                if not item:
+                    continue
 
-        videos = []
-
-        for item in entries:
-
-            if not item:
-                continue
-
-            video_id = item.get(
-                "id"
-            )
-
-            thumbnail = item.get(
-                "thumbnail"
-            )
-
-            if (
-                not thumbnail
-                and video_id
-            ):
-
-                thumbnail = (
-                    "https://i.ytimg.com/vi/"
-                    + str(video_id)
-                    + "/hqdefault.jpg"
+                video_id = item.get(
+                    "id"
                 )
 
-            webpage_url = item.get(
-                "webpage_url"
-            )
-
-            if (
-                not webpage_url
-                and video_id
-            ):
-
-                webpage_url = (
-                    "https://www.youtube.com/watch?v="
-                    + str(video_id)
+                thumbnail = item.get(
+                    "thumbnail"
                 )
 
-            videos.append({
+                if (
+                    not thumbnail
+                    and video_id
+                ):
 
-                "id":
-                    video_id,
-
-                "title":
-                    item.get("title")
-                    or "Untitled",
-
-                "thumbnail":
-                    thumbnail,
-
-                "duration":
-                    item.get(
-                        "duration"
+                    thumbnail = (
+                        "https://i.ytimg.com/vi/"
+                        + str(video_id)
+                        + "/hqdefault.jpg"
                     )
-                    or 0,
 
-                "duration_text":
-                    format_duration(
+                webpage_url = item.get(
+                    "webpage_url"
+                )
+
+                if (
+                    not webpage_url
+                    and video_id
+                ):
+
+                    webpage_url = (
+                        "https://www.youtube.com/watch?v="
+                        + str(video_id)
+                    )
+
+                videos.append({
+
+                    "id":
+                        video_id,
+
+                    "title":
+                        item.get("title")
+                        or "Untitled",
+
+                    "thumbnail":
+                        thumbnail,
+
+                    "duration":
                         item.get(
                             "duration"
                         )
-                    ),
+                        or 0,
 
-                "uploader":
-                    item.get(
-                        "uploader"
-                    ),
+                    "duration_text":
+                        format_duration(
+                            item.get(
+                                "duration"
+                            )
+                        ),
 
-                "channel":
-                    item.get(
-                        "channel"
-                    ),
+                    "uploader":
+                        item.get(
+                            "uploader"
+                        ),
 
-                "channel_id":
-                    item.get(
-                        "channel_id"
-                    ),
+                    "channel":
+                        item.get(
+                            "channel"
+                        ),
 
-                "view_count":
-                    item.get(
-                        "view_count"
-                    ),
+                    "channel_id":
+                        item.get(
+                            "channel_id"
+                        ),
 
-                "upload_date":
-                    item.get(
-                        "upload_date"
-                    ),
+                    "view_count":
+                        item.get(
+                            "view_count"
+                        ),
 
-                "url":
-                    webpage_url,
+                    "upload_date":
+                        item.get(
+                            "upload_date"
+                        ),
 
-                "webpage_url":
-                    webpage_url,
+                    "url":
+                        webpage_url,
 
-                "platform":
-                    "YouTube"
-            })
+                    "webpage_url":
+                        webpage_url,
+
+                    "platform":
+                        "YouTube"
+                })
 
         response = {
 
@@ -1175,61 +1544,30 @@ def search():
                 videos
         }
 
-        # -----------------------------------------------------
-        # TEMPORARY SEARCH DIAGNOSTIC
-        # Only visible when ?debug=1 is supplied.
-        # -----------------------------------------------------
-
         if debug:
 
-            first_entry = (
-                entries[0]
-                if entries
-                else None
-            )
-
-            response["diagnostic"] = {
+            response[
+                "diagnostic"
+            ] = {
 
                 "search_method":
                     search_method,
 
-                "result_type":
-                    result.get("_type"),
-
-                "extractor":
-                    result.get(
-                        "extractor"
+                "innertube_count":
+                    diagnostic.get(
+                        "innertube_count",
+                        0
                     ),
 
-                "extractor_key":
-                    result.get(
-                        "extractor_key"
+                "ytsearch_count":
+                    diagnostic.get(
+                        "ytsearch_count",
+                        0
                     ),
 
-                "webpage_url":
-                    result.get(
-                        "webpage_url"
-                    ),
-
-                "entry_count":
-                    len(entries),
-
-                "has_entries":
-                    bool(entries),
-
-                "result_keys":
-                    list(result.keys())[:40],
-
-                "first_entry_keys":
-                    (
-                        list(
-                            first_entry.keys()
-                        )[:40]
-                        if isinstance(
-                            first_entry,
-                            dict
-                        )
-                        else []
+                "innertube_error":
+                    diagnostic.get(
+                        "innertube_error"
                     )
             }
 
@@ -1261,7 +1599,9 @@ def search():
             )
         ):
 
-            response["diagnostic"] = {
+            response[
+                "diagnostic"
+            ] = {
 
                 "exception_type":
                     type(e).__name__,
