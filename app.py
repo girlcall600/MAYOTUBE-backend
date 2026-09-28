@@ -3,6 +3,7 @@ from flask_cors import CORS
 from yt_dlp import YoutubeDL
 import re
 import os
+import urllib.parse
 
 app = Flask(__name__)
 CORS(app)
@@ -969,14 +970,17 @@ def search():
             )
         )
 
+        # -----------------------------------------------------
+        # SEARCH ATTEMPT 1
+        # Existing ytsearch extractor
+        # -----------------------------------------------------
+
         search_query = (
             f"ytsearch{limit}:{query}"
         )
 
         options = get_ydl_options()
 
-        # Search diagnostic only:
-        # use flat extraction for YouTube search.
         options["extract_flat"] = "in_playlist"
 
         with YoutubeDL(
@@ -995,6 +999,67 @@ def search():
 
         if entries is None:
             entries = []
+
+        search_method = "ytsearch"
+
+        # -----------------------------------------------------
+        # SEARCH ATTEMPT 2
+        # Direct YouTube search URL
+        #
+        # This is only used when the normal ytsearch
+        # extractor returns zero entries.
+        # -----------------------------------------------------
+
+        if not entries:
+
+            encoded_query = (
+                urllib.parse.quote_plus(
+                    str(query)
+                )
+            )
+
+            direct_search_url = (
+                "https://www.youtube.com/results"
+                "?search_query="
+                + encoded_query
+            )
+
+            fallback_options = get_ydl_options()
+
+            fallback_options[
+                "extract_flat"
+            ] = "in_playlist"
+
+            with YoutubeDL(
+                fallback_options
+            ) as ydl:
+
+                fallback_result = (
+                    ydl.extract_info(
+                        direct_search_url,
+                        download=False
+                    )
+                )
+
+            fallback_entries = (
+                fallback_result.get(
+                    "entries",
+                    []
+                )
+            )
+
+            if fallback_entries is None:
+                fallback_entries = []
+
+            if fallback_entries:
+
+                result = fallback_result
+                entries = fallback_entries
+                search_method = "youtube_search_url"
+
+        # -----------------------------------------------------
+        # CONVERT RESULTS
+        # -----------------------------------------------------
 
         videos = []
 
@@ -1114,6 +1179,7 @@ def search():
         # TEMPORARY SEARCH DIAGNOSTIC
         # Only visible when ?debug=1 is supplied.
         # -----------------------------------------------------
+
         if debug:
 
             first_entry = (
@@ -1123,6 +1189,9 @@ def search():
             )
 
             response["diagnostic"] = {
+
+                "search_method":
+                    search_method,
 
                 "result_type":
                     result.get("_type"),
