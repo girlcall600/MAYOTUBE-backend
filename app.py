@@ -955,11 +955,29 @@ def search():
             min(limit, 20)
         )
 
+        debug = (
+            str(
+                request.args.get(
+                    "debug",
+                    ""
+                )
+            ).lower()
+            in (
+                "1",
+                "true",
+                "yes"
+            )
+        )
+
         search_query = (
             f"ytsearch{limit}:{query}"
         )
 
         options = get_ydl_options()
+
+        # Search diagnostic only:
+        # use flat extraction for YouTube search.
+        options["extract_flat"] = "in_playlist"
 
         with YoutubeDL(
             options
@@ -974,6 +992,9 @@ def search():
             "entries",
             []
         )
+
+        if entries is None:
+            entries = []
 
         videos = []
 
@@ -1075,7 +1096,7 @@ def search():
                     "YouTube"
             })
 
-        return jsonify({
+        response = {
 
             "success": True,
 
@@ -1087,18 +1108,102 @@ def search():
 
             "results":
                 videos
-        })
+        }
+
+        # -----------------------------------------------------
+        # TEMPORARY SEARCH DIAGNOSTIC
+        # Only visible when ?debug=1 is supplied.
+        # -----------------------------------------------------
+        if debug:
+
+            first_entry = (
+                entries[0]
+                if entries
+                else None
+            )
+
+            response["diagnostic"] = {
+
+                "result_type":
+                    result.get("_type"),
+
+                "extractor":
+                    result.get(
+                        "extractor"
+                    ),
+
+                "extractor_key":
+                    result.get(
+                        "extractor_key"
+                    ),
+
+                "webpage_url":
+                    result.get(
+                        "webpage_url"
+                    ),
+
+                "entry_count":
+                    len(entries),
+
+                "has_entries":
+                    bool(entries),
+
+                "result_keys":
+                    list(result.keys())[:40],
+
+                "first_entry_keys":
+                    (
+                        list(
+                            first_entry.keys()
+                        )[:40]
+                        if isinstance(
+                            first_entry,
+                            dict
+                        )
+                        else []
+                    )
+            }
+
+        return jsonify(
+            response
+        )
 
     except Exception as e:
 
-        return jsonify({
+        response = {
 
             "success": False,
 
             "error":
                 clean_error(e)
+        }
 
-        }), 500
+        if (
+            str(
+                request.args.get(
+                    "debug",
+                    ""
+                )
+            ).lower()
+            in (
+                "1",
+                "true",
+                "yes"
+            )
+        ):
+
+            response["diagnostic"] = {
+
+                "exception_type":
+                    type(e).__name__,
+
+                "error":
+                    clean_error(e)
+            }
+
+        return jsonify(
+            response
+        ), 500
 
 
 # =========================================================
