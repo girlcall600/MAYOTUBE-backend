@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 APP_NAME = "MAYOTUBE API"
-VERSION = "3.0"
+VERSION = "3.1"
 
 
 # =========================================================
@@ -524,13 +524,25 @@ def find_selected_format(
 
 def youtube_innertube_search(
     query,
-    limit
+    limit,
+    continuation=None,
+    shorts=False
 ):
     """
-    Uses YouTube's public web InnerTube search endpoint.
+    YouTube InnerTube search.
 
-    This is intentionally used only for SEARCH.
-    Video-info and download endpoints continue using yt-dlp.
+    First request:
+        query + search params
+
+    Next requests:
+        continuation token
+
+    Returns:
+        {
+            "videos": [...],
+            "continuation": "...",
+            "has_more": True/False
+        }
     """
 
     url = (
@@ -539,18 +551,46 @@ def youtube_innertube_search(
         "?prettyPrint=false"
     )
 
-    payload = {
-        "context": {
-            "client": {
-                "clientName": "WEB",
-                "clientVersion": "2.20260114.08.00",
-                "hl": "en",
-                "gl": "US"
-            }
-        },
-        "query": str(query),
-        "params": "EgIQAQ=="
+    client_version = "2.20260114.08.00"
+
+    context = {
+        "client": {
+            "clientName": "WEB",
+            "clientVersion": client_version,
+            "hl": "en",
+            "gl": "US"
+        }
     }
+
+    if continuation:
+
+        payload = {
+            "context": context,
+            "continuation": str(
+                continuation
+            )
+        }
+
+    else:
+
+        # Normal YouTube video search.
+        #
+        # For Shorts we deliberately keep the query
+        # separate. The Android side will request the
+        # dedicated /api/shorts endpoint.
+        search_query = str(query)
+
+        if shorts:
+            search_query = (
+                search_query
+                + " #shorts"
+            )
+
+        payload = {
+            "context": context,
+            "query": search_query,
+            "params": "EgIQAQ=="
+        }
 
     body = json.dumps(
         payload
@@ -582,7 +622,7 @@ def youtube_innertube_search(
             "1",
 
         "X-YouTube-Client-Version":
-            "2.20260114.08.00"
+            client_version
     }
 
     request_object = urllib.request.Request(
@@ -604,8 +644,133 @@ def youtube_innertube_search(
     )
 
     videos = []
+    continuation_token = None
 
-    def walk(value):
+    def find_continuation(value):
+
+        nonlocal continuation_token
+
+        if continuation_token:
+            return
+
+        if isinstance(
+            value,
+            dict
+        ):
+
+            # Common continuation structure.
+            continuation_endpoint = value.get(
+                "continuationEndpoint"
+            )
+
+            if isinstance(
+                continuation_endpoint,
+                dict
+            ):
+
+                continuation_command = (
+                    continuation_endpoint.get(
+                        "continuationCommand"
+                    )
+                )
+
+                if isinstance(
+                    continuation_command,
+                    dict
+                ):
+
+                    token = (
+                        continuation_command.get(
+                            "token"
+                        )
+                    )
+
+                    if token:
+                        continuation_token = (
+                            token
+                        )
+                        return
+
+            # Another structure used by
+            # some YouTube responses.
+            reload_continuation = value.get(
+                "reloadContinuationData"
+            )
+
+            if isinstance(
+                reload_continuation,
+                dict
+            ):
+
+                token = (
+                    reload_continuation.get(
+                        "continuation"
+                    )
+                )
+
+                if token:
+                    continuation_token = (
+                        token
+                    )
+                    return
+
+            append_continuation = value.get(
+                "continuationItemRenderer"
+            )
+
+            if isinstance(
+                append_continuation,
+                dict
+            ):
+
+                endpoint = (
+                    append_continuation.get(
+                        "continuationEndpoint",
+                        {}
+                    )
+                )
+
+                command = (
+                    endpoint.get(
+                        "continuationCommand",
+                        {}
+                    )
+                )
+
+                token = command.get(
+                    "token"
+                )
+
+                if token:
+                    continuation_token = (
+                        token
+                    )
+                    return
+
+            for child in value.values():
+
+                if continuation_token:
+                    break
+
+                find_continuation(
+                    child
+                )
+
+        elif isinstance(
+            value,
+            list
+        ):
+
+            for child in value:
+
+                if continuation_token:
+                    break
+
+                find_continuation(
+                    child
+                )
+
+    def walk_videos(value):
 
         if len(videos) >= limit:
             return
@@ -641,7 +806,9 @@ def youtube_innertube_search(
                 if len(videos) >= limit:
                     break
 
-                walk(child)
+                walk_videos(
+                    child
+                )
 
         elif isinstance(
             value,
@@ -653,11 +820,25 @@ def youtube_innertube_search(
                 if len(videos) >= limit:
                     break
 
-                walk(child)
+                walk_videos(
+                    child
+                )
 
-    walk(data)
+    walk_videos(
+        data
+    )
 
-    return videos
+    find_continuation(
+        data
+    )
+
+    return {
+        "videos": videos,
+        "continuation": continuation_token,
+        "has_more": bool(
+            continuation_token
+        )
+    }
 
 
 def innertube_video_text(
@@ -921,6 +1102,9 @@ def home():
 
         "features": [
             "search",
+            "search-pagination",
+            "search-continuation",
+            "shorts-search",
             "video-info",
             "quality-selector",
             "direct-download-url",
@@ -936,6 +1120,7 @@ def home():
             "/",
             "/health",
             "/api/search",
+            "/api/shorts",
             "/api/video-info",
             "/api/download-links",
             "/api/download"
@@ -1299,14 +1484,21 @@ def search():
 
         query = (
             request.args.get("q")
-            or request.args.get(
-                "query"
-            )
+            or request.args.get("query")
             or data.get("q")
             or data.get("query")
         )
 
-        if not query:
+        continuation = (
+            request.args.get(
+                "continuation"
+            )
+            or data.get(
+                "continuation"
+            )
+        )
+
+        if not query and not continuation:
 
             return jsonify({
 
@@ -1319,17 +1511,20 @@ def search():
         limit = (
             request.args.get("limit")
             or data.get("limit")
-            or 10
+            or 20
         )
 
         try:
             limit = int(limit)
         except Exception:
-            limit = 10
+            limit = 20
 
+        # Each request can return up to 50.
+        # The Android app will request the next
+        # continuation when the user scrolls.
         limit = max(
             1,
-            min(limit, 20)
+            min(limit, 50)
         )
 
         debug = (
@@ -1348,56 +1543,117 @@ def search():
 
         videos = []
         search_method = None
+        next_continuation = None
         diagnostic = {}
 
         # -----------------------------------------------------
-        # SEARCH ATTEMPT 1
-        # YouTube InnerTube
+        # CONTINUATION SEARCH
         # -----------------------------------------------------
 
-        try:
+        if continuation:
 
-            inner_renderers = (
-                youtube_innertube_search(
-                    query,
-                    limit
+            try:
+
+                result = (
+                    youtube_innertube_search(
+                        query or "",
+                        limit,
+                        continuation=continuation
+                    )
                 )
-            )
 
-            videos = (
-                parse_innertube_results(
-                    inner_renderers
+                videos = parse_innertube_results(
+                    result.get(
+                        "videos",
+                        []
+                    )
                 )
-            )
 
-            if videos:
+                next_continuation = (
+                    result.get(
+                        "continuation"
+                    )
+                )
+
                 search_method = (
-                    "youtube_innertube"
+                    "youtube_innertube_continuation"
                 )
 
                 diagnostic[
-                    "innertube_count"
+                    "continuation_count"
                 ] = len(videos)
 
-            else:
+            except Exception as continuation_error:
+
                 diagnostic[
-                    "innertube_count"
-                ] = 0
-
-        except Exception as inner_error:
-
-            diagnostic[
-                "innertube_error"
-            ] = clean_error(
-                inner_error
-            )
+                    "continuation_error"
+                ] = clean_error(
+                    continuation_error
+                )
 
         # -----------------------------------------------------
-        # SEARCH ATTEMPT 2
-        # Existing ytsearch extractor
+        # FIRST SEARCH
         # -----------------------------------------------------
 
-        if not videos:
+        if not continuation and not videos:
+
+            try:
+
+                inner_result = (
+                    youtube_innertube_search(
+                        query,
+                        limit
+                    )
+                )
+
+                inner_renderers = (
+                    inner_result.get(
+                        "videos",
+                        []
+                    )
+                )
+
+                videos = (
+                    parse_innertube_results(
+                        inner_renderers
+                    )
+                )
+
+                next_continuation = (
+                    inner_result.get(
+                        "continuation"
+                    )
+                )
+
+                if videos:
+
+                    search_method = (
+                        "youtube_innertube"
+                    )
+
+                    diagnostic[
+                        "innertube_count"
+                    ] = len(videos)
+
+                else:
+
+                    diagnostic[
+                        "innertube_count"
+                    ] = 0
+
+            except Exception as inner_error:
+
+                diagnostic[
+                    "innertube_error"
+                ] = clean_error(
+                    inner_error
+                )
+
+        # -----------------------------------------------------
+        # FALLBACK YTSEARCH
+        # -----------------------------------------------------
+
+        if not videos and not continuation:
 
             search_query = (
                 f"ytsearch{limit}:{query}"
@@ -1535,13 +1791,21 @@ def search():
             "success": True,
 
             "query":
-                query,
+                query or "",
 
             "count":
                 len(videos),
 
             "results":
-                videos
+                videos,
+
+            "continuation":
+                next_continuation,
+
+            "has_more":
+                bool(
+                    next_continuation
+                )
         }
 
         if debug:
@@ -1559,6 +1823,12 @@ def search():
                         0
                     ),
 
+                "continuation_count":
+                    diagnostic.get(
+                        "continuation_count",
+                        0
+                    ),
+
                 "ytsearch_count":
                     diagnostic.get(
                         "ytsearch_count",
@@ -1568,6 +1838,11 @@ def search():
                 "innertube_error":
                     diagnostic.get(
                         "innertube_error"
+                    ),
+
+                "continuation_error":
+                    diagnostic.get(
+                        "continuation_error"
                     )
             }
 
@@ -1616,12 +1891,127 @@ def search():
 
 
 # =========================================================
+# SHORTS SEARCH
+# =========================================================
+
+@app.route(
+    "/api/shorts",
+    methods=["GET", "POST"]
+)
+def shorts_search():
+
+    try:
+
+        data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
+
+        query = (
+            request.args.get("q")
+            or request.args.get("query")
+            or data.get("q")
+            or data.get("query")
+        )
+
+        continuation = (
+            request.args.get(
+                "continuation"
+            )
+            or data.get(
+                "continuation"
+            )
+        )
+
+        if not query and not continuation:
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    "Search query is required"
+            }), 400
+
+        limit = (
+            request.args.get("limit")
+            or data.get("limit")
+            or 5
+        )
+
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = 5
+
+        limit = max(
+            1,
+            min(limit, 20)
+        )
+
+        result = (
+            youtube_innertube_search(
+                query or "",
+                limit,
+                continuation=continuation,
+                shorts=True
+            )
+        )
+
+        videos = parse_innertube_results(
+            result.get(
+                "videos",
+                []
+            )
+        )
+
+        return jsonify({
+
+            "success": True,
+
+            "query":
+                query or "",
+
+            "count":
+                len(videos),
+
+            "results":
+                videos,
+
+            "continuation":
+                result.get(
+                    "continuation"
+                ),
+
+            "has_more":
+                bool(
+                    result.get(
+                        "continuation"
+                    )
+                )
+        })
+
+    except Exception as e:
+
+        return jsonify({
+
+            "success": False,
+
+            "error":
+                clean_error(e)
+
+        }), 500
+
+
+# =========================================================
 # OLD API COMPATIBILITY
 # =========================================================
 
 @app.route(
     "/search",
-    methods=["GET"]
+    methods=["GET", "POST"]
 )
 def old_search():
 
