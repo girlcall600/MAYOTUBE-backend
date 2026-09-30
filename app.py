@@ -40,8 +40,10 @@ def is_valid_url(url):
     )
 
 
-def get_ydl_options():
-    return {
+def get_ydl_options(
+    youtube_client=None
+):
+    options = {
         "quiet": True,
         "no_warnings": True,
         "skip_download": True,
@@ -59,6 +61,184 @@ def get_ydl_options():
             )
         }
     }
+
+    # -----------------------------------------------------
+    # YouTube client selection
+    #
+    # android_vr is currently useful because yt-dlp's
+    # documentation lists it as a client that does not
+    # currently require a PO token for GVS requests.
+    #
+    # tv is kept as a fallback.
+    # -----------------------------------------------------
+
+    if youtube_client:
+
+        options["extractor_args"] = {
+            "youtube": {
+                "player_client": [
+                    youtube_client
+                ]
+            }
+        }
+
+    return options
+
+
+def is_youtube_url(url):
+    if not url:
+        return False
+
+    value = str(url).lower()
+
+    return (
+        "youtube.com" in value
+        or "youtu.be" in value
+    )
+
+
+def is_youtube_bot_error(error):
+    text = clean_error(error).lower()
+
+    keywords = [
+        "sign in to confirm",
+        "not a bot",
+        "use --cookies-from-browser",
+        "use --cookies",
+        "confirm you're not a bot",
+        "confirm you’re not a bot",
+        "http error 403",
+        "po token",
+        "proof of origin"
+    ]
+
+    return any(
+        keyword in text
+        for keyword in keywords
+    )
+
+
+def extract_info_with_fallback(
+    url,
+    download=False
+):
+    """
+    Extract video information.
+
+    For YouTube, try documented alternate player clients
+    when the default extraction is blocked.
+
+    Order:
+        1. android_vr
+        2. tv
+        3. normal/default yt-dlp extraction
+
+    The normal extraction is kept as a final fallback so
+    existing non-YouTube platforms continue to work.
+    """
+
+    if not is_youtube_url(url):
+
+        options = get_ydl_options()
+
+        with YoutubeDL(options) as ydl:
+
+            return ydl.extract_info(
+                url,
+                download=download
+            )
+
+    errors = []
+
+    # -----------------------------------------------------
+    # Attempt 1: android_vr
+    # -----------------------------------------------------
+
+    try:
+
+        options = get_ydl_options(
+            "android_vr"
+        )
+
+        with YoutubeDL(options) as ydl:
+
+            info = ydl.extract_info(
+                url,
+                download=download
+            )
+
+        if info:
+            return info
+
+    except Exception as error:
+
+        errors.append(
+            "android_vr: "
+            + clean_error(error)
+        )
+
+    # -----------------------------------------------------
+    # Attempt 2: tv
+    # -----------------------------------------------------
+
+    try:
+
+        options = get_ydl_options(
+            "tv"
+        )
+
+        with YoutubeDL(options) as ydl:
+
+            info = ydl.extract_info(
+                url,
+                download=download
+            )
+
+        if info:
+            return info
+
+    except Exception as error:
+
+        errors.append(
+            "tv: "
+            + clean_error(error)
+        )
+
+    # -----------------------------------------------------
+    # Attempt 3: normal/default yt-dlp
+    # -----------------------------------------------------
+
+    try:
+
+        options = get_ydl_options()
+
+        with YoutubeDL(options) as ydl:
+
+            info = ydl.extract_info(
+                url,
+                download=download
+            )
+
+        if info:
+            return info
+
+    except Exception as error:
+
+        errors.append(
+            "default: "
+            + clean_error(error)
+        )
+
+    if errors:
+
+        raise RuntimeError(
+            "YouTube extraction failed. "
+            + " | ".join(errors)
+        )
+
+    raise RuntimeError(
+        "YouTube extraction failed"
+    )
 
 
 def format_duration(seconds):
@@ -573,11 +753,6 @@ def youtube_innertube_search(
 
     else:
 
-        # Normal YouTube video search.
-        #
-        # For Shorts we deliberately keep the query
-        # separate. The Android side will request the
-        # dedicated /api/shorts endpoint.
         search_query = str(query)
 
         if shorts:
@@ -658,7 +833,6 @@ def youtube_innertube_search(
             dict
         ):
 
-            # Common continuation structure.
             continuation_endpoint = value.get(
                 "continuationEndpoint"
             )
@@ -691,8 +865,6 @@ def youtube_innertube_search(
                         )
                         return
 
-            # Another structure used by
-            # some YouTube responses.
             reload_continuation = value.get(
                 "reloadContinuationData"
             )
@@ -1104,6 +1276,7 @@ def home():
             "search",
             "search-pagination",
             "search-continuation",
+            "50-results-per-request",
             "shorts-search",
             "video-info",
             "quality-selector",
@@ -1182,16 +1355,10 @@ def video_info():
                     "Valid video URL is required"
             }), 400
 
-        options = get_ydl_options()
-
-        with YoutubeDL(
-            options
-        ) as ydl:
-
-            info = ydl.extract_info(
-                url,
-                download=False
-            )
+        info = extract_info_with_fallback(
+            url,
+            download=False
+        )
 
         return jsonify({
 
@@ -1247,16 +1414,10 @@ def download_links():
                     "Valid video URL is required"
             }), 400
 
-        options = get_ydl_options()
-
-        with YoutubeDL(
-            options
-        ) as ydl:
-
-            info = ydl.extract_info(
-                url,
-                download=False
-            )
+        info = extract_info_with_fallback(
+            url,
+            download=False
+        )
 
         quality_formats = (
             get_best_quality_formats(
@@ -1353,16 +1514,10 @@ def download():
                     "Quality or format_id is required"
             }), 400
 
-        options = get_ydl_options()
-
-        with YoutubeDL(
-            options
-        ) as ydl:
-
-            info = ydl.extract_info(
-                url,
-                download=False
-            )
+        info = extract_info_with_fallback(
+            url,
+            download=False
+        )
 
         selected = find_selected_format(
             info,
@@ -1508,20 +1663,27 @@ def search():
                     "Search query is required"
             }), 400
 
+        # -----------------------------------------------------
+        # SEARCH LIMIT
+        #
+        # Default = 50
+        # Maximum = 50 per request
+        #
+        # YouTube provides continuation tokens for additional
+        # pages after the current result set.
+        # -----------------------------------------------------
+
         limit = (
             request.args.get("limit")
             or data.get("limit")
-            or 20
+            or 50
         )
 
         try:
             limit = int(limit)
         except Exception:
-            limit = 20
+            limit = 50
 
-        # Each request can return up to 50.
-        # The Android app will request the next
-        # continuation when the user scrolls.
         limit = max(
             1,
             min(limit, 50)
@@ -1816,6 +1978,9 @@ def search():
 
                 "search_method":
                     search_method,
+
+                "requested_limit":
+                    limit,
 
                 "innertube_count":
                     diagnostic.get(
