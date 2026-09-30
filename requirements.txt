@@ -1,26 +1,11 @@
 Flask>=3.1.0,<4
 flask-cors>=6.0.0,<7
-
-YouTube extraction
-
 yt-dlp[default]>=2025.05.22
-
-Automatic YouTube PO Token provider plugin
-
 bgutil-ytdlp-pot-provider>=2.0.0,<3
-
-Production WSGI server
-
 gunicorn>=23.0.0,<24
-
-HTTP/network reliability
-
 requests>=2.32.0,<3
 urllib3>=2.2.0,<3
 certifi>=2025.0.0
-
-Media/metadata support
-
 mutagen>=1.47.0
 pycryptodomex>=3.20.0
 websockets>=13.0
