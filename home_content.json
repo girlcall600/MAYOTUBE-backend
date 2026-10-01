@@ -1,144 +1,41 @@
 {
   "success": true,
-  "version": 5,
+  "version": 6,
   "app": "MAYOTUBE",
   "enabled": true,
   "updated_at": "2026-10-02T00:00:00Z",
-
   "settings": {
     "refresh_on_home_open": true,
     "refresh_on_app_start": true,
     "cache_last_successful_content": true,
     "show_empty_message": false
   },
-
   "items": [
     {
       "id": "welcome-001",
       "enabled": true,
       "type": "message",
       "title": "MAYOTUBE",
-      "message": "MAYOTUBE میں خوش آمدید۔"
+      "message": "MAYOTUBE میں خوش آمدید۔",
+      "order": 0
     },
-
     {
       "id": "image-001",
       "enabled": true,
       "type": "image",
       "title": "Live Image Test",
       "message": "یہ تصویر GitHub کے home_content.json سے Live آ رہی ہے۔",
-      "image_url": "https://placehold.co/1200x600/png"
+      "image_url": "https://placehold.co/1200x600/png",
+      "order": 1
     },
-
     {
       "id": "video-001",
       "enabled": true,
       "type": "video",
       "title": "Live Video Test",
-      "message": "یہ ویڈیو بھی Home CMS سے Live آ رہی ہے۔",
-      "video_url": "https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4"
-    },
-
-    {
-      "id": "announcement-001",
-      "enabled": false,
-      "type": "announcement",
-      "title": "اہم اعلان",
-      "message": "یہ اعلان بعد میں Live فعال کیا جا سکتا ہے۔"
-    },
-
-    {
-      "id": "audio-001",
-      "enabled": false,
-      "type": "audio",
-      "title": "Live Audio Test",
-      "message": "یہ Audio بعد میں Live فعال کیا جا سکتا ہے۔",
-      "audio_url": ""
-    },
-
-    {
-      "id": "youtube-001",
-      "enabled": false,
-      "type": "youtube",
-      "title": "YouTube",
-      "message": "",
-      "link_url": ""
-    },
-
-    {
-      "id": "channel-001",
-      "enabled": false,
-      "type": "channel",
-      "title": "MAYOTUBE Channel",
-      "message": "",
-      "link_url": ""
-    },
-
-    {
-      "id": "website-001",
-      "enabled": false,
-      "type": "website",
-      "title": "Website",
-      "message": "",
-      "link_url": ""
-    },
-
-    {
-      "id": "donation-001",
-      "enabled": false,
-      "type": "donation",
-      "title": "مسجد ہاجرہ و مدرسہ محمدیہ",
-      "message": "اللہ کی راہ میں تعاون کریں۔",
-      "whatsapp": "03444629716",
-      "easypaisa": "03444629716",
-      "jazzcash": "03014629716",
-      "whatsapp_url": "https://wa.me/9234444629716"
-    },
-
-    {
-      "id": "advertisement-001",
-      "enabled": false,
-      "type": "advertisement",
-      "title": "Advertisement",
-      "message": "",
-      "image_url": "",
-      "link_url": ""
-    },
-
-    {
-      "id": "update-001",
-      "enabled": false,
-      "type": "update",
-      "title": "App Update",
-      "message": "",
-      "button": {
-        "text": "Update",
-        "url": ""
-      }
-    },
-
-    {
-      "id": "download-001",
-      "enabled": false,
-      "type": "download",
-      "title": "Download",
-      "message": "",
-      "button": {
-        "text": "Download",
-        "url": ""
-      }
-    },
-
-    {
-      "id": "custom-001",
-      "enabled": false,
-      "type": "custom",
-      "title": "Custom Content",
-      "message": "",
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": ""
+      "message": "یہ ویڈیو Home CMS سے Live آ رہی ہے۔",
+      "video_url": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+      "order": 2
     }
   ]
 }
