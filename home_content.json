@@ -1,7 +1,7 @@
 {
   "success": true,
-  "version": 1,
-  "updated_at": "2026-10-01T00:00:00Z",
+  "version": 2,
+  "updated_at": "2026-10-01T23:00:00Z",
   "app": "MAYOTUBE",
   "enabled": true,
 
@@ -57,14 +57,14 @@
 
     {
       "id": "image-001",
-      "enabled": false,
+      "enabled": true,
       "order": 3,
       "type": "image",
 
-      "title": "تصویر",
-      "message": "",
+      "title": "Live Image Test",
+      "message": "یہ تصویر GitHub کے home_content.json سے Live آ رہی ہے۔",
 
-      "image_url": "https://example.com/image.jpg",
+      "image_url": "https://placehold.co/1200x600/png",
       "video_url": "",
       "audio_url": "",
       "link_url": "",
