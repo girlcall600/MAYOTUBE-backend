@@ -1,1 +1,295 @@
+{
+  "success": true,
+  "version": 1,
+  "updated_at": "2026-10-01T00:00:00Z",
+  "app": "MAYOTUBE",
+  "enabled": true,
 
+  "settings": {
+    "refresh_on_home_open": true,
+    "refresh_on_app_start": true,
+    "cache_last_successful_content": true,
+    "show_empty_message": false
+  },
+
+  "items": [
+    {
+      "id": "welcome-001",
+      "enabled": true,
+      "order": 1,
+      "type": "message",
+
+      "title": "MAYOTUBE",
+      "message": "MAYOTUBE میں خوش آمدید۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "announcement-001",
+      "enabled": false,
+      "order": 2,
+      "type": "announcement",
+
+      "title": "اہم اعلان",
+      "message": "یہاں اپنا اعلان لکھیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "image-001",
+      "enabled": false,
+      "order": 3,
+      "type": "image",
+
+      "title": "تصویر",
+      "message": "",
+
+      "image_url": "https://example.com/image.jpg",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "video-001",
+      "enabled": false,
+      "order": 4,
+      "type": "video",
+
+      "title": "ویڈیو",
+      "message": "ویڈیو کی تفصیل یہاں لکھیں۔",
+
+      "image_url": "",
+      "video_url": "https://example.com/video.mp4",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "audio-001",
+      "enabled": false,
+      "order": 5,
+      "type": "audio",
+
+      "title": "MP3 / Audio",
+      "message": "آڈیو کی تفصیل یہاں لکھیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "https://example.com/audio.mp3",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "youtube-video-001",
+      "enabled": false,
+      "order": 6,
+      "type": "youtube",
+
+      "title": "YouTube Video",
+      "message": "YouTube ویڈیو یہاں دکھائی جائے گی۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "https://www.youtube.com/watch?v=VIDEO_ID",
+
+      "button": {
+        "enabled": true,
+        "text": "ویڈیو دیکھیں",
+        "url": "https://www.youtube.com/watch?v=VIDEO_ID"
+      }
+    },
+
+    {
+      "id": "channel-001",
+      "enabled": false,
+      "order": 7,
+      "type": "channel",
+
+      "title": "YouTube Channel",
+      "message": "ہمارا YouTube Channel دیکھیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "https://www.youtube.com/@CHANNEL",
+
+      "button": {
+        "enabled": true,
+        "text": "چینل کھولیں",
+        "url": "https://www.youtube.com/@CHANNEL"
+      }
+    },
+
+    {
+      "id": "website-001",
+      "enabled": false,
+      "order": 8,
+      "type": "website",
+
+      "title": "Website",
+      "message": "مزید معلومات کے لیے Website کھولیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "https://example.com",
+
+      "button": {
+        "enabled": true,
+        "text": "Website کھولیں",
+        "url": "https://example.com"
+      }
+    },
+
+    {
+      "id": "donation-001",
+      "enabled": false,
+      "order": 9,
+      "type": "donation",
+
+      "title": "چندے کی اپیل",
+      "message": "مسجد ہاجرہ و مدرسہ محمدیہ کے لیے تعاون فرمائیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": true,
+        "text": "WhatsApp رابطہ",
+        "url": "https://wa.me/9234444629716"
+      },
+
+      "donation": {
+        "whatsapp": "03444629716",
+        "easypaisa": "03444629716",
+        "jazzcash": "03014629716"
+      }
+    },
+
+    {
+      "id": "advertisement-001",
+      "enabled": false,
+      "order": 10,
+      "type": "advertisement",
+
+      "title": "Advertisement",
+      "message": "اشتہار کا متن یہاں لکھیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": true,
+        "text": "مزید معلومات",
+        "url": "https://example.com"
+      }
+    },
+
+    {
+      "id": "update-001",
+      "enabled": false,
+      "order": 11,
+      "type": "update",
+
+      "title": "MAYOTUBE Update",
+      "message": "نئی Update دستیاب ہے۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": false,
+        "text": "",
+        "url": ""
+      }
+    },
+
+    {
+      "id": "download-001",
+      "enabled": false,
+      "order": 12,
+      "type": "download",
+
+      "title": "Download Information",
+      "message": "Download کے متعلق معلومات یہاں لکھی جا سکتی ہیں۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": true,
+        "text": "Download",
+        "url": "https://example.com/file"
+      }
+    },
+
+    {
+      "id": "custom-001",
+      "enabled": false,
+      "order": 13,
+      "type": "custom",
+
+      "title": "Custom Content",
+      "message": "یہ Custom Content ہے۔",
+
+      "image_url": "",
+      "video_url": "",
+      "audio_url": "",
+      "link_url": "",
+
+      "button": {
+        "enabled": true,
+        "text": "Open",
+        "url": "https://example.com"
+      }
+    }
+  ]
+}
