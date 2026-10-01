@@ -1,6 +1,6 @@
 {
   "success": true,
-  "version": 6,
+  "version": 7,
   "app": "MAYOTUBE",
   "enabled": true,
   "updated_at": "2026-10-02T00:00:00Z",
@@ -32,9 +32,9 @@
       "id": "video-001",
       "enabled": true,
       "type": "video",
-      "title": "Live Video Test",
-      "message": "یہ ویڈیو Home CMS سے Live آ رہی ہے۔",
-      "video_url": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+      "title": "10 Second Video Test",
+      "message": "یہ 10 سیکنڈ کی test video ہے۔",
+      "video_url": "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_2MB.mp4",
       "order": 2
     }
   ]
