@@ -1,9 +1,9 @@
 {
   "success": true,
-  "version": 2,
-  "updated_at": "2026-10-01T23:00:00Z",
+  "version": 3,
   "app": "MAYOTUBE",
   "enabled": true,
+  "updated_at": "2026-10-01T23:30:00Z",
 
   "settings": {
     "refresh_on_home_open": true,
@@ -16,236 +16,103 @@
     {
       "id": "welcome-001",
       "enabled": true,
-      "order": 1,
       "type": "message",
-
       "title": "MAYOTUBE",
-      "message": "MAYOTUBE میں خوش آمدید۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": false,
-        "text": "",
-        "url": ""
-      }
-    },
-
-    {
-      "id": "announcement-001",
-      "enabled": false,
-      "order": 2,
-      "type": "announcement",
-
-      "title": "اہم اعلان",
-      "message": "یہاں اپنا اعلان لکھیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": false,
-        "text": "",
-        "url": ""
-      }
+      "message": "MAYOTUBE میں خوش آمدید۔"
     },
 
     {
       "id": "image-001",
       "enabled": true,
-      "order": 3,
       "type": "image",
-
       "title": "Live Image Test",
       "message": "یہ تصویر GitHub کے home_content.json سے Live آ رہی ہے۔",
-
-      "image_url": "https://placehold.co/1200x600/png",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": false,
-        "text": "",
-        "url": ""
-      }
+      "image_url": "https://placehold.co/1200x600/png"
     },
 
     {
       "id": "video-001",
-      "enabled": false,
-      "order": 4,
+      "enabled": true,
       "type": "video",
+      "title": "Live Video Test",
+      "message": "یہ ویڈیو بھی Home Content سے Live آ رہی ہے۔",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+    },
 
-      "title": "ویڈیو",
-      "message": "ویڈیو کی تفصیل یہاں لکھیں۔",
-
-      "image_url": "",
-      "video_url": "https://example.com/video.mp4",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": false,
-        "text": "",
-        "url": ""
-      }
+    {
+      "id": "announcement-001",
+      "enabled": false,
+      "type": "announcement",
+      "title": "اہم اعلان",
+      "message": "یہ اعلان بعد میں Live فعال کیا جا سکتا ہے۔"
     },
 
     {
       "id": "audio-001",
       "enabled": false,
-      "order": 5,
       "type": "audio",
-
-      "title": "MP3 / Audio",
-      "message": "آڈیو کی تفصیل یہاں لکھیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "https://example.com/audio.mp3",
-      "link_url": "",
-
-      "button": {
-        "enabled": false,
-        "text": "",
-        "url": ""
-      }
+      "title": "Live Audio Test",
+      "message": "یہ Audio بعد میں Live فعال کیا جا سکتا ہے۔",
+      "audio_url": ""
     },
 
     {
-      "id": "youtube-video-001",
+      "id": "youtube-001",
       "enabled": false,
-      "order": 6,
       "type": "youtube",
-
-      "title": "YouTube Video",
-      "message": "YouTube ویڈیو یہاں دکھائی جائے گی۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "https://www.youtube.com/watch?v=VIDEO_ID",
-
-      "button": {
-        "enabled": true,
-        "text": "ویڈیو دیکھیں",
-        "url": "https://www.youtube.com/watch?v=VIDEO_ID"
-      }
+      "title": "YouTube",
+      "message": "",
+      "link_url": ""
     },
 
     {
       "id": "channel-001",
       "enabled": false,
-      "order": 7,
       "type": "channel",
-
-      "title": "YouTube Channel",
-      "message": "ہمارا YouTube Channel دیکھیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "https://www.youtube.com/@CHANNEL",
-
-      "button": {
-        "enabled": true,
-        "text": "چینل کھولیں",
-        "url": "https://www.youtube.com/@CHANNEL"
-      }
+      "title": "MAYOTUBE Channel",
+      "message": "",
+      "link_url": ""
     },
 
     {
       "id": "website-001",
       "enabled": false,
-      "order": 8,
       "type": "website",
-
       "title": "Website",
-      "message": "مزید معلومات کے لیے Website کھولیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "https://example.com",
-
-      "button": {
-        "enabled": true,
-        "text": "Website کھولیں",
-        "url": "https://example.com"
-      }
+      "message": "",
+      "link_url": ""
     },
 
     {
       "id": "donation-001",
       "enabled": false,
-      "order": 9,
       "type": "donation",
-
-      "title": "چندے کی اپیل",
-      "message": "مسجد ہاجرہ و مدرسہ محمدیہ کے لیے تعاون فرمائیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": true,
-        "text": "WhatsApp رابطہ",
-        "url": "https://wa.me/9234444629716"
-      },
-
-      "donation": {
-        "whatsapp": "03444629716",
-        "easypaisa": "03444629716",
-        "jazzcash": "03014629716"
-      }
+      "title": "مسجد ہاجرہ و مدرسہ محمدیہ",
+      "message": "اللہ کی راہ میں تعاون کریں۔",
+      "whatsapp": "03444629716",
+      "easypaisa": "03444629716",
+      "jazzcash": "03014629716",
+      "whatsapp_url": "https://wa.me/9234444629716"
     },
 
     {
       "id": "advertisement-001",
       "enabled": false,
-      "order": 10,
       "type": "advertisement",
-
       "title": "Advertisement",
-      "message": "اشتہار کا متن یہاں لکھیں۔",
-
+      "message": "",
       "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": true,
-        "text": "مزید معلومات",
-        "url": "https://example.com"
-      }
+      "link_url": ""
     },
 
     {
       "id": "update-001",
       "enabled": false,
-      "order": 11,
       "type": "update",
-
-      "title": "MAYOTUBE Update",
-      "message": "نئی Update دستیاب ہے۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
+      "title": "App Update",
+      "message": "",
       "button": {
-        "enabled": false,
-        "text": "",
+        "text": "Update",
         "url": ""
       }
     },
@@ -253,43 +120,25 @@
     {
       "id": "download-001",
       "enabled": false,
-      "order": 12,
       "type": "download",
-
-      "title": "Download Information",
-      "message": "Download کے متعلق معلومات یہاں لکھی جا سکتی ہیں۔",
-
-      "image_url": "",
-      "video_url": "",
-      "audio_url": "",
-      "link_url": "",
-
+      "title": "Download",
+      "message": "",
       "button": {
-        "enabled": true,
         "text": "Download",
-        "url": "https://example.com/file"
+        "url": ""
       }
     },
 
     {
       "id": "custom-001",
       "enabled": false,
-      "order": 13,
       "type": "custom",
-
       "title": "Custom Content",
-      "message": "یہ Custom Content ہے۔",
-
+      "message": "",
       "image_url": "",
       "video_url": "",
       "audio_url": "",
-      "link_url": "",
-
-      "button": {
-        "enabled": true,
-        "text": "Open",
-        "url": "https://example.com"
-      }
+      "link_url": ""
     }
   ]
 }
