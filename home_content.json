@@ -1,9 +1,9 @@
 {
   "success": true,
-  "version": 4,
+  "version": 5,
   "app": "MAYOTUBE",
   "enabled": true,
-  "updated_at": "2026-10-01T23:45:00Z",
+  "updated_at": "2026-10-02T00:00:00Z",
 
   "settings": {
     "refresh_on_home_open": true,
@@ -35,8 +35,8 @@
       "enabled": true,
       "type": "video",
       "title": "Live Video Test",
-      "message": "یہ ویڈیو بھی ہوم کنٹینٹ سے لائیو آ رہی ہے۔",
-      "video_url": "https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4"
+      "message": "یہ ویڈیو بھی Home CMS سے Live آ رہی ہے۔",
+      "video_url": "https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4"
     },
 
     {
