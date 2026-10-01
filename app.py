@@ -4,6 +4,7 @@ import json
 import base64
 import tempfile
 import traceback
+from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 from flask import Flask, request, jsonify, Response
@@ -35,16 +36,6 @@ COOKIE_FILE = None
 # ENVIRONMENT CONFIGURATION
 # ============================================================
 
-# ------------------------------------------------------------
-# PO TOKEN PROVIDER
-#
-# Example:
-#
-# BGUTIL_PROVIDER_URL=https://your-provider-domain.example
-#
-# Leave empty if provider is not configured yet.
-# ------------------------------------------------------------
-
 BGUTIL_PROVIDER_URL = (
     os.environ.get(
         "BGUTIL_PROVIDER_URL",
@@ -54,10 +45,6 @@ BGUTIL_PROVIDER_URL = (
     .rstrip("/")
 )
 
-
-# ------------------------------------------------------------
-# Enable / disable automatic mweb provider mode
-# ------------------------------------------------------------
 
 BGUTIL_ENABLED = (
     os.environ.get(
@@ -73,10 +60,6 @@ BGUTIL_ENABLED = (
 )
 
 
-# ------------------------------------------------------------
-# Optional manual PO token
-# ------------------------------------------------------------
-
 YOUTUBE_PO_TOKEN = (
     os.environ.get(
         "YOUTUBE_PO_TOKEN",
@@ -84,10 +67,6 @@ YOUTUBE_PO_TOKEN = (
     ).strip()
 )
 
-
-# ------------------------------------------------------------
-# Optional cookies
-# ------------------------------------------------------------
 
 YOUTUBE_COOKIES_B64 = (
     os.environ.get(
@@ -319,23 +298,10 @@ def get_provider_status():
 def build_extractor_args(
     player_clients=None
 ):
-    """
-    Build yt-dlp extractor arguments.
-
-    Supports:
-
-    1. BgUtils HTTP PO-token provider
-    2. Manual PO token
-    3. YouTube player clients
-    """
 
     extractor_args = {
         "youtube": {}
     }
-
-    # --------------------------------------------------------
-    # BGUTIL HTTP PROVIDER
-    # --------------------------------------------------------
 
     if is_bgutil_configured():
 
@@ -347,10 +313,6 @@ def build_extractor_args(
             ]
         }
 
-    # --------------------------------------------------------
-    # PLAYER CLIENT
-    # --------------------------------------------------------
-
     if player_clients:
 
         extractor_args[
@@ -358,18 +320,6 @@ def build_extractor_args(
         ][
             "player_client"
         ] = player_clients
-
-    # --------------------------------------------------------
-    # MANUAL PO TOKEN
-    #
-    # This remains supported for compatibility.
-    #
-    # Expected example:
-    #
-    # mweb.gvs+TOKEN
-    #
-    # or another valid yt-dlp PO-token value.
-    # --------------------------------------------------------
 
     po_token = get_po_token()
 
@@ -447,10 +397,6 @@ def build_ydl_options(
             "noplaylist"
         ] = True
 
-    # --------------------------------------------------------
-    # COOKIES
-    # --------------------------------------------------------
-
     cookie_file = (
         prepare_cookie_file()
     )
@@ -472,13 +418,6 @@ def get_youtube_client_attempts():
 
     attempts = []
 
-    # --------------------------------------------------------
-    # Provider mode
-    #
-    # Current yt-dlp guidance recommends provider-backed
-    # mweb for PO-token protected GVS requests.
-    # --------------------------------------------------------
-
     if is_bgutil_configured():
 
         attempts.extend([
@@ -488,10 +427,6 @@ def get_youtube_client_attempts():
             ["web_safari"],
         ])
 
-    # --------------------------------------------------------
-    # Existing fallback clients
-    # --------------------------------------------------------
-
     attempts.extend([
         ["android_vr"],
         ["tv"],
@@ -500,10 +435,6 @@ def get_youtube_client_attempts():
         ["ios"],
         None,
     ])
-
-    # --------------------------------------------------------
-    # Remove duplicates while preserving order
-    # --------------------------------------------------------
 
     unique = []
 
@@ -533,10 +464,6 @@ def extract_info_with_fallback(
             "URL is required"
         )
 
-    # --------------------------------------------------------
-    # NON-YOUTUBE URL
-    # --------------------------------------------------------
-
     if not is_youtube_url(url):
 
         options = build_ydl_options(
@@ -552,10 +479,6 @@ def extract_info_with_fallback(
                 url,
                 download=download
             )
-
-    # --------------------------------------------------------
-    # YOUTUBE CLIENT ATTEMPTS
-    # --------------------------------------------------------
 
     client_attempts = (
         get_youtube_client_attempts()
@@ -595,10 +518,6 @@ def extract_info_with_fallback(
                 "clients": clients,
                 "error": message
             })
-
-    # --------------------------------------------------------
-    # FAILURE
-    # --------------------------------------------------------
 
     last_error = (
         errors[-1]["error"]
@@ -1820,6 +1739,315 @@ def old_download_links():
 
 
 # ============================================================
+# MAYOTUBE REMOTE HOME CONTENT
+# ============================================================
+
+HOME_CONTENT_FILE = (
+    Path(__file__).resolve().parent
+    / "home_content.json"
+)
+
+
+def load_home_content():
+
+    if not HOME_CONTENT_FILE.exists():
+
+        return {
+            "success": False,
+            "error": "home_content.json not found",
+            "data": {
+                "app": "MAYOTUBE",
+                "version": 1,
+                "enabled": False,
+                "items": []
+            }
+        }, 500
+
+    try:
+
+        with open(
+            HOME_CONTENT_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            content = json.load(
+                file
+            )
+
+    except json.JSONDecodeError:
+
+        return {
+            "success": False,
+            "error":
+                "home_content.json contains invalid JSON",
+            "data": {
+                "app": "MAYOTUBE",
+                "version": 1,
+                "enabled": False,
+                "items": []
+            }
+        }, 500
+
+    except Exception as error:
+
+        return {
+            "success": False,
+            "error": clean_text(
+                error
+            ),
+            "data": {
+                "app": "MAYOTUBE",
+                "version": 1,
+                "enabled": False,
+                "items": []
+            }
+        }, 500
+
+    if not isinstance(
+        content,
+        dict
+    ):
+
+        return {
+            "success": False,
+            "error":
+                "Home content must be a JSON object",
+            "data": {
+                "app": "MAYOTUBE",
+                "version": 1,
+                "enabled": False,
+                "items": []
+            }
+        }, 500
+
+    return content, 200
+
+
+def prepare_home_items(
+    content
+):
+
+    if not content.get(
+        "enabled",
+        True
+    ):
+
+        return []
+
+    items = content.get(
+        "items",
+        []
+    )
+
+    if not isinstance(
+        items,
+        list
+    ):
+
+        return []
+
+    valid_items = []
+
+    for item in items:
+
+        if not isinstance(
+            item,
+            dict
+        ):
+            continue
+
+        if not item.get(
+            "enabled",
+            False
+        ):
+            continue
+
+        item_id = str(
+            item.get(
+                "id",
+                ""
+            )
+        ).strip()
+
+        item_type = str(
+            item.get(
+                "type",
+                ""
+            )
+        ).strip().lower()
+
+        if not item_id:
+            continue
+
+        if not item_type:
+            continue
+
+        prepared_item = dict(
+            item
+        )
+
+        prepared_item[
+            "id"
+        ] = item_id
+
+        prepared_item[
+            "type"
+        ] = item_type
+
+        prepared_item[
+            "order"
+        ] = safe_int(
+            item.get(
+                "order",
+                0
+            ),
+            0
+        )
+
+        valid_items.append(
+            prepared_item
+        )
+
+    valid_items.sort(
+        key=lambda item: (
+            item.get(
+                "order",
+                0
+            ),
+            item.get(
+                "id",
+                ""
+            )
+        )
+    )
+
+    return valid_items
+
+
+# ============================================================
+# API: REMOTE HOME CONTENT
+# ============================================================
+
+@app.route(
+    "/api/home-content",
+    methods=["GET"]
+)
+def api_home_content():
+
+    try:
+
+        content, status_code = (
+            load_home_content()
+        )
+
+        if status_code != 200:
+
+            return jsonify(
+                content
+            ), status_code
+
+        items = prepare_home_items(
+            content
+        )
+
+        return jsonify({
+
+            "success":
+                True,
+
+            "app":
+                content.get(
+                    "app",
+                    "MAYOTUBE"
+                ),
+
+            "version":
+                content.get(
+                    "version",
+                    1
+                ),
+
+            "updated_at":
+                content.get(
+                    "updated_at",
+                    ""
+                ),
+
+            "enabled":
+                content.get(
+                    "enabled",
+                    True
+                ),
+
+            "settings":
+                content.get(
+                    "settings",
+                    {}
+                ),
+
+            "count":
+                len(items),
+
+            "items":
+                items
+
+        })
+
+    except Exception as error:
+
+        return jsonify({
+
+            "success":
+                False,
+
+            "error":
+                clean_text(
+                    error
+                ),
+
+            "items":
+                []
+
+        }), 500
+
+
+# ============================================================
+# API: HOME CONTENT HEALTH
+# ============================================================
+
+@app.route(
+    "/api/home-content/health",
+    methods=["GET"]
+)
+def home_content_health():
+
+    return jsonify({
+
+        "success":
+            True,
+
+        "app":
+            "MAYOTUBE",
+
+        "service":
+            "home-content",
+
+        "content_file":
+            "home_content.json",
+
+        "content_file_exists":
+            HOME_CONTENT_FILE.exists(),
+
+        "content_file_path":
+            str(
+                HOME_CONTENT_FILE
+            )
+
+    })
+
+
+# ============================================================
 # HEALTH
 # ============================================================
 
@@ -1879,6 +2107,9 @@ def health():
                 else "fallback-clients"
             ),
 
+        "home_content":
+            HOME_CONTENT_FILE.exists(),
+
     })
 
 
@@ -1935,12 +2166,40 @@ def home():
 
             "future-ready-provider-architecture",
 
+            "remote-home-content",
+
+            "remote-home-messages",
+
+            "remote-home-images",
+
+            "remote-home-videos",
+
+            "remote-home-audio",
+
+            "remote-home-youtube-links",
+
+            "remote-home-channel-links",
+
+            "remote-home-website-links",
+
+            "remote-home-donations",
+
+            "remote-home-advertisements",
+
+            "remote-home-buttons",
+
         ],
 
         "endpoints": {
 
             "health":
                 "/health",
+
+            "home_content":
+                "/api/home-content",
+
+            "home_content_health":
+                "/api/home-content/health",
 
             "video_info":
                 "/api/video-info",
