@@ -27,6 +27,8 @@ except Exception:
 
 app = Flask(__name__)
 CORS(app)
+
+
 # ============================================================
 # ADMIN PANEL
 # ============================================================
@@ -37,7 +39,7 @@ CORS(app)
 )
 def admin_panel():
     return render_template("admin.html")
-    
+
 APP_NAME = "MAYOTUBE API"
 APP_VERSION = "5.1"
 
