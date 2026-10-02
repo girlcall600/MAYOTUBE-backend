@@ -1,6 +1,6 @@
 {
   "success": true,
-  "version": 7,
+  "version": 8,
   "app": "MAYOTUBE",
   "enabled": true,
   "updated_at": "2026-10-02T00:00:00Z",
@@ -32,9 +32,9 @@
       "id": "video-001",
       "enabled": true,
       "type": "video",
-      "title": "10 Second Video Test",
-      "message": "یہ 10 سیکنڈ کی test video ہے۔",
-      "video_url": "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_2MB.mp4",
+      "title": "Audio Video Test",
+      "message": "یہ H.264 + AAC audio والی test video ہے۔",
+      "video_url": "https://assets.testfiles.dev/video/sample-3s.mp4",
       "order": 2
     }
   ]
