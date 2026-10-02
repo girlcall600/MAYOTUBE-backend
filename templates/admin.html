@@ -1,1 +1,2025 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+    <title>MAYOTUBE ADMIN</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background: #0d0d0d;
+            color: #ffffff;
+            font-family: Arial, "Noto Nastaliq Urdu", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #171717, #202020);
+            border: 1px solid #303030;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: #999999;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666666;
+            flex-shrink: 0;
+        }
+
+        .status-dot.online {
+            background: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        .card {
+            background: #171717;
+            border: 1px solid #2d2d2d;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .muted {
+            color: #999999;
+            font-size: 13px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #d7d7d7;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            background: #101010;
+            color: #ffffff;
+            outline: none;
+            padding: 13px 14px;
+            direction: ltr;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.16);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 800;
+            min-height: 46px;
+            transition: 0.15s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #7c3aed;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #8b5cf6;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: #ffffff;
+        }
+
+        .btn-dark {
+            background: #292929;
+            color: #ffffff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .btn-small {
+            min-height: 38px;
+            padding: 8px 11px;
+            font-size: 12px;
+        }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 430px;
+            background: #171717;
+            border: 1px solid #303030;
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.45);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .login-description {
+            text-align: center;
+            color: #999999;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0 16px;
+            color: #bbbbbb;
+            font-size: 13px;
+        }
+
+        .remember input {
+            width: auto;
+            margin: 0;
+        }
+
+        .error {
+            background: rgba(220, 38, 38, 0.12);
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            color: #ff8a8a;
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .success {
+            background: rgba(22, 163, 74, 0.12);
+            border: 1px solid rgba(22, 163, 74, 0.4);
+            color: #78e59b;
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .home-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: #101010;
+            border: 1px solid #303030;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .home-status {
+            font-weight: 800;
+        }
+
+        .switch {
+            position: relative;
+            width: 56px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: #444444;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            left: 4px;
+            top: 4px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .switch input:checked + .slider {
+            background: #16a34a;
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            background: #101010;
+            border: 1px solid #2d2d2d;
+            border-radius: 13px;
+            padding: 13px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .stat-label {
+            color: #999999;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 45px;
+            color: #dddddd;
+        }
+
+        .checkbox-line input {
+            width: auto;
+        }
+
+        .item {
+            background: #101010;
+            border: 1px solid #303030;
+            border-radius: 15px;
+            padding: 13px;
+            margin-bottom: 10px;
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .item-title {
+            font-weight: 800;
+            font-size: 16px;
+            word-break: break-word;
+        }
+
+        .item-type {
+            display: inline-block;
+            background: #292929;
+            color: #bdbdbd;
+            border-radius: 8px;
+            padding: 4px 7px;
+            font-size: 10px;
+            margin-top: 5px;
+            direction: ltr;
+        }
+
+        .item-message {
+            color: #b9b9b9;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 9px 0;
+            word-break: break-word;
+        }
+
+        .item-url {
+            color: #8b5cf6;
+            font-size: 12px;
+            direction: ltr;
+            text-align: left;
+            word-break: break-all;
+            margin-bottom: 9px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            border-radius: 8px;
+            padding: 4px 7px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .badge-on {
+            background: rgba(22, 163, 74, 0.16);
+            color: #6ee79a;
+        }
+
+        .badge-off {
+            background: rgba(220, 38, 38, 0.16);
+            color: #ff8585;
+        }
+
+        .media-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #101010;
+            border: 1px solid #303030;
+            border-radius: 13px;
+            padding: 10px;
+            margin-bottom: 9px;
+        }
+
+        .media-preview {
+            width: 70px;
+            height: 55px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #222222;
+            flex-shrink: 0;
+        }
+
+        .media-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-name {
+            font-size: 12px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .media-url {
+            color: #888888;
+            font-size: 10px;
+            direction: ltr;
+            text-align: left;
+            word-break: break-all;
+            margin-top: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999999;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px 10px;
+            color: #888888;
+        }
+
+        .toast {
+            position: fixed;
+            left: 14px;
+            right: 14px;
+            bottom: 16px;
+            max-width: 500px;
+            margin: auto;
+            background: #242424;
+            border: 1px solid #444444;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: center;
+            z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .app {
+                padding: 9px;
+            }
+
+            .card {
+                padding: 13px;
+                border-radius: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .dashboard-header {
+                align-items: flex-start;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .brand-title {
+                font-size: 19px;
+            }
+
+            .button-row .btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+
+        <div class="login-logo">MAYOTUBE</div>
+
+        <div class="login-description">
+            Admin Panel<br>
+            یہاں سے آپ Home کا Content اور Media موبائل سے manage کر سکتے ہیں۔
+        </div>
+
+        <div id="loginError" class="error hidden"></div>
+
+        <div class="input-group">
+            <label for="adminToken">Admin Token</label>
+            <input
+                id="adminToken"
+                type="password"
+                autocomplete="off"
+                placeholder="MAYOTUBE_ADMIN_TOKEN"
+            >
+        </div>
+
+        <label class="remember">
+            <input id="rememberToken" type="checkbox">
+            اس device پر token یاد رکھیں
+        </label>
+
+        <button id="loginButton" class="btn btn-primary" style="width:100%;" onclick="login()">
+            Login
+        </button>
+
+    </div>
+</div>
+
+
+<div id="dashboard" class="hidden">
+
+    <div class="app">
+
+        <div class="topbar">
+            <div class="brand">
+
+                <div>
+                    <div class="brand-title">MAYOTUBE ADMIN</div>
+                    <div class="brand-subtitle">Remote Content Management Panel</div>
+                </div>
+
+                <div id="connectionDot" class="status-dot"></div>
+
+            </div>
+        </div>
+
+
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+
+            <button class="btn btn-dark btn-small" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+
+        <div id="globalMessage" class="hidden"></div>
+
+
+        <!-- HOME CONTROL -->
+
+        <div class="card">
+
+            <div class="card-title">
+                🏠 Home Control
+            </div>
+
+            <div class="home-control">
+
+                <div>
+                    <div id="homeStatusText" class="home-status">
+                        Loading...
+                    </div>
+
+                    <div class="muted">
+                        Android app کے Home content کو ON/OFF کریں۔
+                    </div>
+                </div>
+
+                <label class="switch">
+                    <input
+                        id="homeEnabled"
+                        type="checkbox"
+                        onchange="toggleHome()"
+                    >
+                    <span class="slider"></span>
+                </label>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <div id="totalItems" class="stat-value">0</div>
+                    <div class="stat-label">Total Content</div>
+                </div>
+
+                <div class="stat">
+                    <div id="activeItems" class="stat-value">0</div>
+                    <div class="stat-label">Enabled Content</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONTENT FORM -->
+
+        <div class="card">
+
+            <div class="card-title">
+                ✏️ Content Editor
+            </div>
+
+            <input id="itemId" type="hidden">
+
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <label for="itemType">Type</label>
+
+                    <select id="itemType">
+                        <option value="message">Message</option>
+                        <option value="announcement">Announcement</option>
+                        <option value="notification">Notification</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="audio">Audio</option>
+                        <option value="button">Button</option>
+                        <option value="link">Link</option>
+                        <option value="donation">Donation</option>
+                        <option value="advertisement">Advertisement</option>
+                        <option value="website">Website</option>
+                        <option value="channel">Channel</option>
+                    </select>
+                </div>
+
+
+                <div class="input-group">
+                    <label for="itemOrder">Order</label>
+
+                    <input
+                        id="itemOrder"
+                        type="number"
+                        value="0"
+                        min="0"
+                    >
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="itemTitle">Title</label>
+
+                    <input
+                        id="itemTitle"
+                        type="text"
+                        placeholder="مثلاً: MAYOTUBE میں خوش آمدید"
+                    >
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="itemMessage">Message</label>
+
+                    <textarea
+                        id="itemMessage"
+                        placeholder="Home پر دکھایا جانے والا پیغام..."
+                    ></textarea>
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="itemDescription">Description</label>
+
+                    <textarea
+                        id="itemDescription"
+                        placeholder="Additional description..."
+                    ></textarea>
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="imageUrl">Image URL</label>
+
+                    <input
+                        id="imageUrl"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://..."
+                    >
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="videoUrl">Video URL</label>
+
+                    <input
+                        id="videoUrl"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://..."
+                    >
+                </div>
+
+
+                <div class="input-group full">
+                    <label for="linkUrl">Link / Website / YouTube URL</label>
+
+                    <input
+                        id="linkUrl"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://..."
+                    >
+                </div>
+
+
+                <div class="input-group">
+                    <label for="buttonText">Button Text</label>
+
+                    <input
+                        id="buttonText"
+                        type="text"
+                        placeholder="Open / Donate / Watch"
+                    >
+                </div>
+
+
+                <div class="checkbox-line">
+                    <input
+                        id="itemEnabled"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <label for="itemEnabled">
+                        Content Enabled
+                    </label>
+                </div>
+
+            </div>
+
+
+            <div class="button-row">
+
+                <button
+                    class="btn btn-primary"
+                    onclick="saveItem()"
+                >
+                    💾 Save Content
+                </button>
+
+                <button
+                    class="btn btn-dark"
+                    onclick="clearForm()"
+                >
+                    + New
+                </button>
+
+                <button
+                    class="btn btn-dark"
+                    onclick="loadAll()"
+                >
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONTENT LIST -->
+
+        <div class="card">
+
+            <div class="card-title">
+                📋 Home Content
+            </div>
+
+            <div id="itemsList">
+                <div class="loading">
+                    Loading...
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- MEDIA -->
+
+        <div class="card">
+
+            <div class="card-title">
+                🖼️ Media Manager
+            </div>
+
+            <div class="muted" style="margin-bottom:12px;">
+                Image, Video یا Audio upload کریں۔ فائل Vercel Blob میں محفوظ ہوگی۔
+            </div>
+
+            <div class="input-group">
+                <input
+                    id="mediaFile"
+                    type="file"
+                    accept="image/*,video/*,audio/*"
+                >
+            </div>
+
+            <button
+                class="btn btn-primary"
+                onclick="uploadMedia()"
+                style="width:100%;"
+            >
+                ⬆️ Upload Media
+            </button>
+
+            <div id="mediaList" style="margin-top:14px;">
+                <div class="loading">
+                    Loading...
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- SYSTEM INFO -->
+
+        <div class="card">
+
+            <div class="card-title">
+                ⚙️ System Status
+            </div>
+
+            <div id="systemInfo" class="muted">
+                Loading...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast" class="toast hidden"></div>
+
+
+<script>
+    "use strict";
+
+    const TOKEN_SESSION_KEY = "mayotube_admin_token_session";
+    const TOKEN_LOCAL_KEY = "mayotube_admin_token";
+
+    let adminToken = "";
+    let cmsContent = null;
+
+
+    // =========================================================
+    // BASIC HELPERS
+    // =========================================================
+
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    function showToast(message) {
+        const toast = $("toast");
+
+        toast.textContent = message;
+        toast.classList.remove("hidden");
+
+        clearTimeout(window.__toastTimer);
+
+        window.__toastTimer = setTimeout(function () {
+            toast.classList.add("hidden");
+        }, 3000);
+    }
+
+
+    function showLoginError(message) {
+        const box = $("loginError");
+
+        box.textContent = message;
+        box.classList.remove("hidden");
+    }
+
+
+    function hideLoginError() {
+        $("loginError").classList.add("hidden");
+    }
+
+
+    function showGlobalMessage(message, success) {
+        const box = $("globalMessage");
+
+        box.className = success ? "success" : "error";
+        box.textContent = message;
+        box.classList.remove("hidden");
+
+        clearTimeout(window.__globalMessageTimer);
+
+        window.__globalMessageTimer = setTimeout(function () {
+            box.classList.add("hidden");
+        }, 4000);
+    }
+
+
+    // =========================================================
+    // API
+    // =========================================================
+
+    async function api(path, options) {
+
+        options = options || {};
+
+        const headers = new Headers(options.headers || {});
+
+        if (adminToken) {
+            headers.set("Authorization", "Bearer " + adminToken);
+        }
+
+        const finalOptions = Object.assign({}, options, {
+            headers: headers
+        });
+
+        const response = await fetch(path, finalOptions);
+
+        let data = null;
+
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = {
+                success: false,
+                error: "Invalid server response"
+            };
+        }
+
+        if (!response.ok) {
+
+            const message =
+                data && data.error
+                    ? data.error
+                    : "Request failed: " + response.status;
+
+            const error = new Error(message);
+
+            error.status = response.status;
+            error.data = data;
+
+            throw error;
+        }
+
+        return data;
+    }
+
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
+
+    async function login() {
+
+        hideLoginError();
+
+        const token = $("adminToken").value.trim();
+
+        if (!token) {
+            showLoginError("Admin Token درج کریں۔");
+            return;
+        }
+
+        const button = $("loginButton");
+
+        button.disabled = true;
+        button.textContent = "Checking...";
+
+        try {
+
+            adminToken = token;
+
+            const status = await api("/api/admin/status");
+
+            if (!status || status.success === false) {
+                throw new Error("Admin authentication failed.");
+            }
+
+            if ($("rememberToken").checked) {
+                localStorage.setItem(TOKEN_LOCAL_KEY, token);
+                sessionStorage.removeItem(TOKEN_SESSION_KEY);
+            } else {
+                sessionStorage.setItem(TOKEN_SESSION_KEY, token);
+                localStorage.removeItem(TOKEN_LOCAL_KEY);
+            }
+
+            showDashboard();
+
+            await loadAll();
+
+            showToast("Login successful");
+
+        } catch (error) {
+
+            adminToken = "";
+
+            showLoginError(
+                error.message || "Login failed"
+            );
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "Login";
+        }
+    }
+
+
+    function showDashboard() {
+
+        $("loginScreen").classList.add("hidden");
+        $("dashboard").classList.remove("hidden");
+
+        $("connectionDot").classList.add("online");
+    }
+
+
+    function showLogin() {
+
+        $("dashboard").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+
+        $("connectionDot").classList.remove("online");
+
+        $("adminToken").value = "";
+    }
+
+
+    function logout() {
+
+        adminToken = "";
+
+        sessionStorage.removeItem(TOKEN_SESSION_KEY);
+        localStorage.removeItem(TOKEN_LOCAL_KEY);
+
+        cmsContent = null;
+
+        showLogin();
+
+        showToast("Logged out");
+    }
+
+
+    // =========================================================
+    // LOAD ALL
+    // =========================================================
+
+    async function loadAll() {
+
+        try {
+
+            await Promise.all([
+                loadContent(),
+                loadMedia(),
+                loadStatus()
+            ]);
+
+        } catch (error) {
+
+            if (error.status === 401) {
+
+                adminToken = "";
+
+                sessionStorage.removeItem(TOKEN_SESSION_KEY);
+                localStorage.removeItem(TOKEN_LOCAL_KEY);
+
+                showLogin();
+
+                showLoginError("Token invalid یا expire ہو چکا ہے۔");
+
+                return;
+            }
+
+            showGlobalMessage(
+                error.message || "Data load failed",
+                false
+            );
+        }
+    }
+
+
+    // =========================================================
+    // CONTENT
+    // =========================================================
+
+    async function loadContent() {
+
+        const container = $("itemsList");
+
+        container.innerHTML =
+            '<div class="loading">Loading content...</div>';
+
+        const data = await api("/api/admin/content");
+
+        cmsContent = data;
+
+        const items = Array.isArray(data.items)
+            ? data.items
+            : [];
+
+        $("totalItems").textContent = items.length;
+
+        const activeCount = items.filter(function (item) {
+            return item.enabled !== false;
+        }).length;
+
+        $("activeItems").textContent = activeCount;
+
+        const enabled =
+            data.enabled !== false;
+
+        $("homeEnabled").checked = enabled;
+
+        $("homeStatusText").textContent =
+            enabled
+                ? "Home Content ON"
+                : "Home Content OFF";
+
+        renderItems(items);
+    }
+
+
+    function renderItems(items) {
+
+        const container = $("itemsList");
+
+        if (!items.length) {
+
+            container.innerHTML =
+                '<div class="empty">ابھی کوئی content موجود نہیں۔</div>';
+
+            return;
+        }
+
+        const sorted = items.slice().sort(function (a, b) {
+
+            return Number(a.order || 0) - Number(b.order || 0);
+
+        });
+
+
+        container.innerHTML = sorted.map(function (item) {
+
+            const title =
+                item.title ||
+                "(No title)";
+
+            const message =
+                item.message ||
+                item.description ||
+                "";
+
+            let url = "";
+
+            if (item.image_url) {
+                url = item.image_url;
+            } else if (item.video_url) {
+                url = item.video_url;
+            } else if (item.link_url) {
+                url = item.link_url;
+            }
+
+
+            const enabled =
+                item.enabled !== false;
+
+
+            return `
+                <div class="item">
+
+                    <div class="item-head">
+
+                        <div style="flex:1;min-width:0;">
+
+                            <div class="item-title">
+                                ${escapeHtml(title)}
+                            </div>
+
+                            <div class="item-type">
+                                ${escapeHtml(item.type || "unknown")}
+                            </div>
+
+                        </div>
+
+                        <span class="badge ${enabled ? "badge-on" : "badge-off"}">
+                            ${enabled ? "ON" : "OFF"}
+                        </span>
+
+                    </div>
+
+
+                    ${
+                        message
+                            ? `
+                                <div class="item-message">
+                                    ${escapeHtml(message)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+
+                    ${
+                        url
+                            ? `
+                                <div class="item-url">
+                                    ${escapeHtml(url)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+
+                    <div class="item-actions">
+
+                        <button
+                            class="btn btn-primary btn-small"
+                            onclick="editItem('${escapeHtml(item.id || "")}')"
+                        >
+                            Edit
+                        </button>
+
+
+                        <button
+                            class="btn btn-warning btn-small"
+                            onclick="toggleItem('${escapeHtml(item.id || "")}')"
+                        >
+                            ${enabled ? "Disable" : "Enable"}
+                        </button>
+
+
+                        <button
+                            class="btn btn-danger btn-small"
+                            onclick="deleteItem('${escapeHtml(item.id || "")}')"
+                        >
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+    }
+
+
+    function clearForm() {
+
+        $("itemId").value = "";
+        $("itemType").value = "message";
+        $("itemTitle").value = "";
+        $("itemMessage").value = "";
+        $("itemDescription").value = "";
+        $("imageUrl").value = "";
+        $("videoUrl").value = "";
+        $("linkUrl").value = "";
+        $("buttonText").value = "";
+        $("itemOrder").value = "0";
+        $("itemEnabled").checked = true;
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+
+    function editItem(id) {
+
+        if (!cmsContent || !Array.isArray(cmsContent.items)) {
+            return;
+        }
+
+        const item = cmsContent.items.find(function (entry) {
+            return String(entry.id) === String(id);
+        });
+
+        if (!item) {
+            showGlobalMessage("Content نہیں ملا۔", false);
+            return;
+        }
+
+
+        $("itemId").value = item.id || "";
+        $("itemType").value = item.type || "message";
+        $("itemTitle").value = item.title || "";
+        $("itemMessage").value = item.message || "";
+        $("itemDescription").value = item.description || "";
+        $("imageUrl").value = item.image_url || "";
+        $("videoUrl").value = item.video_url || "";
+        $("linkUrl").value = item.link_url || "";
+        $("buttonText").value = item.button_text || "";
+        $("itemOrder").value = item.order || 0;
+        $("itemEnabled").checked = item.enabled !== false;
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+        showToast("Edit mode");
+    }
+
+
+    async function saveItem() {
+
+        const id = $("itemId").value.trim();
+
+        const item = {
+
+            type: $("itemType").value,
+
+            title: $("itemTitle").value.trim(),
+
+            message: $("itemMessage").value.trim(),
+
+            description: $("itemDescription").value.trim(),
+
+            image_url: $("imageUrl").value.trim(),
+
+            video_url: $("videoUrl").value.trim(),
+
+            link_url: $("linkUrl").value.trim(),
+
+            button_text: $("buttonText").value.trim(),
+
+            order: Number($("itemOrder").value || 0),
+
+            enabled: $("itemEnabled").checked
+        };
+
+
+        if (!item.title && !item.message) {
+
+            showGlobalMessage(
+                "Title یا Message میں سے کم از کم ایک درج کریں۔",
+                false
+            );
+
+            return;
+        }
+
+
+        try {
+
+            let data;
+
+            if (id) {
+
+                data = await api(
+                    "/api/admin/content/" +
+                    encodeURIComponent(id),
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(item)
+                    }
+                );
+
+            } else {
+
+                data = await api(
+                    "/api/admin/content",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(item)
+                    }
+                );
+            }
+
+
+            if (data && data.success === false) {
+                throw new Error(data.error || "Save failed");
+            }
+
+
+            showGlobalMessage(
+                id
+                    ? "Content successfully updated."
+                    : "New content successfully created.",
+                true
+            );
+
+            clearForm();
+
+            await loadContent();
+
+        } catch (error) {
+
+            showGlobalMessage(
+                error.message || "Save failed",
+                false
+            );
+        }
+    }
+
+
+    async function toggleItem(id) {
+
+        if (!id) {
+            return;
+        }
+
+        try {
+
+            await api(
+                "/api/admin/content/" +
+                encodeURIComponent(id) +
+                "/toggle",
+                {
+                    method: "PATCH"
+                }
+            );
+
+            await loadContent();
+
+            showToast("Content status updated");
+
+        } catch (error) {
+
+            showGlobalMessage(
+                error.message || "Toggle failed",
+                false
+            );
+        }
+    }
+
+
+    async function deleteItem(id) {
+
+        if (!id) {
+            return;
+        }
+
+        const confirmed = confirm(
+            "کیا آپ واقعی یہ content delete کرنا چاہتے ہیں؟"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            await api(
+                "/api/admin/content/" +
+                encodeURIComponent(id),
+                {
+                    method: "DELETE"
+                }
+            );
+
+            await loadContent();
+
+            clearForm();
+
+            showToast("Content deleted");
+
+        } catch (error) {
+
+            showGlobalMessage(
+                error.message || "Delete failed",
+                false
+            );
+        }
+    }
+
+
+    // =========================================================
+    // HOME TOGGLE
+    // =========================================================
+
+    async function toggleHome() {
+
+        const enabled = $("homeEnabled").checked;
+
+        try {
+
+            await api(
+                "/api/admin/home/toggle",
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        enabled: enabled
+                    })
+                }
+            );
+
+
+            $("homeStatusText").textContent =
+                enabled
+                    ? "Home Content ON"
+                    : "Home Content OFF";
+
+
+            showToast(
+                enabled
+                    ? "Home Content ON"
+                    : "Home Content OFF"
+            );
+
+        } catch (error) {
+
+            $("homeEnabled").checked = !enabled;
+
+            showGlobalMessage(
+                error.message || "Home toggle failed",
+                false
+            );
+        }
+    }
+
+
+    // =========================================================
+    // MEDIA
+    // =========================================================
+
+    async function loadMedia() {
+
+        const container = $("mediaList");
+
+        container.innerHTML =
+            '<div class="loading">Loading media...</div>';
+
+
+        try {
+
+            const data =
+                await api("/api/admin/media");
+
+
+            const media =
+                Array.isArray(data.items)
+                    ? data.items
+                    : (
+                        Array.isArray(data.media)
+                            ? data.media
+                            : []
+                    );
+
+
+            if (!media.length) {
+
+                container.innerHTML =
+                    '<div class="empty">ابھی کوئی media موجود نہیں۔</div>';
+
+                return;
+            }
+
+
+            container.innerHTML =
+                media.map(function (file) {
+
+                    const url =
+                        file.url ||
+                        file.download_url ||
+                        "";
+
+                    const pathname =
+                        file.pathname ||
+                        file.path ||
+                        "";
+
+
+                    const contentType =
+                        file.content_type ||
+                        "";
+
+
+                    let preview = "";
+
+                    if (contentType.startsWith("image/")) {
+
+                        preview =
+                            `<img class="media-preview"
+                                  src="${escapeHtml(url)}"
+                                  alt="">`;
+
+                    } else if (contentType.startsWith("video/")) {
+
+                        preview =
+                            `<video class="media-preview"
+                                    src="${escapeHtml(url)}"
+                                    muted></video>`;
+
+                    } else if (contentType.startsWith("audio/")) {
+
+                        preview =
+                            `<div class="media-preview"
+                                  style="display:flex;align-items:center;justify-content:center;font-size:25px;">
+                                  🎵
+                              </div>`;
+
+                    } else {
+
+                        preview =
+                            `<div class="media-preview"
+                                  style="display:flex;align-items:center;justify-content:center;font-size:20px;">
+                                  📁
+                              </div>`;
+                    }
+
+
+                    return `
+                        <div class="media-item">
+
+                            ${preview}
+
+                            <div class="media-info">
+
+                                <div class="media-name">
+                                    ${escapeHtml(file.pathname || file.filename || "Media")}
+                                </div>
+
+                                <div class="media-url">
+                                    ${escapeHtml(url)}
+                                </div>
+
+                            </div>
+
+
+                            <div style="display:flex;flex-direction:column;gap:5px;">
+
+                                <button
+                                    class="btn btn-primary btn-small"
+                                    onclick="useMedia('${escapeHtml(url)}','${escapeHtml(contentType)}')"
+                                >
+                                    Use
+                                </button>
+
+                                <button
+                                    class="btn btn-danger btn-small"
+                                    onclick="deleteMedia('${escapeHtml(pathname)}','${escapeHtml(url)}')"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+
+                }).join("");
+
+
+        } catch (error) {
+
+            container.innerHTML =
+                '<div class="empty">Media load failed.</div>';
+
+            throw error;
+        }
+    }
+
+
+    async function uploadMedia() {
+
+        const input = $("mediaFile");
+
+        if (!input.files || !input.files.length) {
+
+            showGlobalMessage(
+                "پہلے کوئی file select کریں۔",
+                false
+            );
+
+            return;
+        }
+
+
+        const file = input.files[0];
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+
+        try {
+
+            showToast("Uploading...");
+
+            const data =
+                await api(
+                    "/api/admin/media",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            if (data && data.success === false) {
+                throw new Error(data.error || "Upload failed");
+            }
+
+
+            input.value = "";
+
+            await loadMedia();
+
+            showGlobalMessage(
+                "Media successfully uploaded.",
+                true
+            );
+
+        } catch (error) {
+
+            showGlobalMessage(
+                error.message || "Upload failed",
+                false
+            );
+        }
+    }
+
+
+    function useMedia(url, contentType) {
+
+        if (!url) {
+            return;
+        }
+
+
+        if (contentType.startsWith("image/")) {
+
+            $("imageUrl").value = url;
+
+        } else if (contentType.startsWith("video/")) {
+
+            $("videoUrl").value = url;
+
+        } else if (contentType.startsWith("audio/")) {
+
+            $("videoUrl").value = url;
+
+        } else {
+
+            $("linkUrl").value = url;
+        }
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+        showToast("Media URL added to editor");
+    }
+
+
+    async function deleteMedia(pathname, url) {
+
+        const confirmed = confirm(
+            "کیا آپ واقعی یہ media delete کرنا چاہتے ہیں؟"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            await api(
+                "/api/admin/media",
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        pathname: pathname,
+                        url: url
+                    })
+                }
+            );
+
+
+            await loadMedia();
+
+            showToast("Media deleted");
+
+        } catch (error) {
+
+            showGlobalMessage(
+                error.message || "Media delete failed",
+                false
+            );
+        }
+    }
+
+
+    // =========================================================
+    // STATUS
+    // =========================================================
+
+    async function loadStatus() {
+
+        const data =
+            await api("/api/admin/status");
+
+
+        const blob =
+            data.blob_configured === true
+                ? "Configured"
+                : "Not configured";
+
+
+        const token =
+            data.admin_configured === true
+                ? "Configured"
+                : "Not configured";
+
+
+        $("systemInfo").innerHTML =
+
+            "Admin Token: <b>" +
+            escapeHtml(token) +
+            "</b><br><br>" +
+
+            "Vercel Blob: <b>" +
+            escapeHtml(blob) +
+            "</b><br><br>" +
+
+            "CMS Content: <b>" +
+            escapeHtml(
+                data.cms_content_configured === true
+                    ? "Configured"
+                    : "Not configured"
+            ) +
+            "</b>";
+    }
+
+
+    // =========================================================
+    // STARTUP
+    // =========================================================
+
+    async function initialize() {
+
+        let savedToken =
+            sessionStorage.getItem(TOKEN_SESSION_KEY);
+
+
+        let remember =
+            false;
+
+
+        if (!savedToken) {
+
+            savedToken =
+                localStorage.getItem(TOKEN_LOCAL_KEY);
+
+            if (savedToken) {
+                remember = true;
+            }
+        }
+
+
+        if (savedToken) {
+
+            adminToken = savedToken;
+
+            $("adminToken").value =
+                savedToken;
+
+            $("rememberToken").checked =
+                remember;
+
+
+            try {
+
+                await api("/api/admin/status");
+
+                showDashboard();
+
+                await loadAll();
+
+                return;
+
+            } catch (error) {
+
+                adminToken = "";
+
+                sessionStorage.removeItem(TOKEN_SESSION_KEY);
+                localStorage.removeItem(TOKEN_LOCAL_KEY);
+            }
+        }
+
+
+        showLogin();
+    }
+
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialize
+    );
+
+</script>
+
+</body>
+</html>
