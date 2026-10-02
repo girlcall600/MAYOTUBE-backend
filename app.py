@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from urllib.parse import urlparse, parse_qs
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, render_template
 from flask_cors import CORS
 
 import yt_dlp
@@ -27,7 +27,16 @@ except Exception:
 
 app = Flask(__name__)
 CORS(app)
+# ============================================================
+# ADMIN PANEL
+# ============================================================
 
+@app.route(
+    "/admin",
+    methods=["GET"]
+)
+def admin_panel():
+    return render_template("admin.html")
 APP_NAME = "MAYOTUBE API"
 APP_VERSION = "5.1"
 
