@@ -522,6 +522,175 @@
             color: #888888;
         }
 
+        /* =====================================================
+           LIVE HOME PREVIEW
+           ===================================================== */
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .preview-phone {
+            background: #0b0b0b;
+            border: 1px solid #383838;
+            border-radius: 22px;
+            padding: 10px;
+            max-width: 430px;
+            margin: 0 auto;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+                0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .preview-phone-top {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666666;
+            font-size: 10px;
+        }
+
+        .preview-screen {
+            background: #101010;
+            border: 1px solid #252525;
+            border-radius: 16px;
+            min-height: 180px;
+            overflow: hidden;
+        }
+
+        .preview-screen-header {
+            padding: 12px 13px;
+            background: linear-gradient(135deg, #171717, #202020);
+            border-bottom: 1px solid #292929;
+        }
+
+        .preview-screen-title {
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .preview-screen-subtitle {
+            margin-top: 3px;
+            color: #888888;
+            font-size: 10px;
+        }
+
+        .preview-content {
+            padding: 10px;
+        }
+
+        .preview-card {
+            background: #181818;
+            border: 1px solid #303030;
+            border-radius: 13px;
+            padding: 11px;
+            margin-bottom: 9px;
+            overflow: hidden;
+        }
+
+        .preview-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .preview-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .preview-card-type {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            background: #292929;
+            color: #999999;
+            font-size: 9px;
+            direction: ltr;
+        }
+
+        .preview-card-message {
+            margin-top: 8px;
+            color: #cccccc;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .preview-card-image {
+            display: block;
+            width: 100%;
+            max-height: 230px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 9px;
+            background: #222222;
+        }
+
+        .preview-card-video {
+            display: block;
+            width: 100%;
+            max-height: 230px;
+            border-radius: 10px;
+            margin-top: 9px;
+            background: #000000;
+        }
+
+        .preview-card-link {
+            display: block;
+            margin-top: 9px;
+            color: #a78bfa;
+            font-size: 11px;
+            direction: ltr;
+            text-align: left;
+            word-break: break-all;
+        }
+
+        .preview-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 9px 13px;
+            border-radius: 9px;
+            background: #7c3aed;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .preview-off {
+            text-align: center;
+            padding: 30px 15px;
+            color: #ff8585;
+        }
+
+        .preview-off-icon {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .preview-empty {
+            text-align: center;
+            padding: 30px 15px;
+            color: #888888;
+            line-height: 1.7;
+        }
+
+        .preview-meta {
+            margin-top: 10px;
+            padding-top: 9px;
+            border-top: 1px solid #292929;
+            color: #777777;
+            font-size: 10px;
+        }
+
         .toast {
             position: fixed;
             left: 14px;
@@ -571,6 +740,14 @@
 
             .button-row .btn {
                 flex: 1;
+            }
+
+            .preview-header {
+                align-items: flex-start;
+            }
+
+            .preview-phone {
+                border-radius: 18px;
             }
         }
     </style>
@@ -684,6 +861,42 @@
                 <div class="stat">
                     <div id="activeItems" class="stat-value">0</div>
                     <div class="stat-label">Enabled Content</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LIVE HOME PREVIEW -->
+
+        <div class="card">
+
+            <div class="preview-header">
+
+                <div>
+                    <div class="card-title" style="margin-bottom:4px;">
+                        👁️ Live Home Preview
+                    </div>
+
+                    <div class="muted">
+                        Android Home API سے موجودہ active content کا preview۔
+                    </div>
+                </div>
+
+                <button
+                    class="btn btn-dark btn-small"
+                    onclick="loadHomePreview()"
+                >
+                    🔄 Refresh
+                </button>
+
+            </div>
+
+            <div id="homePreview">
+
+                <div class="loading">
+                    Loading preview...
                 </div>
 
             </div>
@@ -1164,7 +1377,8 @@
             await Promise.all([
                 loadContent(),
                 loadMedia(),
-                loadStatus()
+                loadStatus(),
+                loadHomePreview()
             ]);
 
         } catch (error) {
@@ -1504,6 +1718,8 @@
 
             await loadContent();
 
+            await loadHomePreview();
+
         } catch (error) {
 
             showGlobalMessage(
@@ -1532,6 +1748,8 @@
             );
 
             await loadContent();
+
+            await loadHomePreview();
 
             showToast("Content status updated");
 
@@ -1571,6 +1789,8 @@
             );
 
             await loadContent();
+
+            await loadHomePreview();
 
             clearForm();
 
@@ -1616,6 +1836,9 @@
                     : "Home Content OFF";
 
 
+            await loadHomePreview();
+
+
             showToast(
                 enabled
                     ? "Home Content ON"
@@ -1630,6 +1853,353 @@
                 error.message || "Home toggle failed",
                 false
             );
+        }
+    }
+
+
+    // =========================================================
+    // LIVE HOME PREVIEW
+    // =========================================================
+
+    async function loadHomePreview() {
+
+        const container = $("homePreview");
+
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML =
+            '<div class="loading">Loading Home preview...</div>';
+
+
+        try {
+
+            const response =
+                await fetch("/api/home-content", {
+                    method: "GET",
+                    cache: "no-store"
+                });
+
+
+            let data = null;
+
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = null;
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data && data.error
+                        ? data.error
+                        : "Home API request failed: " + response.status
+                );
+            }
+
+
+            if (!data) {
+                throw new Error("Home API نے کوئی data واپس نہیں کیا۔");
+            }
+
+
+            renderHomePreview(data);
+
+        } catch (error) {
+
+            container.innerHTML =
+                '<div class="preview-empty">' +
+                '<div style="font-size:28px;margin-bottom:8px;">⚠️</div>' +
+                '<div style="color:#ff8585;font-weight:800;">Preview load failed</div>' +
+                '<div style="margin-top:6px;">' +
+                escapeHtml(error.message || "Unknown error") +
+                '</div>' +
+                '</div>';
+        }
+    }
+
+
+    function renderHomePreview(data) {
+
+        const container = $("homePreview");
+
+        if (!container) {
+            return;
+        }
+
+
+        const homeEnabled =
+            data.enabled !== false;
+
+
+        const sourceItems =
+            Array.isArray(data.items)
+                ? data.items
+                : [];
+
+
+        const activeItems =
+            sourceItems
+                .filter(function (item) {
+                    return item && item.enabled !== false;
+                })
+                .slice()
+                .sort(function (a, b) {
+                    return Number(a.order || 0) -
+                           Number(b.order || 0);
+                });
+
+
+        let cardsHtml = "";
+
+
+        if (!homeEnabled) {
+
+            cardsHtml =
+                '<div class="preview-off">' +
+                    '<div class="preview-off-icon">🚫</div>' +
+                    '<div style="font-weight:900;font-size:16px;">Home Content OFF</div>' +
+                    '<div style="margin-top:7px;font-size:12px;">' +
+                        'Admin Panel سے Home Content بند ہے۔' +
+                    '</div>' +
+                '</div>';
+
+        } else if (!activeItems.length) {
+
+            cardsHtml =
+                '<div class="preview-empty">' +
+                    '<div style="font-size:28px;margin-bottom:8px;">📭</div>' +
+                    '<div>کوئی enabled Home content موجود نہیں۔</div>' +
+                '</div>';
+
+        } else {
+
+            cardsHtml =
+                activeItems.map(function (item) {
+                    return buildPreviewCard(item);
+                }).join("");
+        }
+
+
+        const previewVersion =
+            data.version !== undefined &&
+            data.version !== null
+                ? "Version: " + data.version
+                : "";
+
+
+        container.innerHTML =
+            '<div class="preview-phone">' +
+
+                '<div class="preview-phone-top">' +
+                    'MAYOTUBE HOME' +
+                '</div>' +
+
+                '<div class="preview-screen">' +
+
+                    '<div class="preview-screen-header">' +
+                        '<div class="preview-screen-title">' +
+                            'MAYOTUBE' +
+                        '</div>' +
+
+                        '<div class="preview-screen-subtitle">' +
+                            (
+                                homeEnabled
+                                    ? 'Home Content ON'
+                                    : 'Home Content OFF'
+                            ) +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="preview-content">' +
+                        cardsHtml +
+
+                        '<div class="preview-meta">' +
+                            escapeHtml(
+                                previewVersion ||
+                                "Live API Preview"
+                            ) +
+                            ' • ' +
+                            escapeHtml(
+                                String(activeItems.length)
+                            ) +
+                            ' active item(s)' +
+                        '</div>' +
+
+                    '</div>' +
+
+                '</div>' +
+
+            '</div>';
+    }
+
+
+    function buildPreviewCard(item) {
+
+        const type =
+            String(item.type || "unknown");
+
+
+        const title =
+            item.title ||
+            "";
+
+
+        const message =
+            item.message ||
+            item.description ||
+            "";
+
+
+        const imageUrl =
+            item.image_url ||
+            "";
+
+
+        const videoUrl =
+            item.video_url ||
+            "";
+
+
+        const linkUrl =
+            item.link_url ||
+            "";
+
+
+        const buttonText =
+            item.button_text ||
+            "";
+
+
+        let mediaHtml = "";
+
+
+        if (imageUrl) {
+
+            mediaHtml =
+                '<img' +
+                    ' class="preview-card-image"' +
+                    ' src="' + escapeHtml(imageUrl) + '"' +
+                    ' alt="' + escapeHtml(title) + '"' +
+                    ' loading="lazy"' +
+                    ' onerror="this.style.display=\'none\'"' +
+                '>';
+
+        } else if (videoUrl) {
+
+            mediaHtml =
+                '<video' +
+                    ' class="preview-card-video"' +
+                    ' src="' + escapeHtml(videoUrl) + '"' +
+                    ' controls' +
+                    ' preload="metadata"' +
+                '></video>';
+        }
+
+
+        let linkHtml = "";
+
+        if (linkUrl) {
+
+            linkHtml =
+                '<a' +
+                    ' class="preview-card-link"' +
+                    ' href="' + escapeHtml(safePreviewUrl(linkUrl)) + '"' +
+                    ' target="_blank"' +
+                    ' rel="noopener noreferrer"' +
+                '>' +
+                    escapeHtml(linkUrl) +
+                '</a>';
+        }
+
+
+        let buttonHtml = "";
+
+        if (buttonText && linkUrl) {
+
+            buttonHtml =
+                '<a' +
+                    ' class="preview-button"' +
+                    ' href="' + escapeHtml(safePreviewUrl(linkUrl)) + '"' +
+                    ' target="_blank"' +
+                    ' rel="noopener noreferrer"' +
+                '>' +
+                    escapeHtml(buttonText) +
+                '</a>';
+        }
+
+
+        return (
+            '<div class="preview-card">' +
+
+                (
+                    title
+                        ? '<div class="preview-card-title">' +
+                            escapeHtml(title) +
+                          '</div>'
+                        : ""
+                ) +
+
+                '<div class="preview-card-type">' +
+                    escapeHtml(type) +
+                '</div>' +
+
+                (
+                    message
+                        ? '<div class="preview-card-message">' +
+                            escapeHtml(message) +
+                          '</div>'
+                        : ""
+                ) +
+
+                mediaHtml +
+
+                linkHtml +
+
+                buttonHtml +
+
+            '</div>'
+        );
+    }
+
+
+    function safePreviewUrl(value) {
+
+        const raw =
+            String(value || "").trim();
+
+
+        if (!raw) {
+            return "#";
+        }
+
+
+        try {
+
+            const parsed =
+                new URL(raw, window.location.origin);
+
+
+            const protocol =
+                parsed.protocol.toLowerCase();
+
+
+            if (
+                protocol === "http:" ||
+                protocol === "https:"
+            ) {
+                return parsed.href;
+            }
+
+
+            return "#";
+
+        } catch (error) {
+
+            return "#";
         }
     }
 
