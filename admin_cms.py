@@ -294,10 +294,110 @@ def blob_result_value(
         key
     )
 
-    return getattr(
+    value = getattr(
         result,
         attribute,
-        default
+        None
+    )
+
+    if value is not None:
+        return value
+
+    blob = getattr(
+        result,
+        "blob",
+        None
+    )
+
+    if blob is not None:
+
+        if isinstance(
+            blob,
+            dict
+        ):
+
+            return blob.get(
+                key,
+                default
+            )
+
+        nested_attribute = attr_map.get(
+            key,
+            key
+        )
+
+        nested_value = getattr(
+            blob,
+            nested_attribute,
+            None
+        )
+
+        if nested_value is not None:
+            return nested_value
+
+    return default
+
+
+def read_blob_stream(
+    stream
+):
+
+    if stream is None:
+        return b""
+
+    chunks = []
+
+    try:
+
+        for chunk in stream:
+
+            if chunk is None:
+                continue
+
+            if isinstance(
+                chunk,
+                bytes
+            ):
+
+                chunks.append(
+                    chunk
+                )
+
+            elif isinstance(
+                chunk,
+                bytearray
+            ):
+
+                chunks.append(
+                    bytes(chunk)
+                )
+
+            elif isinstance(
+                chunk,
+                str
+            ):
+
+                chunks.append(
+                    chunk.encode(
+                        "utf-8"
+                    )
+                )
+
+            else:
+
+                chunks.append(
+                    bytes(chunk)
+                )
+
+    except TypeError as error:
+
+        raise Exception(
+            "Unable to read Vercel Blob stream: "
+            + clean_text(error)
+        )
+
+    return b"".join(
+        chunks
     )
 
 
@@ -320,6 +420,11 @@ def load_blob_json():
 
             return None
 
+        # ----------------------------------------------------
+        # Some SDK versions expose the downloaded content
+        # directly through "body".
+        # ----------------------------------------------------
+
         body = getattr(
             result,
             "body",
@@ -333,24 +438,51 @@ def load_blob_json():
                 bytes
             ):
 
-                return json.loads(
-                    body.decode(
-                        "utf-8"
-                    )
+                raw = body
+
+            elif isinstance(
+                body,
+                bytearray
+            ):
+
+                raw = bytes(
+                    body
                 )
 
-            if isinstance(
+            elif isinstance(
                 body,
                 str
             ):
 
-                return json.loads(
+                raw = body.encode(
+                    "utf-8"
+                )
+
+            else:
+
+                raw = bytes(
                     body
                 )
 
-            return json.loads(
-                body
-            )
+            if raw:
+
+                content = json.loads(
+                    raw.decode(
+                        "utf-8"
+                    )
+                )
+
+                if isinstance(
+                    content,
+                    dict
+                ):
+
+                    return content
+
+        # ----------------------------------------------------
+        # Current Vercel Blob SDK exposes downloaded data
+        # through result.stream.
+        # ----------------------------------------------------
 
         stream = getattr(
             result,
@@ -360,32 +492,90 @@ def load_blob_json():
 
         if stream is not None:
 
-            chunks = []
-
-            for chunk in stream:
-
-                if isinstance(
-                    chunk,
-                    str
-                ):
-
-                    chunk = chunk.encode(
-                        "utf-8"
-                    )
-
-                chunks.append(
-                    chunk
-                )
-
-            raw = b"".join(
-                chunks
+            raw = read_blob_stream(
+                stream
             )
 
-            return json.loads(
+            if raw:
+
+                content = json.loads(
+                    raw.decode(
+                        "utf-8"
+                    )
+                )
+
+                if isinstance(
+                    content,
+                    dict
+                ):
+
+                    return content
+
+        # ----------------------------------------------------
+        # Some result wrappers may expose the content as
+        # "data" or "content".
+        # ----------------------------------------------------
+
+        for attribute_name in (
+            "data",
+            "content"
+        ):
+
+            value = getattr(
+                result,
+                attribute_name,
+                None
+            )
+
+            if value is None:
+                continue
+
+            if isinstance(
+                value,
+                bytes
+            ):
+
+                raw = value
+
+            elif isinstance(
+                value,
+                bytearray
+            ):
+
+                raw = bytes(
+                    value
+                )
+
+            elif isinstance(
+                value,
+                str
+            ):
+
+                raw = value.encode(
+                    "utf-8"
+                )
+
+            else:
+
+                continue
+
+            if not raw:
+                continue
+
+            content = json.loads(
                 raw.decode(
                     "utf-8"
                 )
             )
+
+            if isinstance(
+                content,
+                dict
+            ):
+
+                return content
+
+        return None
 
     except Exception as error:
 
@@ -398,13 +588,13 @@ def load_blob_json():
             in message
             or "404"
             in message
+            or "blobnotfound"
+            in message
         ):
 
             return None
 
         raise
-
-    return None
 
 
 def save_blob_json(
@@ -477,7 +667,7 @@ def load_cms_content():
             content = load_blob_json()
 
             # ------------------------------------------------
-            # CMS FILE ALREADY EXISTS
+            # CMS FILE ALREADY EXISTS IN VERCEL BLOB
             # ------------------------------------------------
 
             if isinstance(
@@ -485,13 +675,22 @@ def load_cms_content():
                 dict
             ):
 
+                if not isinstance(
+                    content.get(
+                        "items"
+                    ),
+                    list
+                ):
+
+                    content[
+                        "items"
+                    ] = []
+
                 return content
 
             # ------------------------------------------------
-            # CMS FILE DOES NOT EXIST YET
-            #
-            # Create it automatically from the existing
-            # local home_content.json file.
+            # CMS FILE DOES NOT EXIST.
+            # Initialize it once from legacy content.
             # ------------------------------------------------
 
             legacy = legacy_home_content()
