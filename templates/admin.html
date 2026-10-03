@@ -1,1101 +1,781 @@
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAYOTUBE ADMIN - Mobile 9:16</title>
-<style>
-* { box-sizing: border-box; }
-html, body {
-    margin: 0;
-    padding: 0;
-    background: #050505;
-    color: #ffffff;
-    font-family: Arial, "Noto Nastaliq Urdu", "Noto Sans Arabic", sans-serif;
-}
-body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-button, input, select, textarea { font-family: inherit; }
-button { cursor: pointer; }
-.hidden { display: none !important; }
-
-/* ===================================================== VERTICAL 9:16 CONTAINER ===================================================== */
-.phone-frame {
-    width: 100%;
-    max-width: 420px;
-    height: 100vh;
-    max-height: 880px;
-    background: #090909;
-    border: 2px solid #222;
-    border-radius: 30px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-    position: relative;
-}
-
-.phone-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-    scroll-behavior: smooth;
-}
-
-/* Scrollbar styling for clean mobile look */
-.phone-content::-webkit-scrollbar {
-    width: 4px;
-}
-.phone-content::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
-}
-
-/* ===================================================== LOGIN ===================================================== */
-#loginScreen {
-    position: absolute;
-    inset: 0;
-    z-index: 100;
-    background: radial-gradient(circle at top, #252525 0, #090909 65%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.login-card {
-    width: 100%;
-    background: #151515;
-    border: 1px solid #303030;
-    border-radius: 20px;
-    padding: 22px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, .5);
-}
-.login-logo { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 6px; }
-.login-subtitle { text-align: center; color: #999; font-size: 12px; margin-bottom: 20px; }
-
-/* ===================================================== INPUTS ===================================================== */
-.input-group { margin-bottom: 10px; }
-.input-group label { display: block; color: #cfcfcf; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
-input, select, textarea {
-    width: 100%;
-    background: #0e0e0e;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 9px;
-    padding: 10px;
-    outline: none;
-    font-size: 13px;
-}
-input:focus, select:focus, textarea:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 2px rgba(124, 58, 237, .15);
-}
-textarea { min-height: 80px; resize: vertical; }
-.muted { color: #777; font-size: 10px; margin-top: 3px; }
-.form-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-
-/* ===================================================== BUTTONS ===================================================== */
-.btn {
-    border: 0;
-    border-radius: 9px;
-    padding: 10px 14px;
-    color: #fff;
-    background: #272727;
-    font-size: 12px;
-    font-weight: 800;
-}
-.btn:hover { filter: brightness(1.15); }
-.btn-primary { background: #6d28d9; }
-.btn-success { background: #15803d; }
-.btn-danger { background: #b91c1c; }
-.btn-warning { background: #a16207; }
-.btn-blue { background: #1d4ed8; }
-.btn-small { padding: 6px 9px; font-size: 10px; }
-.button-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-
-/* ===================================================== HEADER ===================================================== */
-.topbar {
-    background: #151515;
-    border: 1px solid #2d2d2d;
-    border-radius: 12px;
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-.brand { font-size: 16px; font-weight: 900; }
-.status { display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 11px; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, .6); }
-
-/* ===================================================== CARDS ===================================================== */
-.admin-card {
-    background: #151515;
-    border: 1px solid #2c2c2c;
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 10px;
-}
-.card-title { font-size: 15px; font-weight: 900; margin-bottom: 10px; }
-.card-subtitle { color: #888; font-size: 11px; margin-top: -6px; margin-bottom: 10px; }
-
-/* ===================================================== HOME CONTROL ===================================================== */
-.home-control { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.home-info strong { display: block; margin-bottom: 3px; font-size: 13px; }
-.home-info span { color: #888; font-size: 11px; }
-.switch { position: relative; width: 50px; height: 26px; flex-shrink: 0; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: #333; border-radius: 30px; transition: .2s; }
-.slider:before { content: ""; position: absolute; width: 20px; height: 20px; right: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
-.switch input:checked + .slider { background: #16a34a; }
-.switch input:checked + .slider:before { transform: translateX(-24px); }
-
-/* ===================================================== STATS ===================================================== */
-.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.stat { background: #0e0e0e; border: 1px solid #292929; border-radius: 10px; padding: 10px; text-align: center; }
-.stat-number { font-size: 18px; font-weight: 900; margin-bottom: 3px; }
-.stat-label { color: #888; font-size: 10px; }
-
-/* ===================================================== BOX DESIGN CONTROLS ===================================================== */
-.design-controls { background: #101010; border: 1px solid #303030; border-radius: 12px; padding: 10px; margin-top: 5px; }
-.design-controls-title { font-size: 14px; font-weight: 900; margin-bottom: 10px; }
-.design-section { border-top: 1px solid #292929; padding-top: 10px; margin-top: 10px; }
-.design-section:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
-.color-row { display: flex; align-items: center; gap: 6px; }
-.color-row input[type="color"] { width: 45px; height: 38px; padding: 2px; border-radius: 8px; cursor: pointer; }
-.range-value { min-width: 55px; text-align: center; color: #a78bfa; font-size: 11px; font-weight: 800; }
-
-/* ===================================================== SCHEDULE ===================================================== */
-.schedule-box { background: #0d0d0d; border: 1px solid #292929; border-radius: 10px; padding: 10px; }
-.schedule-status { margin-top: 6px; font-size: 11px; font-weight: 800; }
-.schedule-active { color: #22c55e; }
-.schedule-inactive { color: #ef4444; }
-
-/* ===================================================== LIST ===================================================== */
-.toolbar { display: flex; gap: 6px; flex-direction: column; margin-bottom: 10px; }
-.items-list { display: flex; flex-direction: column; gap: 8px; }
-.item-card { background: #0e0e0e; border: 1px solid #2c2c2c; border-radius: 11px; padding: 10px; }
-.item-head { display: flex; align-items: flex-start; gap: 8px; }
-.drag-handle { cursor: grab; color: #777; font-size: 18px; user-select: none; }
-.item-main { flex: 1; min-width: 0; }
-.item-title { font-size: 13px; font-weight: 900; word-break: break-word; }
-.item-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
-.badge { display: inline-flex; padding: 3px 6px; border-radius: 5px; font-size: 9px; font-weight: 800; background: #252525; color: #aaa; }
-.badge-green { color: #86efac; background: rgba(22, 101, 52, .3); }
-.badge-red { color: #fca5a5; background: rgba(127, 29, 29, .3); }
-.badge-purple { color: #c4b5fd; background: rgba(76, 29, 149, .3); }
-.item-preview { margin-top: 7px; color: #999; font-size: 11px; white-space: pre-wrap; word-break: break-word; }
-.item-actions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-
-/* ===================================================== LIVE PREVIEW ===================================================== */
-.preview-wrapper { background: #080808; border: 1px solid #282828; border-radius: 12px; padding: 10px; }
-.preview-phone { background: #101010; border-radius: 14px; padding: 10px; min-height: 180px; }
-.preview-card { margin: 0 auto 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); }
-.preview-card-title { font-size: 14px; font-weight: 900; margin-bottom: 6px; }
-.preview-card-type { color: #888; font-size: 9px; margin-bottom: 5px; }
-.preview-card-message { font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-.preview-card-image { width: 100%; display: block; border-radius: 8px; margin-top: 7px; background: #080808; }
-.preview-card-video { width: 100%; max-height: 300px; display: block; border-radius: 8px; margin-top: 7px; background: #000; }
-.preview-card-link { display: block; margin-top: 7px; color: #93c5fd; word-break: break-all; font-size: 11px; }
-.preview-card-button { display: inline-block; margin-top: 8px; background: #6d28d9; color: white; padding: 7px 12px; border-radius: 8px; text-decoration: none; font-size: 11px; font-weight: 800; }
-.preview-empty { text-align: center; color: #777; padding: 25px 10px; font-size: 12px; }
-
-/* ===================================================== MEDIA ===================================================== */
-.media-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.media-card { background: #0e0e0e; border: 1px solid #292929; border-radius: 10px; overflow: hidden; }
-.media-thumb { width: 100%; height: 90px; object-fit: cover; background: #050505; }
-.media-info { padding: 6px; }
-.media-name { font-size: 10px; word-break: break-word; color: #ccc; }
-
-/* ===================================================== RECYCLE BIN ===================================================== */
-.trash-card { background: #130b0b; border: 1px solid #452020; border-radius: 10px; padding: 10px; margin-bottom: 6px; }
-
-/* ===================================================== TOAST ===================================================== */
-#toast {
-    position: fixed;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: #202020;
-    border: 1px solid #3b3b3b;
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    z-index: 99999;
-    opacity: 0;
-    transition: .25s;
-    max-width: calc(100% - 24px);
-    text-align: center;
-}
-#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.loading { text-align: center; padding: 15px; color: #888; font-size: 12px; }
-</style>
-
-<div class="phone-frame">
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="login-logo">MAYOTUBE ADMIN</div>
-            <div class="login-subtitle">Secure Content Management Panel</div>
-            <div class="input-group">
-                <label for="tokenInput">Admin Token</label>
-                <input id="tokenInput" type="password" placeholder="Admin Token" autocomplete="off">
-            </div>
-            <label style="display:flex; align-items:center; gap:6px; color:#aaa; font-size:11px; margin-bottom:12px;">
-                <input id="rememberToken" type="checkbox" style="width:auto"> Remember Token
-            </label>
-            <button class="btn btn-primary" style="width:100%" onclick="login()">🔐 Login</button>
-            <div id="loginError" style="color:#f87171; font-size:11px; margin-top:10px; text-align:center;"></div>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTENT (VERTICAL SCROLL) -->
-    <div id="app" class="phone-content hidden">
-        <!-- TOPBAR -->
-        <div class="topbar">
-            <div>
-                <div class="brand">MAYOTUBE ADMIN</div>
-                <div class="status">
-                    <span class="status-dot"></span>
-                    <span id="connectionText">Connected</span>
-                </div>
-            </div>
-            <button class="btn btn-danger btn-small" onclick="logout()">Logout</button>
-        </div>
-
-        <!-- HOME CONTROL -->
-        <div class="admin-card">
-            <div class="card-title">🏠 Home Control</div>
-            <div class="home-control">
-                <div class="home-info">
-                    <strong>Home Content</strong>
-                    <span id="homeStatusText">Loading...</span>
-                </div>
-                <label class="switch">
-                    <input id="homeEnabled" type="checkbox" onchange="toggleHome()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <!-- STATISTICS -->
-        <div class="admin-card">
-            <div class="card-title">📊 Statistics</div>
-            <div class="stats-grid">
-                <div class="stat">
-                    <div id="statTotal" class="stat-number">0</div>
-                    <div class="stat-label">Total</div>
-                </div>
-                <div class="stat">
-                    <div id="statEnabled" class="stat-number">0</div>
-                    <div class="stat-label">Enabled</div>
-                </div>
-                <div class="stat">
-                    <div id="statDisabled" class="stat-number">0</div>
-                    <div class="stat-label">Disabled</div>
-                </div>
-                <div class="stat">
-                    <div id="statTrash" class="stat-number">0</div>
-                    <div class="stat-label">Recycle Bin</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTENT EDITOR -->
-        <div class="admin-card">
-            <div class="card-title">✏️ Content Editor</div>
-            <div class="card-subtitle">Content بنائیں، Design کریں اور Schedule کریں۔</div>
-            <input id="itemId" type="hidden">
-            <div class="form-grid">
-                <!-- TYPE -->
-                <div class="input-group">
-                    <label for="itemType">Content Type</label>
-                    <select id="itemType" onchange="updateEditorFields()">
-                        <option value="message">Message</option>
-                        <option value="announcement">Announcement</option>
-                        <option value="notification">Notification</option>
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="audio">Audio</option>
-                        <option value="button">Button</option>
-                        <option value="link">Link</option>
-                        <option value="donation">Donation</option>
-                        <option value="advertisement">Advertisement</option>
-                        <option value="website">Website</option>
-                        <option value="channel">Channel</option>
-                    </select>
-                </div>
-                <!-- ORDER -->
-                <div class="input-group">
-                    <label for="itemOrder">Order</label>
-                    <input id="itemOrder" type="number" value="0">
-                </div>
-                <!-- TITLE -->
-                <div class="input-group">
-                    <label for="itemTitle">Title</label>
-                    <input id="itemTitle" type="text" placeholder="Content title">
-                </div>
-                <!-- MESSAGE -->
-                <div id="fieldMessage" class="input-group">
-                    <label for="itemMessage">Message</label>
-                    <textarea id="itemMessage" placeholder="Message..."></textarea>
-                </div>
-                <!-- DESCRIPTION -->
-                <div id="fieldDescription" class="input-group">
-                    <label for="itemDescription">Description</label>
-                    <textarea id="itemDescription" placeholder="Description..."></textarea>
-                </div>
-                <!-- IMAGE -->
-                <div id="fieldImageUrl" class="input-group">
-                    <label for="imageUrl">🖼️ Image URL</label>
-                    <input id="imageUrl" type="url" placeholder="https://...">
-                </div>
-                <!-- VIDEO -->
-                <div id="fieldVideoUrl" class="input-group">
-                    <label for="videoUrl">🎬 Video URL</label>
-                    <input id="videoUrl" type="url" placeholder="https://...">
-                </div>
-                <!-- LINK -->
-                <div id="fieldLinkUrl" class="input-group">
-                    <label for="linkUrl">🔗 Link URL</label>
-                    <input id="linkUrl" type="url" placeholder="https://...">
-                </div>
-                <!-- BUTTON TEXT -->
-                <div id="fieldButtonText" class="input-group">
-                    <label for="buttonText">Button Text</label>
-                    <input id="buttonText" type="text" placeholder="Open">
-                </div>
-                <!-- ENABLE -->
-                <div class="input-group">
-                    <label>Status</label>
-                    <label style="display:flex; align-items:center; gap:6px; background:#0d0d0d; padding:10px; border-radius:8px; border:1px solid #292929;">
-                        <input id="itemEnabled" type="checkbox" checked style="width:auto"> 🟢 Enabled
-                    </label>
-                </div>
-
-                <!-- BOX DESIGN -->
-                <div class="input-group">
-                    <div class="design-controls">
-                        <div class="design-controls-title">📦 Box Design Controls</div>
-                        <div class="design-section">
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label for="boxStyle">Box Style</label>
-                                    <select id="boxStyle">
-                                        <option value="card">Card</option>
-                                        <option value="flat">Flat</option>
-                                        <option value="transparent">Transparent</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label for="boxTextAlign">Text Alignment</label>
-                                    <select id="boxTextAlign">
-                                        <option value="right">Right</option>
-                                        <option value="center">Center</option>
-                                        <option value="left">Left</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="design-section">
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label>Background Color</label>
-                                    <div class="color-row">
-                                        <input id="boxBackgroundColor" type="color" value="#181818">
-                                        <span id="boxBackgroundColorValue" class="range-value">#181818</span>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>Text Color</label>
-                                    <div class="color-row">
-                                        <input id="boxTextColor" type="color" value="#ffffff">
-                                        <span id="boxTextColorValue" class="range-value">#ffffff</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="design-section">
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label for="boxWidth">Box Width (%)</label>
-                                    <input id="boxWidth" type="number" min="10" max="100" value="100">
-                                </div>
-                                <div class="input-group">
-                                    <label for="boxHeight">Box Height (0=Auto)</label>
-                                    <input id="boxHeight" type="number" min="0" max="2000" value="0">
-                                </div>
-                                <div class="input-group">
-                                    <label for="boxPadding">Padding (px)</label>
-                                    <input id="boxPadding" type="number" min="0" max="100" value="11">
-                                </div>
-                                <div class="input-group">
-                                    <label for="boxRadius">Border Radius (px)</label>
-                                    <input id="boxRadius" type="number" min="0" max="100" value="13">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="design-section">
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label for="boxShadow">Shadow</label>
-                                    <select id="boxShadow">
-                                        <option value="none">None</option>
-                                        <option value="small">Small</option>
-                                        <option value="medium" selected>Medium</option>
-                                        <option value="large">Large</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label for="boxBorder">Border</label>
-                                    <select id="boxBorder">
-                                        <option value="none">None</option>
-                                        <option value="subtle" selected>Subtle</option>
-                                        <option value="strong">Strong</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- SCHEDULE -->
-                        <div class="design-section">
-                            <div style="font-weight:800; margin-bottom:8px; font-size:12px;">📅 Scheduled Show / Hide</div>
-                            <div class="schedule-box">
-                                <div class="form-grid">
-                                    <div class="input-group">
-                                        <label for="scheduleStart">Show From</label>
-                                        <input id="scheduleStart" type="datetime-local">
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="scheduleEnd">Hide After</label>
-                                        <input id="scheduleEnd" type="datetime-local">
-                                    </div>
-                                </div>
-                                <div id="scheduleStatus" class="schedule-status">No schedule</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- SAVE -->
-            <div class="button-row" style="margin-top:12px;">
-                <button class="btn btn-primary" onclick="saveItem()">💾 Save</button>
-                <button class="btn" onclick="clearForm()">➕ New</button>
-                <button class="btn" onclick="loadContent()">🔄 Refresh</button>
-            </div>
-        </div>
-
-        <!-- LIVE PREVIEW -->
-        <div class="admin-card">
-            <div class="card-title">👁️ Live Home Preview</div>
-            <div class="preview-wrapper">
-                <div id="homePreview" class="preview-phone">
-                    <div class="preview-empty">Loading preview...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTENT LIST -->
-        <div class="admin-card">
-            <div class="card-title">📦 Home Content</div>
-            <div class="toolbar">
-                <input id="searchItems" type="search" placeholder="🔍 Search..." oninput="renderItems()">
-                <select id="filterType" onchange="renderItems()">
-                    <option value="all">All Types</option>
-                    <option value="message">Message</option>
-                    <option value="announcement">Announcement</option>
-                    <option value="notification">Notification</option>
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="audio">Audio</option>
-                    <option value="button">Button</option>
-                    <option value="link">Link</option>
-                    <option value="donation">Donation</option>
-                    <option value="advertisement">Advertisement</option>
-                    <option value="website">Website</option>
-                    <option value="channel">Channel</option>
-                </select>
-                <select id="filterStatus" onchange="renderItems()">
-                    <option value="all">All Status</option>
-                    <option value="enabled">Enabled</option>
-                    <option value="disabled">Disabled</option>
-                    <option value="scheduled">Scheduled</option>
-                </select>
-            </div>
-            <div id="itemsList" class="items-list"></div>
-        </div>
-
-        <!-- RECYCLE BIN -->
-        <div class="admin-card">
-            <div class="card-title">🗑️ Recycle Bin</div>
-            <div id="trashList"></div>
-            <button class="btn btn-danger btn-small" style="margin-top:8px;" onclick="emptyTrash()">Empty Recycle Bin</button>
-        </div>
-
-        <!-- MEDIA MANAGER -->
-        <div class="admin-card">
-            <div class="card-title">📁 Media Manager</div>
-            <div class="input-group">
-                <input id="mediaFile" type="file" accept="image/*,video/*,audio/*">
-            </div>
-            <div class="button-row">
-                <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
-                <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
-            </div>
-            <div id="mediaList" class="media-grid" style="margin-top:10px"></div>
-        </div>
-
-        <!-- SYSTEM STATUS -->
-        <div class="admin-card">
-            <div class="card-title">⚙️ System Status</div>
-            <pre id="systemStatus" style="background:#080808; border:1px solid #292929; border-radius:8px; padding:10px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#aaa; font-size:10px;">Loading...</pre>
-        </div>
-    </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-let adminToken = "";
-let cmsContent = { items: [], home_enabled: true };
-let draggedId = null;
-const TRASH_KEY = "mayotube_admin_recycle_bin_v1";
-
-function $(id) { return document.getElementById(id); }
-
-let toastTimer = null;
-function showToast(message) {
-    const toast = $("toast");
-    toast.textContent = message;
-    toast.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toast.classList.remove("show"); }, 2800);
-}
-
-function escapeHtml(value) {
-    return String(value ?? "").replace(/&/g, "&amp;").replace(/</g,"&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-function safePreviewUrl(value) {
-    if (!value) return "";
-    try {
-        const url = new URL(value);
-        if (url.protocol === "http:" || url.protocol === "https:") return url.href;
-    } catch (e) {}
-    return "";
-}
-
-async function api(path, options = {}) {
-    const headers = { ...(options.headers || {}), "Authorization": "Bearer " + adminToken };
-    if (options.body && !(options.body instanceof FormData)) {
-        headers["Content-Type"] = "application/json";
-    }
-    const response = await fetch(path, { ...options, headers });
-    const text = await response.text();
-    let data;
-    try { data = JSON.parse(text); } catch (e) { data = { raw: text }; }
-    if (!response.ok) {
-        throw new Error(data.message || data.error || data.raw || "Request failed");
-    }
-    return data;
-}
-
-function login() {
-    const token = $("tokenInput").value.trim();
-    if (!token) {
-        $("loginError").textContent = "Admin Token درج کریں۔";
-        return;
-    }
-    adminToken = token;
-    if ($("rememberToken").checked) {
-        localStorage.setItem("mayotube_admin_token", token);
-    }
-    $("loginError").textContent = "";
-    $("loginScreen").classList.add("hidden");
-    $("app").classList.remove("hidden");
-    initialize();
-}
-
-function logout() {
-    adminToken = "";
-    sessionStorage.removeItem("mayotube_admin_token");
-    $("app").classList.add("hidden");
-    $("loginScreen").classList.remove("hidden");
-    $("tokenInput").value = "";
-}
-
-async function initialize() {
-    updateColorLabels();
-    $("boxBackgroundColor").addEventListener("input", updateColorLabels);
-    $("boxTextColor").addEventListener("input", updateColorLabels);
-    $("scheduleStart").addEventListener("change", updateScheduleStatus);
-    $("scheduleEnd").addEventListener("change", updateScheduleStatus);
-    clearForm();
-    await loadAll();
-}
-
-async function loadAll() {
-    try {
-        await loadContent();
-        await loadHomePreview();
-        await loadMedia();
-        await loadStatus();
-        $("connectionText").textContent = "Connected";
-    } catch (error) {
-        console.error(error);
-        $("connectionText").textContent = "Error";
-        showToast("Error: " + error.message);
-    }
-}
-
-async function loadContent() {
-    const data = await api("/api/admin/content");
-    cmsContent = data || {};
-    if (!Array.isArray(cmsContent.items)) cmsContent.items = [];
-    cmsContent.items.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-    $("homeEnabled").checked = cmsContent.home_enabled !== false;
-    $("homeStatusText").textContent = cmsContent.home_enabled !== false ? "ON" : "OFF";
-    updateStats();
-    renderItems();
-    renderTrash();
-}
-
-function updateStats() {
-    const items = cmsContent.items || [];
-    const enabled = items.filter(item => item.enabled !== false).length;
-    const disabled = items.length - enabled;
-    $("statTotal").textContent = items.length;
-    $("statEnabled").textContent = enabled;
-    $("statDisabled").textContent = disabled;
-    $("statTrash").textContent = getTrash().length;
-}
-
-async function toggleHome() {
-    const enabled = $("homeEnabled").checked;
-    try {
-        await api("/api/admin/home/toggle", { method: "PATCH", body: JSON.stringify({ enabled }) });
-        $("homeStatusText").textContent = enabled ? "ON" : "OFF";
-        showToast(enabled ? "Home ON" : "Home OFF");
-        await loadHomePreview();
-    } catch (error) {
-        $("homeEnabled").checked = !enabled;
-        showToast("Toggle failed: " + error.message);
-    }
-}
-
-function updateEditorFields() {
-    const type = $("itemType").value;
-    const imageTypes = ["image", "donation", "advertisement"];
-    const videoTypes = ["video"];
-    const linkTypes = ["button", "link", "website", "youtube", "channel", "donation", "advertisement"];
-    $("fieldImageUrl").style.display = imageTypes.includes(type) ? "" : "none";
-    $("fieldVideoUrl").style.display = videoTypes.includes(type) ? "" : "none";
-    $("fieldLinkUrl").style.display = linkTypes.includes(type) ? "" : "none";
-    $("fieldButtonText").style.display = ["button", "donation", "advertisement"].includes(type) ? "" : "none";
-}
-
-function getBoxStyleFromForm() {
-    return {
-        boxStyle: $("boxStyle").value || "card",
-        backgroundColor: $("boxBackgroundColor").value || "#181818",
-        textColor: $("boxTextColor").value || "#ffffff",
-        textAlign: $("boxTextAlign").value || "right",
-        borderRadius: Number($("boxRadius").value || 13),
-        boxHeight: Number($("boxHeight").value || 0),
-        boxWidth: Number($("boxWidth").value || 100),
-        padding: Number($("boxPadding").value || 11),
-        shadow: $("boxShadow").value || "medium",
-        border: $("boxBorder").value || "subtle"
-    };
-}
-
-function applyBoxStyleToForm(style) {
-    style = style || {};
-    $("boxStyle").value = style.boxStyle || "card";
-    $("boxBackgroundColor").value = style.backgroundColor || "#181818";
-    $("boxTextColor").value = style.textColor || "#ffffff";
-    $("boxTextAlign").value = style.textAlign || "right";
-    $("boxRadius").value = style.borderRadius !== undefined ? style.borderRadius : 13;
-    $("boxHeight").value = style.boxHeight !== undefined ? style.boxHeight : 0;
-    $("boxWidth").value = style.boxWidth !== undefined ? style.boxWidth : 100;
-    $("boxPadding").value = style.padding !== undefined ? style.padding : 11;
-    $("boxShadow").value = style.shadow || "medium";
-    $("boxBorder").value = style.border || "subtle";
-    updateColorLabels();
-}
-
-function updateColorLabels() {
-    if ($("boxBackgroundColor")) $("boxBackgroundColorValue").textContent = $("boxBackgroundColor").value;
-    if ($("boxTextColor")) $("boxTextColorValue").textContent = $("boxTextColor").value;
-}
-
-function getPreviewShadow(shadow) {
-    switch (shadow) {
-        case "small": return "0 2px 8px rgba(0,0,0,.25)";
-        case "medium": return "0 6px 18px rgba(0,0,0,.35)";
-        case "large": return "0 10px 30px rgba(0,0,0,.50)";
-        default: return "none";
-    }
-}
-
-function getPreviewBoxStyle(item) {
-    const style = item.style || {};
-    const boxStyle = style.boxStyle || "card";
-    let background = style.backgroundColor || "#181818";
-    if (boxStyle === "flat") background = style.backgroundColor || "#101010";
-    if (boxStyle === "transparent") background = "transparent";
-    const width = Math.max(10, Math.min(100, Number(style.boxWidth || 100)));
-    const height = Number(style.boxHeight || 0);
-    const padding = Number(style.padding || 11);
-    const radius = Number(style.borderRadius || 13);
-    const textColor = style.textColor || "#ffffff";
-    const textAlign = style.textAlign || "right";
-    let border = "1px solid rgba(255,255,255,.07)";
-    if (style.border === "none") border = "none";
-    if (style.border === "strong") border = "1px solid rgba(255,255,255,.22)";
-    return { background, width: width + "%", minHeight: height > 0 ? height + "px" : "auto", padding: padding + "px", borderRadius: radius + "px", boxShadow: getPreviewShadow(style.shadow || "medium"), border, color: textColor, textAlign };
-}
-
-function clearForm() {
-    $("itemId").value = "";
-    $("itemType").value = "message";
-    $("itemOrder").value = getNextOrder();
-    $("itemTitle").value = "";
-    $("itemMessage").value = "";
-    $("itemDescription").value = "";
-    $("imageUrl").value = "";
-    $("videoUrl").value = "";
-    $("linkUrl").value = "";
-    $("buttonText").value = "";
-    $("itemEnabled").checked = true;
-    applyBoxStyleToForm({});
-    $("scheduleStart").value = "";
-    $("scheduleEnd").value = "";
-    updateScheduleStatus();
-    updateEditorFields();
-}
-
-function getNextOrder() {
-    const items = cmsContent.items || [];
-    if (!items.length) return 1;
-    return Math.max(...items.map(item => Number(item.order || 0))) + 1;
-}
-
-function editItem(id) {
-    const item = cmsContent.items.find(x => String(x.id) === String(id));
-    if (!item) return;
-    $("itemId").value = item.id || "";
-    $("itemType").value = item.type || "message";
-    $("itemOrder").value = item.order !== undefined ? item.order : 0;
-    $("itemTitle").value = item.title || "";
-    $("itemMessage").value = item.message || "";
-    $("itemDescription").value = item.description || "";
-    $("imageUrl").value = item.image_url || "";
-    $("videoUrl").value = item.video_url || "";
-    $("linkUrl").value = item.link_url || "";
-    $("buttonText").value = item.button_text || "";
-    $("itemEnabled").checked = item.enabled !== false;
-    applyBoxStyleToForm(item.style || {});
-    const schedule = item.schedule || {};
-    $("scheduleStart").value = schedule.start || "";
-    $("scheduleEnd").value = schedule.end || "";
-    updateScheduleStatus();
-    updateEditorFields();
-    showToast("Edit mode");
-}
-
-async function saveItem() {
-    const id = $("itemId").value.trim();
-    const item = {
-        type: $("itemType").value,
-        title: $("itemTitle").value.trim(),
-        message: $("itemMessage").value.trim(),
-        description: $("itemDescription").value.trim(),
-        image_url: $("imageUrl").value.trim(),
-        video_url: $("videoUrl").value.trim(),
-        link_url: $("linkUrl").value.trim(),
-        button_text: $("buttonText").value.trim(),
-        order: Number($("itemOrder").value || 0),
-        enabled: $("itemEnabled").checked,
-        style: getBoxStyleFromForm(),
-        schedule: { start: $("scheduleStart").value || "", end: $("scheduleEnd").value || "" }
-    };
-    try {
-        if (id) {
-            await api("/api/admin/content/" + encodeURIComponent(id), { method: "PUT", body: JSON.stringify(item) });
-        } else {
-            await api("/api/admin/content", { method: "POST", body: JSON.stringify(item) });
-        }
-        showToast(id ? "Updated!" : "Created!");
-        clearForm();
-        await loadContent();
-        await loadHomePreview();
-    } catch (error) {
-        showToast("Save failed: " + error.message);
-    }
-}
-
-async function toggleItem(id) {
-    try {
-        await api("/api/admin/content/" + encodeURIComponent(id) + "/toggle", { method: "PATCH" });
-        showToast("Status updated");
-        await loadContent();
-        await loadHomePreview();
-    } catch (error) {
-        showToast("Toggle failed: " + error.message);
-    }
-}
-
-function getTrash() {
-    try { return JSON.parse(localStorage.getItem(TRASH_KEY) || "[]"); } catch (e) { return []; }
-}
-function setTrash(items) {
-    localStorage.setItem(TRASH_KEY, JSON.stringify(items));
-    updateStats();
-}
-
-async function moveToTrash(id) {
-    const itemIndex = cmsContent.items.findIndex(x => String(x.id) === String(id));
-    if (itemIndex === -1) return;
-    const item = cmsContent.items[itemIndex];
-    const trash = getTrash();
-    if (!trash.some(x => String(x.item.id) === String(id))) {
-        trash.push({ deletedAt: new Date().toISOString(), item: JSON.parse(JSON.stringify(item)) });
-        setTrash(trash);
-    }
-    try {
-        await api("/api/admin/content/" + encodeURIComponent(id), { method: "DELETE" });
-        showToast("Moved to Recycle Bin");
-        await loadContent();
-        await loadHomePreview();
-        renderTrash();
-    } catch (error) {
-        showToast("Error: " + error.message);
-    }
-}
-
-async function restoreTrash(index) {
-    const trash = getTrash();
-    const record = trash[index];
-    if (!record) return;
-    const item = record.item;
-    delete item.id;
-    try {
-        await api("/api/admin/content", { method: "POST", body: JSON.stringify(item) });
-        trash.splice(index, 1);
-        setTrash(trash);
-        showToast("Restored!");
-        await loadContent();
-        await loadHomePreview();
-        renderTrash();
-    } catch (error) {
-        showToast("Restore failed: " + error.message);
-    }
-}
-
-function permanentDeleteTrash(index) {
-    if (!confirm("Delete permanently?")) return;
-    const trash = getTrash();
-    trash.splice(index, 1);
-    setTrash(trash);
-    renderTrash();
-    showToast("Permanently deleted");
-}
-
-function emptyTrash() {
-    if (!getTrash().length) { showToast("Already empty"); return; }
-    if (!confirm("Empty Recycle Bin?")) return;
-    setTrash([]);
-    renderTrash();
-    showToast("Emptied");
-}
-
-function renderTrash() {
-    const container = $("trashList");
-    const trash = getTrash();
-    updateStats();
-    if (!trash.length) {
-        container.innerHTML = '<div class="loading">Recycle Bin خالی ہے۔</div>';
-        return;
-    }
-    container.innerHTML = trash.map((record, index) => {
-        const item = record.item || {};
-        return (
-            '<div class="trash-card">' +
-            '<div style="font-weight:800; font-size:12px;">' + escapeHtml(item.title || "Untitled") + '</div>' +
-            '<div style="color:#888; font-size:10px; margin-top:3px;">' + escapeHtml(item.type || "") + '</div>' +
-            '<div class="item-actions">' +
-            '<button class="btn btn-success btn-small" onclick="restoreTrash(' + index + ')">Restore</button>' +
-            '<button class="btn btn-danger btn-small" onclick="permanentDeleteTrash(' + index + ')">Delete</button>' +
-            '</div>' +
-            '</div>'
-        );
-    }).join("");
-}
-
-function getFilteredItems() {
-    let items = [...(cmsContent.items || [])];
-    const search = ($("searchItems").value || "").trim().toLowerCase();
-    const type = $("filterType").value;
-    const status = $("filterStatus").value;
-    if (search) {
-        items = items.filter(item => [item.title, item.message, item.description, item.type].join(" ").toLowerCase().includes(search));
-    }
-    if (type !== "all") items = items.filter(item => item.type === type);
-    if (status === "enabled") items = items.filter(item => item.enabled !== false);
-    if (status === "disabled") items = items.filter(item => item.enabled === false);
-    items.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-    return items;
-}
-
-function renderItems() {
-    const container = $("itemsList");
-    const items = getFilteredItems();
-    if (!items.length) {
-        container.innerHTML = '<div class="loading">کوئی content نہیں ملا۔</div>';
-        return;
-    }
-    container.innerHTML = items.map(item => {
-        const enabled = item.enabled !== false;
-        return (
-            '<div class="item-card">' +
-            '<div class="item-head">' +
-            '<div class="item-main">' +
-            '<div class="item-title">' + escapeHtml(item.title || "Untitled") + '</div>' +
-            '<div class="item-meta">' +
-            '<span class="badge">' + escapeHtml(item.type || "") + '</span>' +
-            (enabled ? '<span class="badge badge-green">On</span>' : '<span class="badge badge-red">Off</span>') +
-            '</div>' +
-            '</div>' +
-            '</div>' +
-            '<div class="item-actions">' +
-            '<button class="btn btn-primary btn-small" onclick="editItem(\'' + escapeHtml(item.id) + '\')">Edit</button>' +
-            '<button class="btn btn-success btn-small" onclick="toggleItem(\'' + escapeHtml(item.id) + '\')">' + (enabled ? "Disable" : "Enable") + '</button>' +
-            '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' + escapeHtml(item.id) + '\')">Delete</button>' +
-            '</div>' +
-            '</div>'
-        );
-    }).join("");
-}
-
-function hasSchedule(item) {
-    const s = item.schedule || {};
-    return Boolean(s.start || s.end);
-}
-
-function isScheduleActive(item) {
-    const s = item.schedule || {};
-    const now = new Date();
-    if (s.start && now < new Date(s.start)) return false;
-    if (s.end && now > new Date(s.end)) return false;
-    return true;
-}
-
-function updateScheduleStatus() {
-    const start = $("scheduleStart").value;
-    const end = $("scheduleEnd").value;
-    const status = $("scheduleStatus");
-    if (!start && !end) {
-        status.textContent = "No schedule";
-        status.className = "schedule-status";
-        return;
-    }
-    status.textContent = "Scheduled active check setup";
-}
-
-async function loadHomePreview() {
-    const container = $("homePreview");
-    try {
-        const data = await api("/api/home-content");
-        renderHomePreview(data);
-    } catch (error) {
-        container.innerHTML = '<div class="preview-empty">' + escapeHtml(error.message) + '</div>';
-    }
-}
-
-function renderHomePreview(data) {
-    const container = $("homePreview");
-    let items = data && Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
-    items = items.filter(item => item.enabled !== false && isScheduleActive(item)).sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-    if (!items.length) {
-        container.innerHTML = '<div class="preview-empty">کوئی active content نہیں ہے۔</div>';
-        return;
-    }
-    container.innerHTML = items.map(item => {
-        const design = getPreviewBoxStyle(item);
-        const imageUrl = safePreviewUrl(item.image_url);
-        const videoUrl = safePreviewUrl(item.video_url);
-        const linkUrl = safePreviewUrl(item.link_url);
-        let html = '<div class="preview-card" style="background:' + escapeHtml(design.background) + ';width:' + escapeHtml(design.width) + ';padding:' + escapeHtml(design.padding) + ';border-radius:' + escapeHtml(design.borderRadius) + ';box-shadow:' + escapeHtml(design.boxShadow) + ';border:' + escapeHtml(design.border) + ';color:' + escapeHtml(design.color) + ';text-align:' + escapeHtml(design.textAlign) + ';">';
-        if (item.title) html += '<div class="preview-card-title">' + escapeHtml(item.title) + '</div>';
-        if (item.message) html += '<div class="preview-card-message">' + escapeHtml(item.message) + '</div>';
-        if (imageUrl) html += '<img class="preview-card-image" src="' + escapeHtml(imageUrl) + '">';
-        if (videoUrl) html += '<video class="preview-card-video" src="' + escapeHtml(videoUrl) + '" controls></video>';
-        if (item.button_text && linkUrl) html += '<a class="preview-card-button" href="' + escapeHtml(linkUrl) + '" target="_blank">' + escapeHtml(item.button_text) + '</a>';
-        html += '</div>';
-        return html;
-    }).join("");
-}
-
-async function loadMedia() {
-    const container = $("mediaList");
-    try {
-        const data = await api("/api/admin/media");
-        const media = Array.isArray(data) ? data : (Array.isArray(data.media) ? data.media : []);
-        renderMedia(media);
-    } catch (error) {
-        container.innerHTML = '<div class="loading">No media</div>';
-    }
-}
-
-function renderMedia(media) {
-    const container = $("mediaList");
-    if (!media.length) { container.innerHTML = '<div class="loading">Empty</div>'; return; }
-    container.innerHTML = media.map(file => {
-        const url = safePreviewUrl(file.url || file.public_url || "");
-        return '<div class="media-card"><img class="media-thumb" src="' + escapeHtml(url) + '"><div class="media-info"><div class="media-name">' + escapeHtml(file.name || "Media") + '</div><button class="btn btn-primary btn-small" onclick="useMediaUrl(\'' + escapeHtml(url) + '\')">Use</button></div></div>';
-    }).join("");
-}
-
-function useMediaUrl(url) {
-    $("imageUrl").value = url;
-    showToast("URL added");
-}
-
-async function uploadMedia() {
-    const file = $("mediaFile").files[0];
-    if (!file) { showToast("Select file"); return; }
-    const form = new FormData();
-    form.append("file", file);
-    try {
-        await api("/api/admin/media", { method: "POST", body: form });
-        $("mediaFile").value = "";
-        showToast("Uploaded!");
-        await loadMedia();
-    } catch (error) {
-        showToast("Failed: " + error.message);
-    }
-}
-
-async function loadStatus() {
-    try {
-        const data = await api("/api/admin/status");
-        $("systemStatus").textContent = JSON.stringify(data, null, 2);
-    } catch (error) {
-        $("systemStatus").textContent = "Error";
-    }
-}
-
-(function startup() {
-    const saved = localStorage.getItem("mayotube_admin_token");
-    if (saved) {
-        $("tokenInput").value = saved;
-        $("rememberToken").checked = true;
-    }
-})();
-</script>
+<meta charset="UTF-8">    
+  
+<meta    
+    name="viewport"    
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"    
+>    
+  
+<title>MAYOTUBE ADMIN</title>    
+  
+<style>    
+  
+    * {    
+        box-sizing: border-box;    
+    }    
+  
+    html,    
+    body {    
+        margin: 0;    
+        padding: 0;    
+        background: #090909;    
+        color: #ffffff;    
+        font-family:    
+            Arial,    
+            "Noto Nastaliq Urdu",    
+            "Noto Sans Arabic",    
+            sans-serif;    
+    }    
+  
+    body {    
+        min-height: 100vh;    
+    }    
+  
+    button,    
+    input,    
+    select,    
+    textarea {    
+        font-family: inherit;    
+    }    
+  
+    button {    
+        cursor: pointer;    
+    }    
+  
+    .hidden {    
+        display: none !important;    
+    }    
+  
+    .container {    
+        width: 100%;    
+        max-width: 980px;    
+        margin: auto;    
+        padding: 14px;    
+    }    
+  
+    /* =====================================================    
+       LOGIN    
+       ===================================================== */    
+  
+    #loginScreen {    
+        min-height: 100vh;    
+        display: flex;    
+        align-items: center;    
+        justify-content: center;    
+        padding: 18px;    
+        background:    
+            radial-gradient(    
+                circle at top,    
+                #252525 0,    
+                #090909 55%    
+            );    
+    }    
+  
+    .login-card {    
+        width: 100%;    
+        max-width: 430px;    
+        background: #151515;    
+        border: 1px solid #303030;    
+        border-radius: 20px;    
+        padding: 25px;    
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .45);    
+    }    
+  
+    .login-logo {    
+        text-align: center;    
+        font-size: 27px;    
+        font-weight: 900;    
+        letter-spacing: 1px;    
+        margin-bottom: 6px;    
+    }    
+  
+    .login-subtitle {    
+        text-align: center;    
+        color: #999;    
+        font-size: 13px;    
+        margin-bottom: 25px;    
+    }    
+  
+    /* =====================================================    
+       INPUTS    
+       ===================================================== */    
+  
+    .input-group {    
+        margin-bottom: 12px;    
+    }    
+  
+    .input-group label {    
+        display: block;    
+        color: #cfcfcf;    
+        font-size: 13px;    
+        font-weight: 700;    
+        margin-bottom: 7px;    
+    }    
+  
+    input,    
+    select,    
+    textarea {    
+        width: 100%;    
+        background: #0e0e0e;    
+        border: 1px solid #333;    
+        color: #fff;    
+        border-radius: 10px;    
+        padding: 12px;    
+        outline: none;    
+        font-size: 14px;    
+    }    
+  
+    input:focus,    
+    select:focus,    
+    textarea:focus {    
+        border-color: #7c3aed;    
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, .15);    
+    }    
+  
+    textarea {    
+        min-height: 100px;    
+        resize: vertical;    
+    }    
+  
+    .muted {    
+        color: #777;    
+        font-size: 11px;    
+        margin-top: 5px;    
+    }    
+  
+    .form-grid {    
+        display: grid;    
+        grid-template-columns: repeat(2, 1fr);    
+        gap: 12px;    
+    }    
+  
+    .form-grid-3 {    
+        display: grid;    
+        grid-template-columns: repeat(3, 1fr);    
+        gap: 12px;    
+    }    
+  
+    /* =====================================================    
+       BUTTONS    
+       ===================================================== */    
+  
+    .btn {    
+        border: 0;    
+        border-radius: 10px;    
+        padding: 11px 15px;    
+        color: #fff;    
+        background: #272727;    
+        font-size: 13px;    
+        font-weight: 800;    
+    }    
+  
+    .btn:hover {    
+        filter: brightness(1.15);    
+    }    
+  
+    .btn-primary {    
+        background: #6d28d9;    
+    }    
+  
+    .btn-success {    
+        background: #15803d;    
+    }    
+  
+    .btn-danger {    
+        background: #b91c1c;    
+    }    
+  
+    .btn-warning {    
+        background: #a16207;    
+    }    
+  
+    .btn-blue {    
+        background: #1d4ed8;    
+    }    
+  
+    .btn-small {    
+        padding: 7px 10px;    
+        font-size: 11px;    
+    }    
+  
+    .button-row {    
+        display: flex;    
+        flex-wrap: wrap;    
+        gap: 8px;    
+        margin-top: 12px;    
+    }    
+  
+    /* =====================================================    
+       HEADER    
+       ===================================================== */    
+  
+    .topbar {    
+        background: #151515;    
+        border: 1px solid #2d2d2d;    
+        border-radius: 15px;    
+        padding: 14px 16px;    
+        display: flex;    
+        justify-content: space-between;    
+        align-items: center;    
+        gap: 10px;    
+        margin-bottom: 12px;    
+    }    
+  
+    .brand {    
+        font-size: 19px;    
+        font-weight: 900;    
+    }    
+  
+    .status {    
+        display: flex;    
+        align-items: center;    
+        gap: 7px;    
+        color: #aaa;    
+        font-size: 12px;    
+    }    
+  
+    .status-dot {    
+        width: 9px;    
+        height: 9px;    
+        border-radius: 50%;    
+        background: #22c55e;    
+        box-shadow: 0 0 8px rgba(34, 197, 94, .6);    
+    }    
+  
+    /* =====================================================    
+       CARDS    
+       ===================================================== */    
+  
+    .admin-card {    
+        background: #151515;    
+        border: 1px solid #2c2c2c;    
+        border-radius: 16px;    
+        padding: 15px;    
+        margin-bottom: 13px;    
+    }    
+  
+    .card-title {    
+        font-size: 16px;    
+        font-weight: 900;    
+        margin-bottom: 13px;    
+    }    
+  
+    .card-subtitle {    
+        color: #888;    
+        font-size: 12px;    
+        margin-top: -8px;    
+        margin-bottom: 14px;    
+    }    
+  
+    /* =====================================================    
+       HOME CONTROL    
+       ===================================================== */    
+  
+    .home-control {    
+        display: flex;    
+        align-items: center;    
+        justify-content: space-between;    
+        gap: 15px;    
+    }    
+  
+    .home-info strong {    
+        display: block;    
+        margin-bottom: 5px;    
+    }    
+  
+    .home-info span {    
+        color: #888;    
+        font-size: 12px;    
+    }    
+  
+    .switch {    
+        position: relative;    
+        width: 58px;    
+        height: 32px;    
+        flex-shrink: 0;    
+    }    
+  
+    .switch input {    
+        opacity: 0;    
+        width: 0;    
+        height: 0;    
+    }    
+  
+    .slider {    
+        position: absolute;    
+        inset: 0;    
+        background: #333;    
+        border-radius: 30px;    
+        transition: .2s;    
+    }    
+  
+    .slider:before {    
+        content: "";    
+        position: absolute;    
+        width: 24px;    
+        height: 24px;    
+        right: 4px;    
+        top: 4px;    
+        background: #fff;    
+        border-radius: 50%;    
+        transition: .2s;    
+    }    
+  
+    .switch input:checked + .slider {    
+        background: #16a34a;    
+    }    
+  
+    .switch input:checked + .slider:before {    
+        transform: translateX(-26px);    
+    }    
+  
+    /* =====================================================    
+       STATS    
+       ===================================================== */    
+  
+    .stats-grid {    
+        display: grid;    
+        grid-template-columns: repeat(4, 1fr);    
+        gap: 10px;    
+    }    
+  
+    .stat {    
+        background: #0e0e0e;    
+        border: 1px solid #292929;    
+        border-radius: 12px;    
+        padding: 13px;    
+        text-align: center;    
+    }    
+  
+    .stat-number {    
+        font-size: 22px;    
+        font-weight: 900;    
+        margin-bottom: 4px;    
+    }    
+  
+    .stat-label {    
+        color: #888;    
+        font-size: 11px;    
+    }    
+  
+    /* =====================================================    
+       EDITOR    
+       ===================================================== */    
+  
+    .editor-grid {    
+        display: grid;    
+        grid-template-columns: repeat(2, 1fr);    
+        gap: 12px;    
+    }    
+  
+    .full {    
+        grid-column: 1 / -1;    
+    }    
+  
+    /* =====================================================    
+       BOX DESIGN CONTROLS    
+       ===================================================== */    
+  
+    .design-controls {    
+        background: #101010;    
+        border: 1px solid #303030;    
+        border-radius: 14px;    
+        padding: 14px;    
+        margin-top: 5px;    
+    }    
+  
+    .design-controls-title {    
+        font-size: 15px;    
+        font-weight: 900;    
+        margin-bottom: 13px;    
+    }    
+  
+    .design-section {    
+        border-top: 1px solid #292929;    
+        padding-top: 13px;    
+        margin-top: 13px;    
+    }    
+  
+    .design-section:first-child {    
+        border-top: 0;    
+        padding-top: 0;    
+        margin-top: 0;    
+    }    
+  
+    .color-row {    
+        display: flex;    
+        align-items: center;    
+        gap: 8px;    
+    }    
+  
+    .color-row input[type="color"] {    
+        width: 52px;    
+        height: 43px;    
+        padding: 3px;    
+        border-radius: 9px;    
+        cursor: pointer;    
+    }    
+  
+    .range-value {    
+        min-width: 65px;    
+        text-align: center;    
+        color: #a78bfa;    
+        font-size: 12px;    
+        font-weight: 800;    
+    }    
+  
+    /* =====================================================    
+       SCHEDULE    
+       ===================================================== */    
+  
+    .schedule-box {    
+        background: #0d0d0d;    
+        border: 1px solid #292929;    
+        border-radius: 12px;    
+        padding: 12px;    
+    }    
+  
+    .schedule-status {    
+        margin-top: 8px;    
+        font-size: 12px;    
+        font-weight: 800;    
+    }    
+  
+    .schedule-active {    
+        color: #22c55e;    
+    }    
+  
+    .schedule-inactive {    
+        color: #ef4444;    
+    }    
+  
+    /* =====================================================    
+       LIST    
+       ===================================================== */    
+  
+    .toolbar {    
+        display: flex;    
+        gap: 8px;    
+        flex-wrap: wrap;    
+        margin-bottom: 12px;    
+    }    
+  
+    .toolbar input,    
+    .toolbar select {    
+        flex: 1;    
+        min-width: 140px;    
+    }    
+  
+    .items-list {    
+        display: flex;    
+        flex-direction: column;    
+        gap: 10px;    
+    }    
+  
+    .item-card {    
+        background: #0e0e0e;    
+        border: 1px solid #2c2c2c;    
+        border-radius: 13px;    
+        padding: 12px;    
+        transition: .15s;    
+    }    
+  
+    .item-card.dragging {    
+        opacity: .45;    
+        border-color: #7c3aed;    
+    }    
+  
+    .item-card.drag-over {    
+        border-color: #22c55e;    
+        transform: scale(1.01);    
+    }    
+  
+    .item-head {    
+        display: flex;    
+        align-items: flex-start;    
+        gap: 10px;    
+    }    
+  
+    .drag-handle {    
+        cursor: grab;    
+        color: #777;    
+        font-size: 20px;    
+        padding: 2px 5px;    
+        user-select: none;    
+    }    
+  
+    .drag-handle:active {    
+        cursor: grabbing;    
+    }    
+  
+    .item-main {    
+        flex: 1;    
+        min-width: 0;    
+    }    
+  
+    .item-title {    
+        font-size: 14px;    
+        font-weight: 900;    
+        word-break: break-word;    
+    }    
+  
+    .item-meta {    
+        display: flex;    
+        flex-wrap: wrap;    
+        gap: 5px;    
+        margin-top: 6px;    
+    }    
+  
+    .badge {    
+        display: inline-flex;    
+        padding: 4px 7px;    
+        border-radius: 6px;    
+        font-size: 10px;    
+        font-weight: 800;    
+        background: #252525;    
+        color: #aaa;    
+    }    
+  
+    .badge-green {    
+        color: #86efac;    
+        background: rgba(22, 101, 52, .3);    
+    }    
+  
+    .badge-red {    
+        color: #fca5a5;    
+        background: rgba(127, 29, 29, .3);    
+    }    
+  
+    .badge-purple {    
+        color: #c4b5fd;    
+        background: rgba(76, 29, 149, .3);    
+    }    
+  
+    .item-preview {    
+        margin-top: 9px;    
+        color: #999;    
+        font-size: 12px;    
+        white-space: pre-wrap;    
+        word-break: break-word;    
+    }    
+  
+    .item-actions {    
+        display: flex;    
+        flex-wrap: wrap;    
+        gap: 6px;    
+        margin-top: 10px;    
+    }    
+  
+    /* =====================================================    
+       LIVE PREVIEW    
+       ===================================================== */    
+  
+    .preview-wrapper {    
+        background: #080808;    
+        border: 1px solid #282828;    
+        border-radius: 14px;    
+        padding: 12px;    
+        overflow: hidden;    
+    }    
+  
+    .preview-phone {    
+        max-width: 440px;    
+        margin: auto;    
+        background: #101010;    
+        border-radius: 18px;    
+        padding: 12px;    
+        min-height: 200px;    
+    }    
+  
+    .preview-card {    
+        margin: 0 auto 12px;    
+        overflow: hidden;    
+        border: 1px solid rgba(255,255,255,.07);    
+        transition: .15s;    
+    }    
+  
+    .preview-card-title {    
+        font-size: 16px;    
+        font-weight: 900;    
+        margin-bottom: 8px;    
+    }    
+  
+    .preview-card-type {    
+        color: #888;    
+        font-size: 10px;    
+        margin-bottom: 7px;    
+    }    
+  
+    .preview-card-message {    
+        font-size: 13px;    
+        line-height: 1.8;    
+        white-space: pre-wrap;    
+        word-break: break-word;    
+    }    
+  
+    .preview-card-image {    
+        width: 100%;    
+        display: block;    
+        border-radius: 10px;    
+        margin-top: 9px;    
+        background: #080808;    
+    }    
+  
+    .preview-card-video {    
+        width: 100%;    
+        max-height: 500px;    
+        display: block;    
+        border-radius: 10px;    
+        margin-top: 9px;    
+        background: #000;    
+    }    
+  
+    .preview-card-link {    
+        display: block;    
+        margin-top: 9px;    
+        color: #93c5fd;    
+        word-break: break-all;    
+        font-size: 12px;    
+    }    
+  
+    .preview-card-button {    
+        display: inline-block;    
+        margin-top: 10px;    
+        background: #6d28d9;    
+        color: white;    
+        padding: 9px 14px;    
+        border-radius: 9px;    
+        text-decoration: none;    
+        font-size: 12px;    
+        font-weight: 800;    
+    }    
+  
+    .preview-empty {    
+        text-align: center;    
+        color: #777;    
+        padding: 35px 10px;    
+        font-size: 13px;    
+    }    
+  
+    /* =====================================================    
+       MEDIA    
+       ===================================================== */    
+  
+    .media-grid {    
+        display: grid;    
+        grid-template-columns: repeat(3, 1fr);    
+        gap: 10px;    
+    }    
+  
+    .media-card {    
+        background: #0e0e0e;    
+        border: 1px solid #292929;    
+        border-radius: 11px;    
+        overflow: hidden;    
+    }    
+  
+    .media-thumb {    
+        width: 100%;    
+        height: 120px;    
+        object-fit: cover;    
+        background: #050505;    
+    }    
+  
+    .media-info {    
+        padding: 8px;    
+    }    
+  
+    .media-name {    
+        font-size: 11px;    
+        word-break: break-word;    
+        color: #ccc;    
+    }    
+  
+    /* =====================================================    
+       RECYCLE BIN    
+       ===================================================== */    
+  
+    .trash-card {    
+        background: #130b0b;    
+        border: 1px solid #452020;    
+        border-radius: 12px;    
+        padding: 11px;    
+        margin-bottom: 8px;    
+    }    
+  
+    /* =====================================================    
+       TOAST    
+       ===================================================== */    
+  
+    #toast {    
+        position: fixed;    
+        bottom: 20px;    
+        left: 50%;    
+        transform: translateX(-50%) translateY(100px);    
+        background: #202020;    
+        border: 1px solid #3b3b3b;    
+        color: #fff;    
+        padding: 12px 17px;    
+        border-radius: 10px;    
+        font-size: 13px;    
+        font-weight: 700;    
+        z-index: 99999;    
+        opacity: 0;    
+        transition: .25s;    
+        max-width: calc(100% - 30px);    
+        text-align: center;    
+    }    
+  
+    #toast.show {    
+        transform: translateX(-50%) translateY(0);    
+        opacity: 1;    
+    }    
+  
+    /* =====================================================    
+       LOADING    
+       ===================================================== */    
+  
+    .loading {    
+        text-align: center;    
+        padding: 20px;    
+        color: #888;    
+        font-size: 13px;    
+    }    
+  
+    /* =====================================================    
+       RESPONSIVE    
+       ===================================================== */    
+  
+    @media (max-width: 700px) {    
+  
+        .container {    
+            padding: 9px;    
+        }    
+  
+        .editor-grid,    
+        .form-grid,    
+        .form-grid-3 {    
+            grid-template-columns: 1fr;    
+        }    
+  
+        .stats-grid {    
+            grid-template-columns: repeat(2, 1fr);    
+        }    
+  
+        .media-grid {    
+            grid-template-columns: repeat(2, 1fr);    
+        }    
+  
+        .topbar {    
+            padding: 12px;    
+        }    
+  
+        .brand {    
+            font-size: 16px;    
+        }    
+  
+        .admin-card {    
+            padding: 12px;    
+        }    
+    }    
+  
+</style>    
