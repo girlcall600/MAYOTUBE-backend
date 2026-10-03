@@ -474,9 +474,16 @@ def load_cms_content():
 
                 return content
 
-        except Exception:
+            raise Exception(
+                "Vercel Blob CMS content could not be loaded."
+            )
 
-            pass
+        except Exception as error:
+
+            raise Exception(
+                "Vercel Blob CMS read failed: "
+                + clean_text(error)
+            )
 
     return legacy_home_content()
 
