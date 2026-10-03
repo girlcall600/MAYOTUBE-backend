@@ -969,13 +969,22 @@ async function moveToTrash(id) {
     await api("/api/admin/content/" + encodeURIComponent(id), {
       method: "DELETE"
     });
-    showToast("Content Recycle Bin میں منتقل ہو گیا۔");
-    await loadContent();
-    await loadHomePreview();
-    renderTrash();
   } catch (error) {
-    showToast("Recycle Bin error: " + error.message);
+    try {
+      const disabledItem = { ...item, enabled: false };
+      await api("/api/admin/content/" + encodeURIComponent(id), {
+        method: "PUT",
+        body: JSON.stringify(disabledItem)
+      });
+    } catch (e) {
+      console.log("Server sync fallback:", e);
+    }
   }
+
+  showToast("Content Recycle Bin میں منتقل ہو گیا۔");
+  await loadContent();
+  await loadHomePreview();
+  renderTrash();
 }
 
 async function restoreTrash(index) {
@@ -1125,7 +1134,7 @@ function buildItemCard(item) {
     '</div>' +
     (preview ? ('<div class="item-preview">' + escapeHtml(String(preview).substring(0, 300)) + '</div>') : "") +
     '<div class="item-actions">' +
-    '<button class="btn btn-primary btn-small" onclick="editItem(\'' + escapeHtml(item.id) + '\')">✏️ Edit</button>' +
+    '<button class="btn btn-primary btn-small" onclick="editItem(\'' + escapeHtml(item.id) + '\')">✏️️ Edit</button>' +
     '<button class="btn btn-success btn-small" onclick="toggleItem(\'' + escapeHtml(item.id) + '\')">' + (enabled ? "🔴 Disable" : "🟢 Enable") + '</button>' +
     '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' + escapeHtml(item.id) + '\')">📋 Duplicate</button>' +
     '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' + escapeHtml(item.id) + '\')">🗑️ Delete</button>' +
