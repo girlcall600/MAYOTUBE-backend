@@ -960,7 +960,7 @@
                 </div>
 
 
-                <div class="input-group full">
+                <div id="fieldMessage" class="input-group full">
                     <label for="itemMessage">Message</label>
 
                     <textarea
@@ -970,7 +970,7 @@
                 </div>
 
 
-                <div class="input-group full">
+                <div id="fieldDescription" class="input-group full">
                     <label for="itemDescription">Description</label>
 
                     <textarea
@@ -980,7 +980,7 @@
                 </div>
 
 
-                <div class="input-group full">
+                <div id="fieldImageUrl" class="input-group full">
                     <label for="imageUrl">Image URL</label>
 
                     <input
@@ -992,8 +992,8 @@
                 </div>
 
 
-                <div class="input-group full">
-                    <label for="videoUrl">Video URL</label>
+                <div id="fieldVideoUrl" class="input-group full">
+                    <label id="videoUrlLabel" for="videoUrl">Video URL</label>
 
                     <input
                         id="videoUrl"
@@ -1004,8 +1004,10 @@
                 </div>
 
 
-                <div class="input-group full">
-                    <label for="linkUrl">Link / Website / YouTube URL</label>
+                <div id="fieldLinkUrl" class="input-group full">
+                    <label id="linkUrlLabel" for="linkUrl">
+                        Link / Website / YouTube URL
+                    </label>
 
                     <input
                         id="linkUrl"
@@ -1016,7 +1018,7 @@
                 </div>
 
 
-                <div class="input-group">
+                <div id="fieldButtonText" class="input-group">
                     <label for="buttonText">Button Text</label>
 
                     <input
@@ -1571,6 +1573,222 @@
     }
 
 
+    // =========================================================
+    // DYNAMIC CONTENT EDITOR FIELDS
+    // =========================================================
+
+    function updateEditorFields() {
+
+        const typeElement = $("itemType");
+
+        if (!typeElement) {
+            return;
+        }
+
+        const type = typeElement.value;
+
+
+        const fieldMessage = $("fieldMessage");
+        const fieldDescription = $("fieldDescription");
+        const fieldImageUrl = $("fieldImageUrl");
+        const fieldVideoUrl = $("fieldVideoUrl");
+        const fieldLinkUrl = $("fieldLinkUrl");
+        const fieldButtonText = $("fieldButtonText");
+
+        const videoUrlLabel = $("videoUrlLabel");
+        const linkUrlLabel = $("linkUrlLabel");
+
+
+        if (
+            !fieldMessage ||
+            !fieldDescription ||
+            !fieldImageUrl ||
+            !fieldVideoUrl ||
+            !fieldLinkUrl ||
+            !fieldButtonText
+        ) {
+            return;
+        }
+
+
+        /*
+         * ہر field پہلے hide ہوگا۔
+         * پھر selected type کے مطابق صرف required
+         * / relevant fields show ہوں گے۔
+         */
+
+        fieldMessage.classList.add("hidden");
+        fieldDescription.classList.add("hidden");
+        fieldImageUrl.classList.add("hidden");
+        fieldVideoUrl.classList.add("hidden");
+        fieldLinkUrl.classList.add("hidden");
+        fieldButtonText.classList.add("hidden");
+
+
+        /*
+         * Default labels
+         */
+
+        if (videoUrlLabel) {
+            videoUrlLabel.textContent = "Video URL";
+        }
+
+        if (linkUrlLabel) {
+            linkUrlLabel.textContent =
+                "Link / Website / YouTube URL";
+        }
+
+
+        switch (type) {
+
+            case "message":
+            case "announcement":
+            case "notification":
+
+                fieldMessage.classList.remove("hidden");
+                fieldDescription.classList.remove("hidden");
+
+                break;
+
+
+            case "image":
+
+                fieldDescription.classList.remove("hidden");
+                fieldImageUrl.classList.remove("hidden");
+
+                break;
+
+
+            case "video":
+
+                fieldDescription.classList.remove("hidden");
+                fieldVideoUrl.classList.remove("hidden");
+
+                break;
+
+
+            case "youtube":
+
+                fieldDescription.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "YouTube URL";
+                }
+
+                break;
+
+
+            case "audio":
+
+                fieldDescription.classList.remove("hidden");
+                fieldVideoUrl.classList.remove("hidden");
+
+                if (videoUrlLabel) {
+                    videoUrlLabel.textContent = "Audio URL";
+                }
+
+                break;
+
+
+            case "button":
+
+                fieldMessage.classList.remove("hidden");
+                fieldDescription.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Button Link URL";
+                }
+
+                break;
+
+
+            case "link":
+
+                fieldDescription.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Link URL";
+                }
+
+                break;
+
+
+            case "donation":
+
+                fieldMessage.classList.remove("hidden");
+                fieldDescription.classList.remove("hidden");
+                fieldImageUrl.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Donation Link URL";
+                }
+
+                break;
+
+
+            case "advertisement":
+
+                fieldMessage.classList.remove("hidden");
+                fieldDescription.classList.remove("hidden");
+                fieldImageUrl.classList.remove("hidden");
+                fieldVideoUrl.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Advertisement Link URL";
+                }
+
+                break;
+
+
+            case "website":
+
+                fieldDescription.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Website URL";
+                }
+
+                break;
+
+
+            case "channel":
+
+                fieldDescription.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                if (linkUrlLabel) {
+                    linkUrlLabel.textContent = "Channel URL";
+                }
+
+                break;
+
+
+            default:
+
+                fieldMessage.classList.remove("hidden");
+                fieldDescription.classList.remove("hidden");
+                fieldImageUrl.classList.remove("hidden");
+                fieldVideoUrl.classList.remove("hidden");
+                fieldLinkUrl.classList.remove("hidden");
+                fieldButtonText.classList.remove("hidden");
+
+                break;
+        }
+    }
+
+
     function clearForm() {
 
         $("itemId").value = "";
@@ -1584,6 +1802,8 @@
         $("buttonText").value = "";
         $("itemOrder").value = "0";
         $("itemEnabled").checked = true;
+
+        updateEditorFields();
 
         window.scrollTo({
             top: 0,
@@ -1619,6 +1839,9 @@
         $("buttonText").value = item.button_text || "";
         $("itemOrder").value = item.order || 0;
         $("itemEnabled").checked = item.enabled !== false;
+
+
+        updateEditorFields();
 
 
         window.scrollTo({
@@ -2431,6 +2654,9 @@
         }
 
 
+        updateEditorFields();
+
+
         window.scrollTo({
             top: 0,
             behavior: "smooth"
@@ -2529,6 +2755,22 @@
     // =========================================================
 
     async function initialize() {
+
+        /*
+         * Editor کو شروع میں بھی صحیح fields دکھائیں۔
+         */
+        updateEditorFields();
+
+
+        const itemType = $("itemType");
+
+        if (itemType) {
+            itemType.addEventListener(
+                "change",
+                updateEditorFields
+            );
+        }
+
 
         let savedToken =
             sessionStorage.getItem(TOKEN_SESSION_KEY);
