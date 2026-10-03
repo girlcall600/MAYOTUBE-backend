@@ -1,1429 +1,5351 @@
-<!DOCTYPE html>
-<html lang="ur" dir="ltr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAYOTUBE ADMIN</title>
-<style>
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: #090909; color: #ffffff; font-family: Arial, "Noto Nastaliq Urdu", "Noto Sans Arabic", sans-serif; }
-body { min-height: 100vh; }
-button, input, select, textarea { font-family: inherit; }
-button { cursor: pointer; }
-.hidden { display: none !important; }
-.container { width: 100%; max-width: 980px; margin: auto; padding: 14px; }
+<!DOCTYPE html>  <html lang="ur" dir="rtl">  <head>  <meta charset="UTF-8">  
 
-/* ===================================================== LOGIN ===================================================== */
-#loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 18px; background: radial-gradient(circle at top, #252525 0, #090909 55%); }
-.login-card { width: 100%; max-width: 430px; background: #151515; border: 1px solid #303030; border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0, 0, 0, .45); }
-.login-logo { text-align: center; font-size: 27px; font-weight: 900; letter-spacing: 1px; margin-bottom: 6px; }
-.login-subtitle { text-align: center; color: #999; font-size: 13px; margin-bottom: 25px; }
+<meta  
+    name="viewport"  
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"  
+>  
 
-/* ===================================================== INPUTS ===================================================== */
-.input-group { margin-bottom: 12px; }
-.input-group label { display: block; color: #cfcfcf; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
-input, select, textarea { width: 100%; background: #0e0e0e; border: 1px solid #333; color: #fff; border-radius: 10px; padding: 12px; outline: none; font-size: 14px; }
-input:focus, select:focus, textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124, 58, 237, .15); }
-textarea { min-height: 100px; resize: vertical; }
-.muted { color: #777; font-size: 11px; margin-top: 5px; }
-.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+<title>MAYOTUBE ADMIN</title>  
 
-/* ===================================================== BUTTONS ===================================================== */
-.btn { border: 0; border-radius: 10px; padding: 11px 15px; color: #fff; background: #272727; font-size: 13px; font-weight: 800; }
-.btn:hover { filter: brightness(1.15); }
-.btn-primary { background: #6d28d9; }
-.btn-success { background: #15803d; }
-.btn-danger { background: #b91c1c; }
-.btn-warning { background: #a16207; }
-.btn-blue { background: #1d4ed8; }
-.btn-small { padding: 7px 10px; font-size: 11px; }
-.button-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+<style>  
 
-/* ===================================================== HEADER ===================================================== */
-.topbar { background: #151515; border: 1px solid #2d2d2d; border-radius: 15px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-.brand { font-size: 19px; font-weight: 900; }
-.status { display: flex; align-items: center; gap: 7px; color: #aaa; font-size: 12px; }
-.status-dot { width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, .6); }
+    * {  
+        box-sizing: border-box;  
+    }  
 
-/* ===================================================== CARDS ===================================================== */
-.admin-card { background: #151515; border: 1px solid #2c2c2c; border-radius: 16px; padding: 15px; margin-bottom: 13px; }
-.card-title { font-size: 16px; font-weight: 900; margin-bottom: 13px; }
-.card-subtitle { color: #888; font-size: 12px; margin-top: -8px; margin-bottom: 14px; }
+    html,  
+    body {  
+        margin: 0;  
+        padding: 0;  
+        background: #090909;  
+        color: #ffffff;  
+        font-family:  
+            Arial,  
+            "Noto Nastaliq Urdu",  
+            "Noto Sans Arabic",  
+            sans-serif;  
+    }  
 
-/* ===================================================== HOME CONTROL ===================================================== */
-.home-control { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-.home-info strong { display: block; margin-bottom: 5px; }
-.home-info span { color: #888; font-size: 12px; }
-.switch { position: relative; width: 58px; height: 32px; flex-shrink: 0; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: #333; border-radius: 30px; transition: .2s; }
-.slider:before { content: ""; position: absolute; width: 24px; height: 24px; right: 4px; top: 4px; background: #fff; border-radius: 50%; transition: .2s; }
-.switch input:checked + .slider { background: #16a34a; }
-.switch input:checked + .slider:before { transform: translateX(-26px); }
+    body {  
+        min-height: 100vh;  
+    }  
 
-/* ===================================================== STATS ===================================================== */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.stat { background: #0e0e0e; border: 1px solid #292929; border-radius: 12px; padding: 13px; text-align: center; }
-.stat-number { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
-.stat-label { color: #888; font-size: 11px; }
+    button,  
+    input,  
+    select,  
+    textarea {  
+        font-family: inherit;  
+    }  
 
-/* ===================================================== EDITOR ===================================================== */
-.editor-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.full { grid-column: 1 / -1; }
+    button {  
+        cursor: pointer;  
+    }  
 
-/* ===================================================== BOX DESIGN CONTROLS ===================================================== */
-.design-controls { background: #101010; border: 1px solid #303030; border-radius: 14px; padding: 14px; margin-top: 5px; }
-.design-controls-title { font-size: 15px; font-weight: 900; margin-bottom: 13px; }
-.design-section { border-top: 1px solid #292929; padding-top: 13px; margin-top: 13px; }
-.design-section:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
-.color-row { display: flex; align-items: center; gap: 8px; }
-.color-row input[type="color"] { width: 52px; height: 43px; padding: 3px; border-radius: 9px; cursor: pointer; }
-.range-value { min-width: 65px; text-align: center; color: #a78bfa; font-size: 12px; font-weight: 800; }
+    .hidden {  
+        display: none !important;  
+    }  
 
-/* ===================================================== SCHEDULE ===================================================== */
-.schedule-box { background: #0d0d0d; border: 1px solid #292929; border-radius: 12px; padding: 12px; }
-.schedule-status { margin-top: 8px; font-size: 12px; font-weight: 800; }
-.schedule-active { color: #22c55e; }
-.schedule-inactive { color: #ef4444; }
+    .container {  
+        width: 100%;  
+        max-width: 980px;  
+        margin: auto;  
+        padding: 14px;  
+    }  
 
-/* ===================================================== LIST ===================================================== */
-.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.toolbar input, .toolbar select { flex: 1; min-width: 140px; }
-.items-list { display: flex; flex-direction: column; gap: 10px; }
-.item-card { background: #0e0e0e; border: 1px solid #2c2c2c; border-radius: 13px; padding: 12px; transition: .15s; }
-.item-card.dragging { opacity: .45; border-color: #7c3aed; }
-.item-card.drag-over { border-color: #22c55e; transform: scale(1.01); }
-.item-head { display: flex; align-items: flex-start; gap: 10px; }
-.drag-handle { cursor: grab; color: #777; font-size: 20px; padding: 2px 5px; user-select: none; }
-.drag-handle:active { cursor: grabbing; }
-.item-main { flex: 1; min-width: 0; }
-.item-title { font-size: 14px; font-weight: 900; word-break: break-word; }
-.item-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-.badge { display: inline-flex; padding: 4px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; background: #252525; color: #aaa; }
-.badge-green { color: #86efac; background: rgba(22, 101, 52, .3); }
-.badge-red { color: #fca5a5; background: rgba(127, 29, 29, .3); }
-.badge-purple { color: #c4b5fd; background: rgba(76, 29, 149, .3); }
-.item-preview { margin-top: 9px; color: #999; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
-.item-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    /* =====================================================  
+       LOGIN  
+       ===================================================== */  
 
-/* ===================================================== LIVE PREVIEW ===================================================== */
-.preview-wrapper { background: #080808; border: 1px solid #282828; border-radius: 14px; padding: 12px; overflow: hidden; }
-.preview-phone { max-width: 440px; margin: auto; background: #101010; border-radius: 18px; padding: 12px; min-height: 200px; }
-.preview-card { margin: 0 auto 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); transition: .15s; }
-.preview-card-title { font-size: 16px; font-weight: 900; margin-bottom: 8px; }
-.preview-card-type { color: #888; font-size: 10px; margin-bottom: 7px; }
-.preview-card-message { font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
-.preview-card-image { width: 100%; display: block; border-radius: 10px; margin-top: 9px; background: #080808; }
-.preview-card-video { width: 100%; max-height: 500px; display: block; border-radius: 10px; margin-top: 9px; background: #000; }
-.preview-card-link { display: block; margin-top: 9px; color: #93c5fd; word-break: break-all; font-size: 12px; }
-.preview-card-button { display: inline-block; margin-top: 10px; background: #6d28d9; color: white; padding: 9px 14px; border-radius: 9px; text-decoration: none; font-size: 12px; font-weight: 800; }
-.preview-empty { text-align: center; color: #777; padding: 35px 10px; font-size: 13px; }
+    #loginScreen {  
+        min-height: 100vh;  
+        display: flex;  
+        align-items: center;  
+        justify-content: center;  
+        padding: 18px;  
+        background:  
+            radial-gradient(  
+                circle at top,  
+                #252525 0,  
+                #090909 55%  
+            );  
+    }  
 
-/* ===================================================== MEDIA ===================================================== */
-.media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.media-card { background: #0e0e0e; border: 1px solid #292929; border-radius: 11px; overflow: hidden; }
-.media-thumb { width: 100%; height: 120px; object-fit: cover; background: #050505; }
-.media-info { padding: 8px; }
-.media-name { font-size: 11px; word-break: break-word; color: #ccc; }
+    .login-card {  
+        width: 100%;  
+        max-width: 430px;  
+        background: #151515;  
+        border: 1px solid #303030;  
+        border-radius: 20px;  
+        padding: 25px;  
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .45);  
+    }  
 
-/* ===================================================== RECYCLE BIN ===================================================== */
-.trash-card { background: #130b0b; border: 1px solid #452020; border-radius: 12px; padding: 11px; margin-bottom: 8px; }
+    .login-logo {  
+        text-align: center;  
+        font-size: 27px;  
+        font-weight: 900;  
+        letter-spacing: 1px;  
+        margin-bottom: 6px;  
+    }  
 
-/* ===================================================== TOAST ===================================================== */
-#toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #202020; border: 1px solid #3b3b3b; color: #fff; padding: 12px 17px; border-radius: 10px; font-size: 13px; font-weight: 700; z-index: 99999; opacity: 0; transition: .25s; max-width: calc(100% - 30px); text-align: center; }
-#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .login-subtitle {  
+        text-align: center;  
+        color: #999;  
+        font-size: 13px;  
+        margin-bottom: 25px;  
+    }  
 
-/* ===================================================== LOADING ===================================================== */
-.loading { text-align: center; padding: 20px; color: #888; font-size: 13px; }
+    /* =====================================================  
+       INPUTS  
+       ===================================================== */  
 
-/* ===================================================== RESPONSIVE ===================================================== */
-@media (max-width: 700px) {
-  .container { padding: 9px; }
-  .editor-grid, .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .media-grid { grid-template-columns: repeat(2, 1fr); }
-  .topbar { padding: 12px; }
-  .brand { font-size: 16px; }
-  .admin-card { padding: 12px; }
-}
+    .input-group {  
+        margin-bottom: 12px;  
+    }  
+
+    .input-group label {  
+        display: block;  
+        color: #cfcfcf;  
+        font-size: 13px;  
+        font-weight: 700;  
+        margin-bottom: 7px;  
+    }  
+
+    input,  
+    select,  
+    textarea {  
+        width: 100%;  
+        background: #0e0e0e;  
+        border: 1px solid #333;  
+        color: #fff;  
+        border-radius: 10px;  
+        padding: 12px;  
+        outline: none;  
+        font-size: 14px;  
+    }  
+
+    input:focus,  
+    select:focus,  
+    textarea:focus {  
+        border-color: #7c3aed;  
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, .15);  
+    }  
+
+    textarea {  
+        min-height: 100px;  
+        resize: vertical;  
+    }  
+
+    .muted {  
+        color: #777;  
+        font-size: 11px;  
+        margin-top: 5px;  
+    }  
+
+    .form-grid {  
+        display: grid;  
+        grid-template-columns: repeat(2, 1fr);  
+        gap: 12px;  
+    }  
+
+    .form-grid-3 {  
+        display: grid;  
+        grid-template-columns: repeat(3, 1fr);  
+        gap: 12px;  
+    }  
+
+    /* =====================================================  
+       BUTTONS  
+       ===================================================== */  
+
+    .btn {  
+        border: 0;  
+        border-radius: 10px;  
+        padding: 11px 15px;  
+        color: #fff;  
+        background: #272727;  
+        font-size: 13px;  
+        font-weight: 800;  
+    }  
+
+    .btn:hover {  
+        filter: brightness(1.15);  
+    }  
+
+    .btn-primary {  
+        background: #6d28d9;  
+    }  
+
+    .btn-success {  
+        background: #15803d;  
+    }  
+
+    .btn-danger {  
+        background: #b91c1c;  
+    }  
+
+    .btn-warning {  
+        background: #a16207;  
+    }  
+
+    .btn-blue {  
+        background: #1d4ed8;  
+    }  
+
+    .btn-small {  
+        padding: 7px 10px;  
+        font-size: 11px;  
+    }  
+
+    .button-row {  
+        display: flex;  
+        flex-wrap: wrap;  
+        gap: 8px;  
+        margin-top: 12px;  
+    }  
+
+    /* =====================================================  
+       HEADER  
+       ===================================================== */  
+
+    .topbar {  
+        background: #151515;  
+        border: 1px solid #2d2d2d;  
+        border-radius: 15px;  
+        padding: 14px 16px;  
+        display: flex;  
+        justify-content: space-between;  
+        align-items: center;  
+        gap: 10px;  
+        margin-bottom: 12px;  
+    }  
+
+    .brand {  
+        font-size: 19px;  
+        font-weight: 900;  
+    }  
+
+    .status {  
+        display: flex;  
+        align-items: center;  
+        gap: 7px;  
+        color: #aaa;  
+        font-size: 12px;  
+    }  
+
+    .status-dot {  
+        width: 9px;  
+        height: 9px;  
+        border-radius: 50%;  
+        background: #22c55e;  
+        box-shadow: 0 0 8px rgba(34, 197, 94, .6);  
+    }  
+
+    /* =====================================================  
+       CARDS  
+       ===================================================== */  
+
+    .admin-card {  
+        background: #151515;  
+        border: 1px solid #2c2c2c;  
+        border-radius: 16px;  
+        padding: 15px;  
+        margin-bottom: 13px;  
+    }  
+
+    .card-title {  
+        font-size: 16px;  
+        font-weight: 900;  
+        margin-bottom: 13px;  
+    }  
+
+    .card-subtitle {  
+        color: #888;  
+        font-size: 12px;  
+        margin-top: -8px;  
+        margin-bottom: 14px;  
+    }  
+
+    /* =====================================================  
+       HOME CONTROL  
+       ===================================================== */  
+
+    .home-control {  
+        display: flex;  
+        align-items: center;  
+        justify-content: space-between;  
+        gap: 15px;  
+    }  
+
+    .home-info strong {  
+        display: block;  
+        margin-bottom: 5px;  
+    }  
+
+    .home-info span {  
+        color: #888;  
+        font-size: 12px;  
+    }  
+
+    .switch {  
+        position: relative;  
+        width: 58px;  
+        height: 32px;  
+        flex-shrink: 0;  
+    }  
+
+    .switch input {  
+        opacity: 0;  
+        width: 0;  
+        height: 0;  
+    }  
+
+    .slider {  
+        position: absolute;  
+        inset: 0;  
+        background: #333;  
+        border-radius: 30px;  
+        transition: .2s;  
+    }  
+
+    .slider:before {  
+        content: "";  
+        position: absolute;  
+        width: 24px;  
+        height: 24px;  
+        right: 4px;  
+        top: 4px;  
+        background: #fff;  
+        border-radius: 50%;  
+        transition: .2s;  
+    }  
+
+    .switch input:checked + .slider {  
+        background: #16a34a;  
+    }  
+
+    .switch input:checked + .slider:before {  
+        transform: translateX(-26px);  
+    }  
+
+    /* =====================================================  
+       STATS  
+       ===================================================== */  
+
+    .stats-grid {  
+        display: grid;  
+        grid-template-columns: repeat(4, 1fr);  
+        gap: 10px;  
+    }  
+
+    .stat {  
+        background: #0e0e0e;  
+        border: 1px solid #292929;  
+        border-radius: 12px;  
+        padding: 13px;  
+        text-align: center;  
+    }  
+
+    .stat-number {  
+        font-size: 22px;  
+        font-weight: 900;  
+        margin-bottom: 4px;  
+    }  
+
+    .stat-label {  
+        color: #888;  
+        font-size: 11px;  
+    }  
+
+    /* =====================================================  
+       EDITOR  
+       ===================================================== */  
+
+    .editor-grid {  
+        display: grid;  
+        grid-template-columns: repeat(2, 1fr);  
+        gap: 12px;  
+    }  
+
+    .full {  
+        grid-column: 1 / -1;  
+    }  
+
+    /* =====================================================  
+       BOX DESIGN CONTROLS  
+       ===================================================== */  
+
+    .design-controls {  
+        background: #101010;  
+        border: 1px solid #303030;  
+        border-radius: 14px;  
+        padding: 14px;  
+        margin-top: 5px;  
+    }  
+
+    .design-controls-title {  
+        font-size: 15px;  
+        font-weight: 900;  
+        margin-bottom: 13px;  
+    }  
+
+    .design-section {  
+        border-top: 1px solid #292929;  
+        padding-top: 13px;  
+        margin-top: 13px;  
+    }  
+
+    .design-section:first-child {  
+        border-top: 0;  
+        padding-top: 0;  
+        margin-top: 0;  
+    }  
+
+    .color-row {  
+        display: flex;  
+        align-items: center;  
+        gap: 8px;  
+    }  
+
+    .color-row input[type="color"] {  
+        width: 52px;  
+        height: 43px;  
+        padding: 3px;  
+        border-radius: 9px;  
+        cursor: pointer;  
+    }  
+
+    .range-value {  
+        min-width: 65px;  
+        text-align: center;  
+        color: #a78bfa;  
+        font-size: 12px;  
+        font-weight: 800;  
+    }  
+
+    /* =====================================================  
+       SCHEDULE  
+       ===================================================== */  
+
+    .schedule-box {  
+        background: #0d0d0d;  
+        border: 1px solid #292929;  
+        border-radius: 12px;  
+        padding: 12px;  
+    }  
+
+    .schedule-status {  
+        margin-top: 8px;  
+        font-size: 12px;  
+        font-weight: 800;  
+    }  
+
+    .schedule-active {  
+        color: #22c55e;  
+    }  
+
+    .schedule-inactive {  
+        color: #ef4444;  
+    }  
+
+    /* =====================================================  
+       LIST  
+       ===================================================== */  
+
+    .toolbar {  
+        display: flex;  
+        gap: 8px;  
+        flex-wrap: wrap;  
+        margin-bottom: 12px;  
+    }  
+
+    .toolbar input,  
+    .toolbar select {  
+        flex: 1;  
+        min-width: 140px;  
+    }  
+
+    .items-list {  
+        display: flex;  
+        flex-direction: column;  
+        gap: 10px;  
+    }  
+
+    .item-card {  
+        background: #0e0e0e;  
+        border: 1px solid #2c2c2c;  
+        border-radius: 13px;  
+        padding: 12px;  
+        transition: .15s;  
+    }  
+
+    .item-card.dragging {  
+        opacity: .45;  
+        border-color: #7c3aed;  
+    }  
+
+    .item-card.drag-over {  
+        border-color: #22c55e;  
+        transform: scale(1.01);  
+    }  
+
+    .item-head {  
+        display: flex;  
+        align-items: flex-start;  
+        gap: 10px;  
+    }  
+
+    .drag-handle {  
+        cursor: grab;  
+        color: #777;  
+        font-size: 20px;  
+        padding: 2px 5px;  
+        user-select: none;  
+    }  
+
+    .drag-handle:active {  
+        cursor: grabbing;  
+    }  
+
+    .item-main {  
+        flex: 1;  
+        min-width: 0;  
+    }  
+
+    .item-title {  
+        font-size: 14px;  
+        font-weight: 900;  
+        word-break: break-word;  
+    }  
+
+    .item-meta {  
+        display: flex;  
+        flex-wrap: wrap;  
+        gap: 5px;  
+        margin-top: 6px;  
+    }  
+
+    .badge {  
+        display: inline-flex;  
+        padding: 4px 7px;  
+        border-radius: 6px;  
+        font-size: 10px;  
+        font-weight: 800;  
+        background: #252525;  
+        color: #aaa;  
+    }  
+
+    .badge-green {  
+        color: #86efac;  
+        background: rgba(22, 101, 52, .3);  
+    }  
+
+    .badge-red {  
+        color: #fca5a5;  
+        background: rgba(127, 29, 29, .3);  
+    }  
+
+    .badge-purple {  
+        color: #c4b5fd;  
+        background: rgba(76, 29, 149, .3);  
+    }  
+
+    .item-preview {  
+        margin-top: 9px;  
+        color: #999;  
+        font-size: 12px;  
+        white-space: pre-wrap;  
+        word-break: break-word;  
+    }  
+
+    .item-actions {  
+        display: flex;  
+        flex-wrap: wrap;  
+        gap: 6px;  
+        margin-top: 10px;  
+    }  
+
+    /* =====================================================  
+       LIVE PREVIEW  
+       ===================================================== */  
+
+    .preview-wrapper {  
+        background: #080808;  
+        border: 1px solid #282828;  
+        border-radius: 14px;  
+        padding: 12px;  
+        overflow: hidden;  
+    }  
+
+    .preview-phone {  
+        max-width: 440px;  
+        margin: auto;  
+        background: #101010;  
+        border-radius: 18px;  
+        padding: 12px;  
+        min-height: 200px;  
+    }  
+
+    .preview-card {  
+        margin: 0 auto 12px;  
+        overflow: hidden;  
+        border: 1px solid rgba(255,255,255,.07);  
+        transition: .15s;  
+    }  
+
+    .preview-card-title {  
+        font-size: 16px;  
+        font-weight: 900;  
+        margin-bottom: 8px;  
+    }  
+
+    .preview-card-type {  
+        color: #888;  
+        font-size: 10px;  
+        margin-bottom: 7px;  
+    }  
+
+    .preview-card-message {  
+        font-size: 13px;  
+        line-height: 1.8;  
+        white-space: pre-wrap;  
+        word-break: break-word;  
+    }  
+
+    .preview-card-image {  
+        width: 100%;  
+        display: block;  
+        border-radius: 10px;  
+        margin-top: 9px;  
+        background: #080808;  
+    }  
+
+    .preview-card-video {  
+        width: 100%;  
+        max-height: 500px;  
+        display: block;  
+        border-radius: 10px;  
+        margin-top: 9px;  
+        background: #000;  
+    }  
+
+    .preview-card-link {  
+        display: block;  
+        margin-top: 9px;  
+        color: #93c5fd;  
+        word-break: break-all;  
+        font-size: 12px;  
+    }  
+
+    .preview-card-button {  
+        display: inline-block;  
+        margin-top: 10px;  
+        background: #6d28d9;  
+        color: white;  
+        padding: 9px 14px;  
+        border-radius: 9px;  
+        text-decoration: none;  
+        font-size: 12px;  
+        font-weight: 800;  
+    }  
+
+    .preview-empty {  
+        text-align: center;  
+        color: #777;  
+        padding: 35px 10px;  
+        font-size: 13px;  
+    }  
+
+    /* =====================================================  
+       MEDIA  
+       ===================================================== */  
+
+    .media-grid {  
+        display: grid;  
+        grid-template-columns: repeat(3, 1fr);  
+        gap: 10px;  
+    }  
+
+    .media-card {  
+        background: #0e0e0e;  
+        border: 1px solid #292929;  
+        border-radius: 11px;  
+        overflow: hidden;  
+    }  
+
+    .media-thumb {  
+        width: 100%;  
+        height: 120px;  
+        object-fit: cover;  
+        background: #050505;  
+    }  
+
+    .media-info {  
+        padding: 8px;  
+    }  
+
+    .media-name {  
+        font-size: 11px;  
+        word-break: break-word;  
+        color: #ccc;  
+    }  
+
+    /* =====================================================  
+       RECYCLE BIN  
+       ===================================================== */  
+
+    .trash-card {  
+        background: #130b0b;  
+        border: 1px solid #452020;  
+        border-radius: 12px;  
+        padding: 11px;  
+        margin-bottom: 8px;  
+    }  
+
+    /* =====================================================  
+       TOAST  
+       ===================================================== */  
+
+    #toast {  
+        position: fixed;  
+        bottom: 20px;  
+        left: 50%;  
+        transform: translateX(-50%) translateY(100px);  
+        background: #202020;  
+        border: 1px solid #3b3b3b;  
+        color: #fff;  
+        padding: 12px 17px;  
+        border-radius: 10px;  
+        font-size: 13px;  
+        font-weight: 700;  
+        z-index: 99999;  
+        opacity: 0;  
+        transition: .25s;  
+        max-width: calc(100% - 30px);  
+        text-align: center;  
+    }  
+
+    #toast.show {  
+        transform: translateX(-50%) translateY(0);  
+        opacity: 1;  
+    }  
+
+    /* =====================================================  
+       LOADING  
+       ===================================================== */  
+
+    .loading {  
+        text-align: center;  
+        padding: 20px;  
+        color: #888;  
+        font-size: 13px;  
+    }  
+
+    /* =====================================================  
+       RESPONSIVE  
+       ===================================================== */  
+
+    @media (max-width: 700px) {  
+
+        .container {  
+            padding: 9px;  
+        }  
+
+        .editor-grid,  
+        .form-grid,  
+        .form-grid-3 {  
+            grid-template-columns: 1fr;  
+        }  
+
+        .stats-grid {  
+            grid-template-columns: repeat(2, 1fr);  
+        }  
+
+        .media-grid {  
+            grid-template-columns: repeat(2, 1fr);  
+        }  
+
+        .topbar {  
+            padding: 12px;  
+        }  
+
+        .brand {  
+            font-size: 16px;  
+        }  
+
+        .admin-card {  
+            padding: 12px;  
+        }  
+    }  
+
 </style>
-</head>
-<body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">MAYOTUBE ADMIN</div>
-    <div class="login-subtitle">Secure Content Management Panel</div>
-    <div class="input-group">
-      <label for="tokenInput">Admin Token</label>
-      <input id="tokenInput" type="password" placeholder="Admin Token" autocomplete="off">
-    </div>
-    <label style="display:flex; align-items:center; gap:8px; color:#aaa; font-size:12px; margin-bottom:14px;">
-      <input id="rememberToken" type="checkbox" style="width:auto"> Remember Token
-    </label>
-    <button class="btn btn-primary" style="width:100%" onclick="login()">🔐 Login</button>
-    <div id="loginError" style="color:#f87171; font-size:12px; margin-top:12px; text-align:center;"></div>
-  </div>
+</head>  <body>  <!-- =========================================================  
+     LOGIN  
+     ========================================================= -->  <div id="loginScreen">  <div class="login-card">  
+
+    <div class="login-logo">  
+        MAYOTUBE ADMIN  
+    </div>  
+
+    <div class="login-subtitle">  
+        Secure Content Management Panel  
+    </div>  
+
+    <div class="input-group">  
+
+        <label for="tokenInput">  
+            Admin Token  
+        </label>  
+
+        <input  
+            id="tokenInput"  
+            type="password"  
+            placeholder="Admin Token"  
+            autocomplete="off"  
+        >  
+
+    </div>  
+
+    <label  
+        style="  
+            display:flex;  
+            align-items:center;  
+            gap:8px;  
+            color:#aaa;  
+            font-size:12px;  
+            margin-bottom:14px;  
+        "  
+    >  
+
+        <input  
+            id="rememberToken"  
+            type="checkbox"  
+            style="width:auto"  
+        >  
+
+        Remember Token  
+
+    </label>  
+
+    <button  
+        class="btn btn-primary"  
+        style="width:100%"  
+        onclick="login()"  
+    >  
+        🔐 Login  
+    </button>  
+
+    <div  
+        id="loginError"  
+        style="  
+            color:#f87171;  
+            font-size:12px;  
+            margin-top:12px;  
+            text-align:center;  
+        "  
+    ></div>  
+
 </div>
 
-<!-- MAIN APP -->
-<div id="app" class="container hidden">
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div>
-      <div class="brand">MAYOTUBE ADMIN</div>
-      <div class="status">
-        <span class="status-dot"></span>
-        <span id="connectionText">Connected</span>
-      </div>
-    </div>
-    <button class="btn btn-danger btn-small" onclick="logout()">Logout</button>
-  </div>
+</div>  <!-- =========================================================  
+     APP  
+     ========================================================= -->  <div id="app" class="hidden">  <div class="container">  
 
-  <!-- HOME CONTROL -->
-  <div class="admin-card">
-    <div class="card-title">🏠 Home Control</div>
-    <div class="home-control">
-      <div class="home-info">
-        <strong>Home Content</strong>
-        <span id="homeStatusText">Loading...</span>
-      </div>
-      <label class="switch">
-        <input id="homeEnabled" type="checkbox" onchange="toggleHome()">
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
+    <!-- TOPBAR -->  
 
-  <!-- STATISTICS -->
-  <div class="admin-card">
-    <div class="card-title">📊 Statistics</div>
-    <div class="stats-grid">
-      <div class="stat">
-        <div id="statTotal" class="stat-number">0</div>
-        <div class="stat-label">Total</div>
-      </div>
-      <div class="stat">
-        <div id="statEnabled" class="stat-number">0</div>
-        <div class="stat-label">Enabled</div>
-      </div>
-      <div class="stat">
-        <div id="statDisabled" class="stat-number">0</div>
-        <div class="stat-label">Disabled</div>
-      </div>
-      <div class="stat">
-        <div id="statTrash" class="stat-number">0</div>
-        <div class="stat-label">Recycle Bin</div>
-      </div>
-    </div>
-  </div>
+    <div class="topbar">  
 
-  <!-- CONTENT EDITOR -->
-  <div class="admin-card">
-    <div class="card-title">✏️ Content Editor</div>
-    <div class="card-subtitle">Content بنائیں، Design کریں اور Schedule کریں۔</div>
-    <input id="itemId" type="hidden">
-    <div class="editor-grid">
-      <!-- TYPE -->
-      <div class="input-group">
-        <label for="itemType">Content Type</label>
-        <select id="itemType" onchange="updateEditorFields()">
-          <option value="message">Message</option>
-          <option value="announcement">Announcement</option>
-          <option value="notification">Notification</option>
-          <option value="image">Image</option>
-          <option value="video">Video</option>
-          <option value="youtube">YouTube</option>
-          <option value="audio">Audio</option>
-          <option value="button">Button</option>
-          <option value="link">Link</option>
-          <option value="donation">Donation</option>
-          <option value="advertisement">Advertisement</option>
-          <option value="website">Website</option>
-          <option value="channel">Channel</option>
-        </select>
-      </div>
-      <!-- ORDER -->
-      <div class="input-group">
-        <label for="itemOrder">Order</label>
-        <input id="itemOrder" type="number" value="0">
-        <div class="muted">Drag & Drop سے بھی ترتیب تبدیل کر سکتے ہیں۔</div>
-      </div>
-      <!-- TITLE -->
-      <div class="input-group full">
-        <label for="itemTitle">Title</label>
-        <input id="itemTitle" type="text" placeholder="Content title">
-      </div>
-      <!-- MESSAGE -->
-      <div id="fieldMessage" class="input-group full">
-        <label for="itemMessage">Message</label>
-        <textarea id="itemMessage" placeholder="Message..."></textarea>
-      </div>
-      <!-- DESCRIPTION -->
-      <div id="fieldDescription" class="input-group full">
-        <label for="itemDescription">Description</label>
-        <textarea id="itemDescription" placeholder="Description..."></textarea>
-      </div>
-      <!-- IMAGE -->
-      <div id="fieldImageUrl" class="input-group full">
-        <label for="imageUrl">🖼️ Image URL</label>
-        <input id="imageUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- VIDEO -->
-      <div id="fieldVideoUrl" class="input-group full">
-        <label for="videoUrl">🎬 Video URL</label>
-        <input id="videoUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- LINK -->
-      <div id="fieldLinkUrl" class="input-group full">
-        <label for="linkUrl">🔗 Link URL</label>
-        <input id="linkUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- BUTTON TEXT -->
-      <div id="fieldButtonText" class="input-group">
-        <label for="buttonText">Button Text</label>
-        <input id="buttonText" type="text" placeholder="Open">
-      </div>
-      <!-- ENABLE -->
-      <div class="input-group">
-        <label>Status</label>
-        <label style="display:flex; align-items:center; gap:8px; background:#0d0d0d; padding:12px; border-radius:10px; border:1px solid #292929;">
-          <input id="itemEnabled" type="checkbox" checked style="width:auto"> 🟢 Enabled
-        </label>
-      </div>
+        <div>  
 
-      <!-- BOX DESIGN CONTROLS -->
-      <div class="input-group full">
-        <div class="design-controls">
-          <div class="design-controls-title">📦 Box Design Controls</div>
-          <div class="design-section">
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="boxStyle">Box Style</label>
-                <select id="boxStyle">
-                  <option value="card">Card</option>
-                  <option value="flat">Flat</option>
-                  <option value="transparent">Transparent</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label for="boxTextAlign">Text Alignment</label>
-                <select id="boxTextAlign">
-                  <option value="right">Right</option>
-                  <option value="center">Center</option>
-                  <option value="left">Left</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div class="form-grid">
-              <div class="input-group">
-                <label>Background Color</label>
-                <div class="color-row">
-                  <input id="boxBackgroundColor" type="color" value="#181818">
-                  <span id="boxBackgroundColorValue" class="range-value">#181818</span>
-                </div>
-              </div>
-              <div class="input-group">
-                <label>Text Color</label>
-                <div class="color-row">
-                  <input id="boxTextColor" type="color" value="#ffffff">
-                  <span id="boxTextColorValue" class="range-value">#ffffff</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="boxWidth">Box Width</label>
-                <input id="boxWidth" type="number" min="10" max="100" value="100">
-                <div class="muted">Percentage</div>
-              </div>
-              <div class="input-group">
-                <label for="boxHeight">Box Height</label>
-                <input id="boxHeight" type="number" min="0" max="2000" value="0">
-                <div class="muted">0 = Auto</div>
-              </div>
-              <div class="input-group">
-                <label for="boxPadding">Padding</label>
-                <input id="boxPadding" type="number" min="0" max="100" value="11">
-                <div class="muted">px</div>
-              </div>
-              <div class="input-group">
-                <label for="boxRadius">Border Radius</label>
-                <input id="boxRadius" type="number" min="0" max="100" value="13">
-                <div class="muted">px</div>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="boxShadow">Shadow</label>
-                <select id="boxShadow">
-                  <option value="none">None</option>
-                  <option value="small">Small</option>
-                  <option value="medium" selected>Medium</option>
-                  <option value="large">Large</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label for="boxBorder">Border</label>
-                <select id="boxBorder">
-                  <option value="none">None</option>
-                  <option value="subtle" selected>Subtle</option>
-                  <option value="strong">Strong</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div style="font-weight:800; margin-bottom:10px; font-size:13px;">🖼️ Image Controls</div>
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="imageHeight">Image Height</label>
-                <input id="imageHeight" type="number" min="0" max="1500" value="230">
-                <div class="muted">px</div>
-              </div>
-              <div class="input-group">
-                <label for="boxImageFit">Image Fit</label>
-                <select id="boxImageFit">
-                  <option value="cover">Cover</option>
-                  <option value="contain">Contain</option>
-                  <option value="fill">Fill</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div style="font-weight:800; margin-bottom:10px; font-size:13px;">🎬 Video Controls</div>
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="videoHeight">Video Height</label>
-                <input id="videoHeight" type="number" min="0" max="1500" value="240">
-              </div>
-              <div class="input-group">
-                <label for="videoFit">Video Fit</label>
-                <select id="videoFit">
-                  <option value="contain">Contain</option>
-                  <option value="cover">Cover</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label>Autoplay</label>
-                <label style="display:flex; gap:8px; align-items:center; padding:11px; background:#0d0d0d; border-radius:9px;">
-                  <input id="videoAutoplay" type="checkbox" style="width:auto"> Autoplay
-                </label>
-              </div>
-              <div class="input-group">
-                <label>Loop</label>
-                <label style="display:flex; gap:8px; align-items:center; padding:11px; background:#0d0d0d; border-radius:9px;">
-                  <input id="videoLoop" type="checkbox" style="width:auto"> Loop
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div style="font-weight:800; margin-bottom:10px; font-size:13px;">🔗 Button / Link Controls</div>
-            <div class="form-grid">
-              <div class="input-group">
-                <label for="buttonColor">Button Color</label>
-                <div class="color-row">
-                  <input id="buttonColor" type="color" value="#6d28d9">
-                  <span id="buttonColorValue" class="range-value">#6d28d9</span>
-                </div>
-              </div>
-              <div class="input-group">
-                <label for="buttonTextColor">Button Text Color</label>
-                <div class="color-row">
-                  <input id="buttonTextColor" type="color" value="#ffffff">
-                  <span id="buttonTextColorValue" class="range-value">#ffffff</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="design-section">
-            <div style="font-weight:800; margin-bottom:10px; font-size:13px;">📅 Scheduled Show / Hide</div>
-            <div class="schedule-box">
-              <div class="form-grid">
-                <div class="input-group">
-                  <label for="scheduleStart">Show From</label>
-                  <input id="scheduleStart" type="datetime-local">
-                </div>
-                <div class="input-group">
-                  <label for="scheduleEnd">Hide After</label>
-                  <input id="scheduleEnd" type="datetime-local">
-                </div>
-              </div>
-              <div id="scheduleStatus" class="schedule-status">No schedule</div>
-            </div>
-          </div>
-        </div>
-      </div>
+            <div class="brand">  
+                MAYOTUBE ADMIN  
+            </div>  
 
-      <div class="input-group full">
-        <div class="button-row">
-          <button class="btn btn-primary" onclick="saveItem()">💾 Save Content</button>
-          <button class="btn" onclick="clearForm()">➕ New</button>
-          <button class="btn" onclick="loadContent()">🔄 Refresh</button>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="status">  
 
-  <!-- LIVE PREVIEW -->
-  <div class="admin-card">
-    <div class="card-title">👁️ Live Home Preview</div>
-    <div class="card-subtitle">Android Home پر enabled content کا preview۔</div>
-    <div class="preview-wrapper">
-      <div id="homePreview" class="preview-phone">
-        <div class="preview-empty">Loading preview...</div>
-      </div>
-    </div>
-  </div>
+                <span class="status-dot"></span>  
 
-  <!-- CONTENT LIST -->
-  <div class="admin-card">
-    <div class="card-title">📦 Home Content</div>
-    <div class="card-subtitle">Drag & Drop کر کے Content کی ترتیب تبدیل کریں۔</div>
-    <div class="toolbar">
-      <input id="searchItems" type="search" placeholder="🔍 Search content..." oninput="renderItems()">
-      <select id="filterType" onchange="renderItems()">
-        <option value="all">All Types</option>
-        <option value="message">Message</option>
-        <option value="announcement">Announcement</option>
-        <option value="notification">Notification</option>
-        <option value="image">Image</option>
-        <option value="video">Video</option>
-        <option value="youtube">YouTube</option>
-        <option value="audio">Audio</option>
-        <option value="button">Button</option>
-        <option value="link">Link</option>
-        <option value="donation">Donation</option>
-        <option value="advertisement">Advertisement</option>
-        <option value="website">Website</option>
-        <option value="channel">Channel</option>
-      </select>
-      <select id="filterStatus" onchange="renderItems()">
-        <option value="all">All Status</option>
-        <option value="enabled">Enabled</option>
-        <option value="disabled">Disabled</option>
-        <option value="scheduled">Scheduled</option>
-      </select>
-    </div>
-    <div id="itemsList" class="items-list"></div>
-  </div>
+                <span id="connectionText">  
+                    Connected  
+                </span>  
 
-  <!-- RECYCLE BIN -->
-  <div class="admin-card">
-    <div class="card-title">🗑️ Recycle Bin</div>
-    <div class="card-subtitle">Deleted content یہاں سے Restore یا Permanently Delete کیا جا سکتا ہے۔</div>
-    <div id="trashList"></div>
-    <button class="btn btn-danger btn-small" onclick="emptyTrash()" style="margin-top: 10px;">Empty Recycle Bin</button>
-  </div>
+            </div>  
 
-  <!-- MEDIA MANAGER -->
-  <div class="admin-card">
-    <div class="card-title">📁 Media Manager</div>
-    <div class="card-subtitle">Images, videos اور دیگر media upload/manage کریں۔</div>
-    <div class="input-group">
-      <input id="mediaFile" type="file" accept="image/*,video/*,audio/*">
-    </div>
-    <div class="button-row">
-      <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
-      <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
-    </div>
-    <div id="mediaList" class="media-grid" style="margin-top:13px"></div>
-  </div>
+        </div>  
 
-  <!-- SYSTEM STATUS -->
-  <div class="admin-card">
-    <div class="card-title">⚙️ System Status</div>
-    <pre id="systemStatus" style="background:#080808; border:1px solid #292929; border-radius:10px; padding:12px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#aaa; font-size:11px;">Loading...</pre>
-  </div>
+        <button  
+            class="btn btn-danger btn-small"  
+            onclick="logout()"  
+        >  
+            Logout  
+        </button>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         HOME CONTROL  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            🏠 Home Control  
+        </div>  
+
+        <div class="home-control">  
+
+            <div class="home-info">  
+
+                <strong>  
+                    Home Content  
+                </strong>  
+
+                <span id="homeStatusText">  
+                    Loading...  
+                </span>  
+
+            </div>  
+
+            <label class="switch">  
+
+                <input  
+                    id="homeEnabled"  
+                    type="checkbox"  
+                    onchange="toggleHome()"  
+                >  
+
+                <span class="slider"></span>  
+
+            </label>  
+
+        </div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         STATISTICS  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            📊 Statistics  
+        </div>  
+
+        <div class="stats-grid">  
+
+            <div class="stat">  
+                <div  
+                    id="statTotal"  
+                    class="stat-number"  
+                >0</div>  
+
+                <div class="stat-label">  
+                    Total  
+                </div>  
+            </div>  
+
+            <div class="stat">  
+                <div  
+                    id="statEnabled"  
+                    class="stat-number"  
+                >0</div>  
+
+                <div class="stat-label">  
+                    Enabled  
+                </div>  
+            </div>  
+
+            <div class="stat">  
+                <div  
+                    id="statDisabled"  
+                    class="stat-number"  
+                >0</div>  
+
+                <div class="stat-label">  
+                    Disabled  
+                </div>  
+            </div>  
+
+            <div class="stat">  
+                <div  
+                    id="statTrash"  
+                    class="stat-number"  
+                >0</div>  
+
+                <div class="stat-label">  
+                    Recycle Bin  
+                </div>  
+            </div>  
+
+        </div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         CONTENT EDITOR  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            ✏️ Content Editor  
+        </div>  
+
+        <div class="card-subtitle">  
+            Content بنائیں، Design کریں اور Schedule کریں۔  
+        </div>  
+
+        <input  
+            id="itemId"  
+            type="hidden"  
+        >  
+
+        <div class="editor-grid">  
+
+            <!-- TYPE -->  
+
+            <div class="input-group">  
+
+                <label for="itemType">  
+                    Content Type  
+                </label>  
+
+                <select  
+                    id="itemType"  
+                    onchange="updateEditorFields()"  
+                >  
+
+                    <option value="message">  
+                        Message  
+                    </option>  
+
+                    <option value="announcement">  
+                        Announcement  
+                    </option>  
+
+                    <option value="notification">  
+                        Notification  
+                    </option>  
+
+                    <option value="image">  
+                        Image  
+                    </option>  
+
+                    <option value="video">  
+                        Video  
+                    </option>  
+
+                    <option value="youtube">  
+                        YouTube  
+                    </option>  
+
+                    <option value="audio">  
+                        Audio  
+                    </option>  
+
+                    <option value="button">  
+                        Button  
+                    </option>  
+
+                    <option value="link">  
+                        Link  
+                    </option>  
+
+                    <option value="donation">  
+                        Donation  
+                    </option>  
+
+                    <option value="advertisement">  
+                        Advertisement  
+                    </option>  
+
+                    <option value="website">  
+                        Website  
+                    </option>  
+
+                    <option value="channel">  
+                        Channel  
+                    </option>  
+
+                </select>  
+
+            </div>  
+
+
+            <!-- ORDER -->  
+
+            <div class="input-group">  
+
+                <label for="itemOrder">  
+                    Order  
+                </label>  
+
+                <input  
+                    id="itemOrder"  
+                    type="number"  
+                    value="0"  
+                >  
+
+                <div class="muted">  
+                    Drag & Drop سے بھی ترتیب تبدیل کر سکتے ہیں۔  
+                </div>  
+
+            </div>  
+
+
+            <!-- TITLE -->  
+
+            <div class="input-group full">  
+
+                <label for="itemTitle">  
+                    Title  
+                </label>  
+
+                <input  
+                    id="itemTitle"  
+                    type="text"  
+                    placeholder="Content title"  
+                >  
+
+            </div>  
+
+
+            <!-- MESSAGE -->  
+
+            <div  
+                id="fieldMessage"  
+                class="input-group full"  
+            >  
+
+                <label for="itemMessage">  
+                    Message  
+                </label>  
+
+                <textarea  
+                    id="itemMessage"  
+                    placeholder="Message..."  
+                ></textarea>  
+
+            </div>  
+
+
+            <!-- DESCRIPTION -->  
+
+            <div  
+                id="fieldDescription"  
+                class="input-group full"  
+            >  
+
+                <label for="itemDescription">  
+                    Description  
+                </label>  
+
+                <textarea  
+                    id="itemDescription"  
+                    placeholder="Description..."  
+                ></textarea>  
+
+            </div>  
+
+
+            <!-- IMAGE -->  
+
+            <div  
+                id="fieldImageUrl"  
+                class="input-group full"  
+            >  
+
+                <label for="imageUrl">  
+                    🖼️ Image URL  
+                </label>  
+
+                <input  
+                    id="imageUrl"  
+                    type="url"  
+                    placeholder="https://..."  
+                >  
+
+            </div>  
+
+
+            <!-- VIDEO -->  
+
+            <div  
+                id="fieldVideoUrl"  
+                class="input-group full"  
+            >  
+
+                <label for="videoUrl">  
+                    🎬 Video URL  
+                </label>  
+
+                <input  
+                    id="videoUrl"  
+                    type="url"  
+                    placeholder="https://..."  
+                >  
+
+            </div>  
+
+
+            <!-- LINK -->  
+
+            <div  
+                id="fieldLinkUrl"  
+                class="input-group full"  
+            >  
+
+                <label for="linkUrl">  
+                    🔗 Link URL  
+                </label>  
+
+                <input  
+                    id="linkUrl"  
+                    type="url"  
+                    placeholder="https://..."  
+                >  
+
+            </div>  
+
+
+            <!-- BUTTON TEXT -->  
+
+            <div  
+                id="fieldButtonText"  
+                class="input-group"  
+            >  
+
+                <label for="buttonText">  
+                    Button Text  
+                </label>  
+
+                <input  
+                    id="buttonText"  
+                    type="text"  
+                    placeholder="Open"  
+                >  
+
+            </div>  
+
+
+            <!-- ENABLE -->  
+
+            <div class="input-group">  
+
+                <label>  
+                    Status  
+                </label>  
+
+                <label  
+                    style="  
+                        display:flex;  
+                        align-items:center;  
+                        gap:8px;  
+                        background:#0d0d0d;  
+                        padding:12px;  
+                        border-radius:10px;  
+                        border:1px solid #292929;  
+                    "  
+                >  
+
+                    <input  
+                        id="itemEnabled"  
+                        type="checkbox"  
+                        checked  
+                        style="width:auto"  
+                    >  
+
+                    🟢 Enabled  
+
+                </label>  
+
+            </div>  
+
+
+            <!-- =================================================  
+                 BOX DESIGN  
+                 ================================================= -->  
+
+            <div class="input-group full">  
+
+                <div class="design-controls">  
+
+                    <div class="design-controls-title">  
+                        📦 Box Design Controls  
+                    </div>  
+
+
+                    <!-- BOX STYLE -->  
+
+                    <div class="design-section">  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="boxStyle">  
+                                    Box Style  
+                                </label>  
+
+                                <select id="boxStyle">  
+
+                                    <option value="card">  
+                                        Card  
+                                    </option>  
+
+                                    <option value="flat">  
+                                        Flat  
+                                    </option>  
+
+                                    <option value="transparent">  
+                                        Transparent  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxTextAlign">  
+                                    Text Alignment  
+                                </label>  
+
+                                <select id="boxTextAlign">  
+
+                                    <option value="right">  
+                                        Right  
+                                    </option>  
+
+                                    <option value="center">  
+                                        Center  
+                                    </option>  
+
+                                    <option value="left">  
+                                        Left  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- COLORS -->  
+
+                    <div class="design-section">  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label>  
+                                    Background Color  
+                                </label>  
+
+                                <div class="color-row">  
+
+                                    <input  
+                                        id="boxBackgroundColor"  
+                                        type="color"  
+                                        value="#181818"  
+                                    >  
+
+                                    <span  
+                                        id="boxBackgroundColorValue"  
+                                        class="range-value"  
+                                    >  
+                                        #181818  
+                                    </span>  
+
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label>  
+                                    Text Color  
+                                </label>  
+
+                                <div class="color-row">  
+
+                                    <input  
+                                        id="boxTextColor"  
+                                        type="color"  
+                                        value="#ffffff"  
+                                    >  
+
+                                    <span  
+                                        id="boxTextColorValue"  
+                                        class="range-value"  
+                                    >  
+                                        #ffffff  
+                                    </span>  
+
+                                </div>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- SIZE -->  
+
+                    <div class="design-section">  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="boxWidth">  
+                                    Box Width  
+                                </label>  
+
+                                <input  
+                                    id="boxWidth"  
+                                    type="number"  
+                                    min="10"  
+                                    max="100"  
+                                    value="100"  
+                                >  
+
+                                <div class="muted">  
+                                    Percentage  
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxHeight">  
+                                    Box Height  
+                                </label>  
+
+                                <input  
+                                    id="boxHeight"  
+                                    type="number"  
+                                    min="0"  
+                                    max="2000"  
+                                    value="0"  
+                                >  
+
+                                <div class="muted">  
+                                    0 = Auto  
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxPadding">  
+                                    Padding  
+                                </label>  
+
+                                <input  
+                                    id="boxPadding"  
+                                    type="number"  
+                                    min="0"  
+                                    max="100"  
+                                    value="11"  
+                                >  
+
+                                <div class="muted">  
+                                    px  
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxRadius">  
+                                    Border Radius  
+                                </label>  
+
+                                <input  
+                                    id="boxRadius"  
+                                    type="number"  
+                                    min="0"  
+                                    max="100"  
+                                    value="13"  
+                                >  
+
+                                <div class="muted">  
+                                    px  
+                                </div>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- SHADOW -->  
+
+                    <div class="design-section">  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="boxShadow">  
+                                    Shadow  
+                                </label>  
+
+                                <select id="boxShadow">  
+
+                                    <option value="none">  
+                                        None  
+                                    </option>  
+
+                                    <option value="small">  
+                                        Small  
+                                    </option>  
+
+                                    <option  
+                                        value="medium"  
+                                        selected  
+                                    >  
+                                        Medium  
+                                    </option>  
+
+                                    <option value="large">  
+                                        Large  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxBorder">  
+                                    Border  
+                                </label>  
+
+                                <select id="boxBorder">  
+
+                                    <option value="none">  
+                                        None  
+                                    </option>  
+
+                                    <option  
+                                        value="subtle"  
+                                        selected  
+                                    >  
+                                        Subtle  
+                                    </option>  
+
+                                    <option value="strong">  
+                                        Strong  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- IMAGE CONTROLS -->  
+
+                    <div class="design-section">  
+
+                        <div  
+                            style="  
+                                font-weight:800;  
+                                margin-bottom:10px;  
+                                font-size:13px;  
+                            "  
+                        >  
+                            🖼️ Image Controls  
+                        </div>  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="imageHeight">  
+                                    Image Height  
+                                </label>  
+
+                                <input  
+                                    id="imageHeight"  
+                                    type="number"  
+                                    min="0"  
+                                    max="1500"  
+                                    value="230"  
+                                >  
+
+                                <div class="muted">  
+                                    px  
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="boxImageFit">  
+                                    Image Fit  
+                                </label>  
+
+                                <select id="boxImageFit">  
+
+                                    <option value="cover">  
+                                        Cover  
+                                    </option>  
+
+                                    <option value="contain">  
+                                        Contain  
+                                    </option>  
+
+                                    <option value="fill">  
+                                        Fill  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- VIDEO CONTROLS -->  
+
+                    <div class="design-section">  
+
+                        <div  
+                            style="  
+                                font-weight:800;  
+                                margin-bottom:10px;  
+                                font-size:13px;  
+                            "  
+                        >  
+                            🎬 Video Controls  
+                        </div>  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="videoHeight">  
+                                    Video Height  
+                                </label>  
+
+                                <input  
+                                    id="videoHeight"  
+                                    type="number"  
+                                    min="0"  
+                                    max="1500"  
+                                    value="240"  
+                                >  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="videoFit">  
+                                    Video Fit  
+                                </label>  
+
+                                <select id="videoFit">  
+
+                                    <option value="contain">  
+                                        Contain  
+                                    </option>  
+
+                                    <option value="cover">  
+                                        Cover  
+                                    </option>  
+
+                                </select>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label>  
+                                    Autoplay  
+                                </label>  
+
+                                <label  
+                                    style="  
+                                        display:flex;  
+                                        gap:8px;  
+                                        align-items:center;  
+                                        padding:11px;  
+                                        background:#0d0d0d;  
+                                        border-radius:9px;  
+                                    "  
+                                >  
+
+                                    <input  
+                                        id="videoAutoplay"  
+                                        type="checkbox"  
+                                        style="width:auto"  
+                                    >  
+
+                                    Autoplay  
+
+                                </label>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label>  
+                                    Loop  
+                                </label>  
+
+                                <label  
+                                    style="  
+                                        display:flex;  
+                                        gap:8px;  
+                                        align-items:center;  
+                                        padding:11px;  
+                                        background:#0d0d0d;  
+                                        border-radius:9px;  
+                                    "  
+                                >  
+
+                                    <input  
+                                        id="videoLoop"  
+                                        type="checkbox"  
+                                        style="width:auto"  
+                                    >  
+
+                                    Loop  
+
+                                </label>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- BUTTON LINK -->  
+
+                    <div class="design-section">  
+
+                        <div  
+                            style="  
+                                font-weight:800;  
+                                margin-bottom:10px;  
+                                font-size:13px;  
+                            "  
+                        >  
+                            🔗 Button / Link Controls  
+                        </div>  
+
+                        <div class="form-grid">  
+
+                            <div class="input-group">  
+
+                                <label for="buttonColor">  
+                                    Button Color  
+                                </label>  
+
+                                <div class="color-row">  
+
+                                    <input  
+                                        id="buttonColor"  
+                                        type="color"  
+                                        value="#6d28d9"  
+                                    >  
+
+                                    <span  
+                                        id="buttonColorValue"  
+                                        class="range-value"  
+                                    >  
+                                        #6d28d9  
+                                    </span>  
+
+                                </div>  
+
+                            </div>  
+
+
+                            <div class="input-group">  
+
+                                <label for="buttonTextColor">  
+                                    Button Text Color  
+                                </label>  
+
+                                <div class="color-row">  
+
+                                    <input  
+                                        id="buttonTextColor"  
+                                        type="color"  
+                                        value="#ffffff"  
+                                    >  
+
+                                    <span  
+                                        id="buttonTextColorValue"  
+                                        class="range-value"  
+                                    >  
+                                        #ffffff  
+                                    </span>  
+
+                                </div>  
+
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+
+                    <!-- SCHEDULE -->  
+
+                    <div class="design-section">  
+
+                        <div  
+                            style="  
+                                font-weight:800;  
+                                margin-bottom:10px;  
+                                font-size:13px;  
+                            "  
+                        >  
+                            📅 Scheduled Show / Hide  
+                        </div>  
+
+                        <div class="schedule-box">  
+
+                            <div class="form-grid">  
+
+                                <div class="input-group">  
+
+                                    <label for="scheduleStart">  
+                                        Show From  
+                                    </label>  
+
+                                    <input  
+                                        id="scheduleStart"  
+                                        type="datetime-local"  
+                                    >  
+
+                                </div>  
+
+
+                                <div class="input-group">  
+
+                                    <label for="scheduleEnd">  
+                                        Hide After  
+                                    </label>  
+
+                                    <input  
+                                        id="scheduleEnd"  
+                                        type="datetime-local"  
+                                    >  
+
+                                </div>  
+
+                            </div>  
+
+                            <div  
+                                id="scheduleStatus"  
+                                class="schedule-status"  
+                            >  
+                                No schedule  
+                            </div>  
+
+                        </div>  
+
+                    </div>  
+
+                </div>  
+
+            </div>  
+
+
+            <!-- SAVE -->  
+
+            <div class="input-group full">  
+
+                <div class="button-row">  
+
+                    <button  
+                        class="btn btn-primary"  
+                        onclick="saveItem()"  
+                    >  
+                        💾 Save Content  
+                    </button>  
+
+                    <button  
+                        class="btn"  
+                        onclick="clearForm()"  
+                    >  
+                        ➕ New  
+                    </button>  
+
+                    <button  
+                        class="btn"  
+                        onclick="loadContent()"  
+                    >  
+                        🔄 Refresh  
+                    </button>  
+
+                </div>  
+
+            </div>  
+
+        </div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         LIVE PREVIEW  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            👁️ Live Home Preview  
+        </div>  
+
+        <div class="card-subtitle">  
+            Android Home پر enabled content کا preview۔  
+        </div>  
+
+        <div class="preview-wrapper">  
+
+            <div  
+                id="homePreview"  
+                class="preview-phone"  
+            >  
+
+                <div class="preview-empty">  
+                    Loading preview...  
+                </div>  
+
+            </div>  
+
+        </div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         CONTENT LIST  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            📦 Home Content  
+        </div>  
+
+        <div class="card-subtitle">  
+            Drag & Drop کر کے Content کی ترتیب تبدیل کریں۔  
+        </div>  
+
+
+        <!-- SEARCH -->  
+
+        <div class="toolbar">  
+
+            <input  
+                id="searchItems"  
+                type="search"  
+                placeholder="🔍 Search content..."  
+                oninput="renderItems()"  
+            >  
+
+            <select  
+                id="filterType"  
+                onchange="renderItems()"  
+            >  
+
+                <option value="all">  
+                    All Types  
+                </option>  
+
+                <option value="message">  
+                    Message  
+                </option>  
+
+                <option value="announcement">  
+                    Announcement  
+                </option>  
+
+                <option value="notification">  
+                    Notification  
+                </option>  
+
+                <option value="image">  
+                    Image  
+                </option>  
+
+                <option value="video">  
+                    Video  
+                </option>  
+
+                <option value="youtube">  
+                    YouTube  
+                </option>  
+
+                <option value="audio">  
+                    Audio  
+                </option>  
+
+                <option value="button">  
+                    Button  
+                </option>  
+
+                <option value="link">  
+                    Link  
+                </option>  
+
+                <option value="donation">  
+                    Donation  
+                </option>  
+
+                <option value="advertisement">  
+                    Advertisement  
+                </option>  
+
+                <option value="website">  
+                    Website  
+                </option>  
+
+                <option value="channel">  
+                    Channel  
+                </option>  
+
+            </select>  
+
+
+            <select  
+                id="filterStatus"  
+                onchange="renderItems()"  
+            >  
+
+                <option value="all">  
+                    All Status  
+                </option>  
+
+                <option value="enabled">  
+                    Enabled  
+                </option>  
+
+                <option value="disabled">  
+                    Disabled  
+                </option>  
+
+                <option value="scheduled">  
+                    Scheduled  
+                </option>  
+
+            </select>  
+
+        </div>  
+
+
+        <div  
+            id="itemsList"  
+            class="items-list"  
+        ></div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         RECYCLE BIN  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            🗑️ Recycle Bin  
+        </div>  
+
+        <div class="card-subtitle">  
+            Deleted content یہاں سے Restore کیا جا سکتا ہے۔  
+        </div>  
+
+        <div  
+            id="trashList"  
+        ></div>  
+
+        <button  
+            class="btn btn-danger btn-small"  
+            onclick="emptyTrash()"  
+        >  
+            Empty Recycle Bin  
+        </button>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         MEDIA MANAGER  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            📁 Media Manager  
+        </div>  
+
+        <div class="card-subtitle">  
+            Images, videos اور دیگر media upload/manage کریں۔  
+        </div>  
+
+        <div class="input-group">  
+
+            <input  
+                id="mediaFile"  
+                type="file"  
+                accept="image/*,video/*,audio/*"  
+            >  
+
+        </div>  
+
+        <div class="button-row">  
+
+            <button  
+                class="btn btn-primary"  
+                onclick="uploadMedia()"  
+            >  
+                ⬆️ Upload  
+            </button>  
+
+            <button  
+                class="btn"  
+                onclick="loadMedia()"  
+            >  
+                🔄 Refresh  
+            </button>  
+
+        </div>  
+
+        <div  
+            id="mediaList"  
+            class="media-grid"  
+            style="margin-top:13px"  
+        ></div>  
+
+    </div>  
+
+
+    <!-- =================================================  
+         SYSTEM STATUS  
+         ================================================= -->  
+
+    <div class="admin-card">  
+
+        <div class="card-title">  
+            ⚙️ System Status  
+        </div>  
+
+        <pre  
+            id="systemStatus"  
+            style="  
+                background:#080808;  
+                border:1px solid #292929;  
+                border-radius:10px;  
+                padding:12px;  
+                overflow:auto;  
+                white-space:pre-wrap;  
+                word-break:break-word;  
+                color:#aaa;  
+                font-size:11px;  
+            "  
+        >Loading...</pre>  
+
+    </div>  
+
 </div>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
-<script>
-let adminToken = "";
-let cmsContent = { items: [], home_enabled: true };
-let draggedId = null;
-const TRASH_KEY = "mayotube_admin_recycle_bin_v1";
-
-function $(id) { return document.getElementById(id); }
-
-let toastTimer = null;
-function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2800);
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function safePreviewUrl(value) {
-  if (!value) return "";
-  try {
-    const url = new URL(value);
-    if (url.protocol === "http:" || url.protocol === "https:") {
-      return url.href;
-    }
-  } catch (e) {}
-  return "";
-}
-
-async function api(path, options = {}) {
-  const headers = { ...(options.headers || {}), "Authorization": "Bearer " + adminToken };
-  if (options.body && !(options.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
-  }
-  const response = await fetch(path, { ...options, headers });
-  const text = await response.text();
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch (e) {
-    data = { raw: text };
-  }
-  if (!response.ok) {
-    throw new Error(data.message || data.error || data.raw || "Request failed");
-  }
-  return data;
-}
-
-function login() {
-  const token = $("tokenInput").value.trim();
-  if (!token) {
-    $("loginError").textContent = "Admin Token درج کریں۔";
-    return;
-  }
-  adminToken = token;
-  if ($("rememberToken").checked) {
-    localStorage.setItem("mayotube_admin_token", token);
-  }
-  $("loginError").textContent = "";
-  $("loginScreen").classList.add("hidden");
-  $("app").classList.remove("hidden");
-  initialize();
-}
-
-function logout() {
-  adminToken = "";
-  sessionStorage.removeItem("mayotube_admin_token");
-  localStorage.removeItem("mayotube_admin_token");
-  $("app").classList.add("hidden");
-  $("loginScreen").classList.remove("hidden");
-  $("tokenInput").value = "";
-}
-
-async function initialize() {
-  updateColorLabels();
-  $("boxBackgroundColor").addEventListener("input", updateColorLabels);
-  $("boxTextColor").addEventListener("input", updateColorLabels);
-  $("buttonColor").addEventListener("input", updateColorLabels);
-  $("buttonTextColor").addEventListener("input", updateColorLabels);
-  $("scheduleStart").addEventListener("change", updateScheduleStatus);
-  $("scheduleEnd").addEventListener("change", updateScheduleStatus);
-  clearForm();
-  await loadAll();
-}
-
-async function loadAll() {
-  try {
-    await loadContent();
-    await loadHomePreview();
-    await loadMedia();
-    await loadStatus();
-    $("connectionText").textContent = "Connected";
-  } catch (error) {
-    console.error(error);
-    $("connectionText").textContent = "Connection Error";
-    showToast("Error: " + error.message);
-  }
-}
-
-async function loadContent() {
-  const data = await api("/api/admin/content");
-  cmsContent = data || {};
-  if (!Array.isArray(cmsContent.items)) {
-    cmsContent.items = [];
-  }
-  cmsContent.items.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-  $("homeEnabled").checked = cmsContent.home_enabled !== false;
-  $("homeStatusText").textContent = cmsContent.home_enabled !== false ? "Home content is ON" : "Home content is OFF";
-  updateStats();
-  renderItems();
-  renderTrash();
-}
-
-function updateStats() {
-  const items = cmsContent.items || [];
-  const enabled = items.filter(item => item.enabled !== false).length;
-  const disabled = items.length - enabled;
-  $("statTotal").textContent = items.length;
-  $("statEnabled").textContent = enabled;
-  $("statDisabled").textContent = disabled;
-  $("statTrash").textContent = getTrash().length;
-}
-
-async function toggleHome() {
-  const enabled = $("homeEnabled").checked;
-  try {
-    await api("/api/admin/home/toggle", {
-      method: "PATCH",
-      body: JSON.stringify({ enabled })
-    });
-    $("homeStatusText").textContent = enabled ? "Home content is ON" : "Home content is OFF";
-    showToast(enabled ? "Home ON کر دیا گیا۔" : "Home OFF کر دیا گیا۔");
-    await loadHomePreview();
-  } catch (error) {
-    $("homeEnabled").checked = !enabled;
-    showToast("Home toggle failed: " + error.message);
-  }
-}
-
-function updateEditorFields() {
-  const type = $("itemType").value;
-  const imageTypes = ["image", "donation", "advertisement"];
-  const videoTypes = ["video"];
-  const linkTypes = ["button", "link", "website", "youtube", "channel", "donation", "advertisement"];
-  $("fieldImageUrl").style.display = imageTypes.includes(type) ? "" : "none";
-  $("fieldVideoUrl").style.display = videoTypes.includes(type) ? "" : "none";
-  $("fieldLinkUrl").style.display = linkTypes.includes(type) ? "" : "none";
-  $("fieldButtonText").style.display = ["button", "donation", "advertisement"].includes(type) ? "" : "none";
-}
-
-function getBoxStyleFromForm() {
-  return {
-    boxStyle: $("boxStyle").value || "card",
-    backgroundColor: $("boxBackgroundColor").value || "#181818",
-    textColor: $("boxTextColor").value || "#ffffff",
-    textAlign: $("boxTextAlign").value || "right",
-    borderRadius: Number($("boxRadius").value || 13),
-    boxHeight: Number($("boxHeight").value || 0),
-    boxWidth: Number($("boxWidth").value || 100),
-    padding: Number($("boxPadding").value || 11),
-    shadow: $("boxShadow").value || "medium",
-    border: $("boxBorder").value || "subtle",
-    imageHeight: Number($("imageHeight").value || 230),
-    imageFit: $("boxImageFit").value || "cover",
-    videoHeight: Number($("videoHeight").value || 240),
-    videoFit: $("videoFit").value || "contain",
-    videoAutoplay: $("videoAutoplay").checked,
-    videoLoop: $("videoLoop").checked,
-    buttonColor: $("buttonColor").value || "#6d28d9",
-    buttonTextColor: $("buttonTextColor").value || "#ffffff"
-  };
-}
-
-function applyBoxStyleToForm(style) {
-  style = style || {};
-  $("boxStyle").value = style.boxStyle || "card";
-  $("boxBackgroundColor").value = style.backgroundColor || "#181818";
-  $("boxTextColor").value = style.textColor || "#ffffff";
-  $("boxTextAlign").value = style.textAlign || "right";
-  $("boxRadius").value = style.borderRadius !== undefined ? style.borderRadius : 13;
-  $("boxHeight").value = style.boxHeight !== undefined ? style.boxHeight : 0;
-  $("boxWidth").value = style.boxWidth !== undefined ? style.boxWidth : 100;
-  $("boxPadding").value = style.padding !== undefined ? style.padding : 11;
-  $("boxShadow").value = style.shadow || "medium";
-  $("boxBorder").value = style.border || "subtle";
-  $("imageHeight").value = style.imageHeight !== undefined ? style.imageHeight : 230;
-  $("boxImageFit").value = style.imageFit || "cover";
-  $("videoHeight").value = style.videoHeight !== undefined ? style.videoHeight : 240;
-  $("videoFit").value = style.videoFit || "contain";
-  $("videoAutoplay").checked = style.videoAutoplay === true;
-  $("videoLoop").checked = style.videoLoop === true;
-  $("buttonColor").value = style.buttonColor || "#6d28d9";
-  $("buttonTextColor").value = style.buttonTextColor || "#ffffff";
-  updateColorLabels();
-}
-
-function updateColorLabels() {
-  if ($("boxBackgroundColor")) $("boxBackgroundColorValue").textContent = $("boxBackgroundColor").value;
-  if ($("boxTextColor")) $("boxTextColorValue").textContent = $("boxTextColor").value;
-  if ($("buttonColor")) $("buttonColorValue").textContent = $("buttonColor").value;
-  if ($("buttonTextColor")) $("buttonTextColorValue").textContent = $("buttonTextColor").value;
-}
-
-function getPreviewShadow(shadow) {
-  switch (shadow) {
-    case "small": return "0 2px 8px rgba(0,0,0,.25)";
-    case "medium": return "0 6px 18px rgba(0,0,0,.35)";
-    case "large": return "0 10px 30px rgba(0,0,0,.50)";
-    default: return "none";
-  }
-}
-
-function getPreviewBoxStyle(item) {
-  const style = item.style || {};
-  const boxStyle = style.boxStyle || "card";
-  let background = style.backgroundColor || "#181818";
-  if (boxStyle === "flat") background = style.backgroundColor || "#101010";
-  if (boxStyle === "transparent") background = "transparent";
-
-  const width = Math.max(10, Math.min(100, Number(style.boxWidth || 100)));
-  const height = Number(style.boxHeight || 0);
-  const padding = Number(style.padding || 11);
-  const radius = Number(style.borderRadius || 13);
-  const textColor = style.textColor || "#ffffff";
-  const textAlign = style.textAlign || "right";
-
-  let border = "1px solid rgba(255,255,255,.07)";
-  if (style.border === "none") border = "none";
-  if (style.border === "strong") border = "1px solid rgba(255,255,255,.22)";
-
-  return {
-    background,
-    width: width + "%",
-    minHeight: height > 0 ? height + "px" : "auto",
-    padding: padding + "px",
-    borderRadius: radius + "px",
-    boxShadow: getPreviewShadow(style.shadow || "medium"),
-    border,
-    color: textColor,
-    textAlign
-  };
-}
-
-function clearForm() {
-  $("itemId").value = "";
-  $("itemType").value = "message";
-  $("itemOrder").value = getNextOrder();
-  $("itemTitle").value = "";
-  $("itemMessage").value = "";
-  $("itemDescription").value = "";
-  $("imageUrl").value = "";
-  $("videoUrl").value = "";
-  $("linkUrl").value = "";
-  $("buttonText").value = "";
-  $("itemEnabled").checked = true;
-  applyBoxStyleToForm({
-    boxStyle: "card", backgroundColor: "#181818", textColor: "#ffffff", textAlign: "right",
-    borderRadius: 13, boxHeight: 0, boxWidth: 100, padding: 11, shadow: "medium", border: "subtle",
-    imageHeight: 230, imageFit: "cover", videoHeight: 240, videoFit: "contain",
-    videoAutoplay: false, videoLoop: false, buttonColor: "#6d28d9", buttonTextColor: "#ffffff"
-  });
-  $("scheduleStart").value = "";
-  $("scheduleEnd").value = "";
-  updateScheduleStatus();
-  updateEditorFields();
-}
-
-function getNextOrder() {
-  const items = cmsContent.items || [];
-  if (!items.length) return 1;
-  return Math.max(...items.map(item => Number(item.order || 0))) + 1;
-}
-
-function editItem(id) {
-  const item = cmsContent.items.find(x => String(x.id) === String(id));
-  if (!item) return;
-  $("itemId").value = item.id || "";
-  $("itemType").value = item.type || "message";
-  $("itemOrder").value = item.order !== undefined ? item.order : 0;
-  $("itemTitle").value = item.title || "";
-  $("itemMessage").value = item.message || "";
-  $("itemDescription").value = item.description || "";
-  $("imageUrl").value = item.image_url || "";
-  $("videoUrl").value = item.video_url || "";
-  $("linkUrl").value = item.link_url || "";
-  $("buttonText").value = item.button_text || "";
-  $("itemEnabled").checked = item.enabled !== false;
-  applyBoxStyleToForm(item.style || {});
-  const schedule = item.schedule || {};
-  $("scheduleStart").value = schedule.start || "";
-  $("scheduleEnd").value = schedule.end || "";
-  updateScheduleStatus();
-  updateEditorFields();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  showToast("Content edit mode میں ہے۔");
-}
-
-async function saveItem() {
-  const id = $("itemId").value.trim();
-  const item = {
-    type: $("itemType").value,
-    title: $("itemTitle").value.trim(),
-    message: $("itemMessage").value.trim(),
-    description: $("itemDescription").value.trim(),
-    image_url: $("imageUrl").value.trim(),
-    video_url: $("videoUrl").value.trim(),
-    link_url: $("linkUrl").value.trim(),
-    button_text: $("buttonText").value.trim(),
-    order: Number($("itemOrder").value || 0),
-    enabled: $("itemEnabled").checked,
-    style: getBoxStyleFromForm(),
-    schedule: {
-      start: $("scheduleStart").value || "",
-      end: $("scheduleEnd").value || ""
-    }
-  };
-  try {
-    if (id) {
-      await api("/api/admin/content/" + encodeURIComponent(id), {
-        method: "PUT",
-        body: JSON.stringify(item)
-      });
-    } else {
-      await api("/api/admin/content", {
-        method: "POST",
-        body: JSON.stringify(item)
-      });
-    }
-    showToast(id ? "Content update ہو گیا۔" : "Content create ہو گیا۔");
-    clearForm();
-    await loadContent();
-    await loadHomePreview();
-  } catch (error) {
-    console.error(error);
-    showToast("Save failed: " + error.message);
-  }
-}
-
-async function toggleItem(id) {
-  try {
-    await api("/api/admin/content/" + encodeURIComponent(id) + "/toggle", { method: "PATCH" });
-    showToast("Status update ہو گیا۔");
-    await loadContent();
-    await loadHomePreview();
-  } catch (error) {
-    showToast("Toggle failed: " + error.message);
-  }
-}
-
-async function duplicateItem(id) {
-  const item = cmsContent.items.find(x => String(x.id) === String(id));
-  if (!item) return;
-  const copy = {
-    type: item.type || "message",
-    title: (item.title || "Untitled") + " (Copy)",
-    message: item.message || "",
-    description: item.description || "",
-    image_url: item.image_url || "",
-    video_url: item.video_url || "",
-    link_url: item.link_url || "",
-    button_text: item.button_text || "",
-    order: getNextOrder(),
-    enabled: item.enabled !== false,
-    style: JSON.parse(JSON.stringify(item.style || {})),
-    schedule: JSON.parse(JSON.stringify(item.schedule || {}))
-  };
-  try {
-    await api("/api/admin/content", {
-      method: "POST",
-      body: JSON.stringify(copy)
-    });
-    showToast("Content duplicate ہو گیا۔");
-    await loadContent();
-    await loadHomePreview();
-  } catch (error) {
-    showToast("Duplicate failed: " + error.message);
-  }
-}
-
-function getTrash() {
-  try {
-    return JSON.parse(localStorage.getItem(TRASH_KEY) || "[]");
-  } catch (e) {
-    return [];
-  }
-}
-
-function setTrash(items) {
-  localStorage.setItem(TRASH_KEY, JSON.stringify(items));
-  updateStats();
-}
-
-async function moveToTrash(id) {
-  const item = cmsContent.items.find(x => String(x.id) === String(id));
-  if (!item) return;
-
-  const trash = getTrash();
-  const exists = trash.some(x => String(x.item.id) === String(id));
-  if (!exists) {
-    trash.push({
-      deletedAt: new Date().toISOString(),
-      item: JSON.parse(JSON.stringify(item))
-    });
-    setTrash(trash);
-  }
-
-  try {
-    await api("/api/admin/content/" + encodeURIComponent(id), {
-      method: "DELETE"
-    });
-  } catch (error) {
-    try {
-      const disabledItem = { ...item, enabled: false };
-      await api("/api/admin/content/" + encodeURIComponent(id), {
-        method: "PUT",
-        body: JSON.stringify(disabledItem)
-      });
-    } catch (e) {
-      console.log("Server sync fallback:", e);
-    }
-  }
-
-  showToast("Content Recycle Bin میں منتقل ہو گیا۔");
-  await loadContent();
-  await loadHomePreview();
-  renderTrash();
-}
-
-async function restoreTrash(index) {
-  const trash = getTrash();
-  const record = trash[index];
-  if (!record) return;
-
-  const item = record.item;
-  const restored = {
-    type: item.type || "message",
-    title: item.title || "",
-    message: item.message || "",
-    description: item.description || "",
-    image_url: item.image_url || "",
-    video_url: item.video_url || "",
-    link_url: item.link_url || "",
-    button_text: item.button_text || "",
-    order: item.order || getNextOrder(),
-    enabled: item.enabled !== false,
-    style: item.style || {},
-    schedule: item.schedule || {}
-  };
-
-  try {
-    await api("/api/admin/content", {
-      method: "POST",
-      body: JSON.stringify(restored)
-    });
-    trash.splice(index, 1);
-    setTrash(trash);
-    showToast("Content restore ہو گیا۔");
-    await loadContent();
-    await loadHomePreview();
-    renderTrash();
-  } catch (error) {
-    showToast("Restore failed: " + error.message);
-  }
-}
-
-function deleteForever(index) {
-  if (!confirm("کیا آپ واقعی اس باکس کو ہمیشہ کے لیے ڈیلیٹ کرنا چاہتے ہیں؟")) {
-    return;
-  }
-  const trash = getTrash();
-  trash.splice(index, 1);
-  setTrash(trash);
-  renderTrash();
-  showToast("باکس ہمیشہ کے لیے ڈیلیٹ کر دیا گیا۔");
-}
-
-function emptyTrash() {
-  if (!getTrash().length) {
-    showToast("Recycle Bin پہلے ہی خالی ہے۔");
-    return;
-  }
-  if (!confirm("کیا آپ واقعی Recycle Bin خالی کرنا چاہتے ہیں؟")) {
-    return;
-  }
-  setTrash([]);
-  renderTrash();
-  showToast("Recycle Bin خالی کر دیا گیا۔");
-}
-
-function renderTrash() {
-  const container = $("trashList");
-  const trash = getTrash();
-  updateStats();
-
-  if (!trash.length) {
-    container.innerHTML = '<div class="loading">Recycle Bin خالی ہے۔</div>';
-    return;
-  }
-
-  container.innerHTML = trash.map((record, index) => {
-    const item = record.item || {};
-    return (
-      '<div class="trash-card">' +
-      '<div style="font-weight:800">' + escapeHtml(item.title || "Untitled") + '</div>' +
-      '<div style="color:#888;font-size:11px;margin-top:5px">' + escapeHtml(item.type || "unknown") + " • " + escapeHtml(record.deletedAt || "") + '</div>' +
-      '<div class="item-actions">' +
-      '<button class="btn btn-success btn-small" onclick="restoreTrash(' + index + ')">↩️ Restore</button>' +
-      '<button class="btn btn-danger btn-small" onclick="deleteForever(' + index + ')">❌ Delete Forever</button>' +
-      '</div>' +
-      '</div>'
-    );
-  }).join("");
-}
-
-function getFilteredItems() {
-  let items = [...(cmsContent.items || [])];
-  const search = ($("searchItems").value || "").trim().toLowerCase();
-  const type = $("filterType").value;
-  const status = $("filterStatus").value;
-
-  if (search) {
-    items = items.filter(item => {
-      const text = [item.title, item.message, item.description, item.type, item.link_url].join(" ").toLowerCase();
-      return text.includes(search);
-    });
-  }
-  if (type !== "all") {
-    items = items.filter(item => item.type === type);
-  }
-  if (status === "enabled") {
-    items = items.filter(item => item.enabled !== false);
-  }
-  if (status === "disabled") {
-    items = items.filter(item => item.enabled === false);
-  }
-  if (status === "scheduled") {
-    items = items.filter(item => hasSchedule(item));
-  }
-  items.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-  return items;
-}
-
-function renderItems() {
-  const container = $("itemsList");
-  const items = getFilteredItems();
-  if (!items.length) {
-    container.innerHTML = '<div class="loading">کوئی content نہیں ملا۔</div>';
-    return;
-  }
-  container.innerHTML = items.map(item => buildItemCard(item)).join("");
-  setupDragAndDrop();
-}
-
-function buildItemCard(item) {
-  const enabled = item.enabled !== false;
-  const scheduled = hasSchedule(item);
-  let statusBadge = enabled ? '<span class="badge badge-green">🟢 Enabled</span>' : '<span class="badge badge-red">🔴 Disabled</span>';
-  if (scheduled) statusBadge += '<span class="badge badge-purple">📅 Scheduled</span>';
-  const preview = item.message || item.description || item.link_url || "";
-
-  return (
-    '<div class="item-card" draggable="true" data-id="' + escapeHtml(item.id) + '">' +
-    '<div class="item-head">' +
-    '<div class="drag-handle" title="Drag">☷</div>' +
-    '<div class="item-main">' +
-    '<div class="item-title">' + escapeHtml(item.title || "Untitled") + '</div>' +
-    '<div class="item-meta">' +
-    '<span class="badge">' + escapeHtml(item.type || "unknown") + '</span>' +
-    '<span class="badge">Order ' + escapeHtml(item.order || 0) + '</span>' +
-    statusBadge +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    (preview ? ('<div class="item-preview">' + escapeHtml(String(preview).substring(0, 300)) + '</div>') : "") +
-    '<div class="item-actions">' +
-    '<button class="btn btn-primary btn-small" onclick="editItem(\'' + escapeHtml(item.id) + '\')">✏️️ Edit</button>' +
-    '<button class="btn btn-success btn-small" onclick="toggleItem(\'' + escapeHtml(item.id) + '\')">' + (enabled ? "🔴 Disable" : "🟢 Enable") + '</button>' +
-    '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' + escapeHtml(item.id) + '\')">📋 Duplicate</button>' +
-    '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' + escapeHtml(item.id) + '\')">🗑️ Delete</button>' +
-    '</div>' +
-    '</div>'
-  );
-}
-
-function setupDragAndDrop() {
-  const cards = document.querySelectorAll(".item-card");
-  cards.forEach(card => {
-    card.addEventListener("dragstart", () => {
-      draggedId = card.dataset.id;
-      card.classList.add("dragging");
-    });
-    card.addEventListener("dragend", () => {
-      card.classList.remove("dragging");
-      document.querySelectorAll(".item-card").forEach(c => c.classList.remove("drag-over"));
-    });
-    card.addEventListener("dragover", event => {
-      event.preventDefault();
-      card.classList.add("drag-over");
-    });
-    card.addEventListener("dragleave", () => {
-      card.classList.remove("drag-over");
-    });
-    card.addEventListener("drop", async event => {
-      event.preventDefault();
-      card.classList.remove("drag-over");
-      const targetId = card.dataset.id;
-      if (!draggedId || draggedId === targetId) return;
-      await reorderItems(draggedId, targetId);
-    });
-  });
-}
-
-async function reorderItems(draggedId, targetId) {
-  const items = [...cmsContent.items];
-  const fromIndex = items.findIndex(x => String(x.id) === String(draggedId));
-  const toIndex = items.findIndex(x => String(x.id) === String(targetId));
-  if (fromIndex < 0 || toIndex < 0) return;
-
-  const [moved] = items.splice(fromIndex, 1);
-  items.splice(toIndex, 0, moved);
-  items.forEach((item, index) => { item.order = index + 1; });
-
-  try {
-    for (const item of items) {
-      await api("/api/admin/content/" + encodeURIComponent(item.id), {
-        method: "PUT",
-        body: JSON.stringify({
-          type: item.type || "message",
-          title: item.title || "",
-          message: item.message || "",
-          description: item.description || "",
-          image_url: item.image_url || "",
-          video_url: item.video_url || "",
-          link_url: item.link_url || "",
-          button_text: item.button_text || "",
-          order: item.order,
-          enabled: item.enabled !== false,
-          style: item.style || {},
-          schedule: item.schedule || {}
-        })
-      });
-    }
-    cmsContent.items = items;
-    renderItems();
-    await loadHomePreview();
-    showToast("Content order update ہو گیا۔");
-  } catch (error) {
-    showToast("Order update failed: " + error.message);
-    await loadContent();
-  }
-}
-
-function hasSchedule(item) {
-  const schedule = item.schedule || {};
-  return Boolean(schedule.start || schedule.end);
-}
-
-function isScheduleActive(item) {
-  const schedule = item.schedule || {};
-  const now = new Date();
-  if (schedule.start) {
-    const start = new Date(schedule.start);
-    if (!isNaN(start.getTime()) && now < start) return false;
-  }
-  if (schedule.end) {
-    const end = new Date(schedule.end);
-    if (!isNaN(end.getTime()) && now > end) return false;
-  }
-  return true;
-}
-
-function updateScheduleStatus() {
-  const start = $("scheduleStart").value;
-  const end = $("scheduleEnd").value;
-  const status = $("scheduleStatus");
-  if (!start && !end) {
-    status.textContent = "No schedule";
-    status.className = "schedule-status";
-    return;
-  }
-  const now = new Date();
-  let active = true;
-  if (start) {
-    const startDate = new Date(start);
-    if (!isNaN(startDate) && now < startDate) active = false;
-  }
-  if (end) {
-    const endDate = new Date(end);
-    if (!isNaN(endDate) && now > endDate) active = false;
-  }
-  status.textContent = active ? "🟢 Schedule ابھی active ہے" : "🔴 Schedule ابھی active نہیں ہے";
-  status.className = "schedule-status " + (active ? "schedule-active" : "schedule-inactive");
-}
-
-async function loadHomePreview() {
-  const container = $("homePreview");
-  try {
-    const data = await api("/api/home-content");
-    renderHomePreview(data);
-  } catch (error) {
-    console.error(error);
-    container.innerHTML = '<div class="preview-empty">' + escapeHtml(error.message) + '</div>';
-  }
-}
-
-function renderHomePreview(data) {
-  const container = $("homePreview");
-  let items = data && Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
-  items = items
-    .filter(item => item.enabled !== false)
-    .filter(item => isScheduleActive(item))
-    .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-
-  if (!items.length) {
-    container.innerHTML = '<div class="preview-empty">Home پر ابھی کوئی active content نہیں ہے۔</div>';
-    return;
-  }
-  container.innerHTML = items.map(item => buildPreviewCard(item)).join("");
-}
-
-function buildPreviewCard(item) {
-  const design = getPreviewBoxStyle(item);
-  const style = item.style || {};
-  const imageHeight = Number(style.imageHeight !== undefined ? style.imageHeight : 230);
-  const imageFit = style.imageFit || "cover";
-  const videoHeight = Number(style.videoHeight !== undefined ? style.videoHeight : 240);
-  const videoFit = style.videoFit || "contain";
-  const imageUrl = safePreviewUrl(item.image_url);
-  const videoUrl = safePreviewUrl(item.video_url);
-  const linkUrl = safePreviewUrl(item.link_url);
-  const buttonColor = style.buttonColor || "#6d28d9";
-  const buttonTextColor = style.buttonTextColor || "#ffffff";
-
-  let html = '<div class="preview-card" style="background:' + escapeHtml(design.background) + ';width:' + escapeHtml(design.width) + ';min-height:' + escapeHtml(design.minHeight) + ';padding:' + escapeHtml(design.padding) + ';border-radius:' + escapeHtml(design.borderRadius) + ';box-shadow:' + escapeHtml(design.boxShadow) + ';border:' + escapeHtml(design.border) + ';color:' + escapeHtml(design.color) + ';text-align:' + escapeHtml(design.textAlign) + '">';
-  if (item.title) html += '<div class="preview-card-title">' + escapeHtml(item.title) + '</div>';
-  html += '<div class="preview-card-type">' + escapeHtml(item.type || "") + '</div>';
-  if (item.message) html += '<div class="preview-card-message">' + escapeHtml(item.message) + '</div>';
-  if (item.description) html += '<div class="preview-card-message">' + escapeHtml(item.description) + '</div>';
-  if (imageUrl) {
-    html += '<img class="preview-card-image" src="' + escapeHtml(imageUrl) + '" style="height:' + escapeHtml(imageHeight + "px") + ';object-fit:' + escapeHtml(imageFit) + '" loading="lazy" onerror="this.style.display=\'none\'">';
-  }
-  if (videoUrl) {
-    html += '<video class="preview-card-video" src="' + escapeHtml(videoUrl) + '" controls preload="metadata" style="height:' + escapeHtml(videoHeight + "px") + ';object-fit:' + escapeHtml(videoFit) + '"' + (style.videoAutoplay ? " autoplay muted" : "") + (style.videoLoop ? " loop" : "") + '></video>';
-  }
-  if (linkUrl) {
-    html += '<a class="preview-card-link" href="' + escapeHtml(linkUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(item.link_url) + '</a>';
-  }
-  if (item.button_text && linkUrl) {
-    html += '<a class="preview-card-button" href="' + escapeHtml(linkUrl) + '" target="_blank" rel="noopener noreferrer" style="background:' + escapeHtml(buttonColor) + ';color:' + escapeHtml(buttonTextColor) + '">' + escapeHtml(item.button_text) + '</a>';
-  }
-  html += "</div>";
-  return html;
-}
-
-async function loadMedia() {
-  const container = $("mediaList");
-  try {
-    const data = await api("/api/admin/media");
-    const media = Array.isArray(data) ? data : (Array.isArray(data.media) ? data.media : []);
-    renderMedia(media);
-  } catch (error) {
-    container.innerHTML = '<div class="loading">' + escapeHtml(error.message) + '</div>';
-  }
-}
-
-function renderMedia(media) {
-  const container = $("mediaList");
-  if (!media.length) {
-    container.innerHTML = '<div class="loading">No media found.</div>';
-    return;
-  }
-  container.innerHTML = media.map(file => buildMediaCard(file)).join("");
-}
-
-function buildMediaCard(file) {
-  const url = safePreviewUrl(file.url || file.public_url || file.href || "");
-  const name = file.name || file.filename || "Media";
-  let visual = "";
-  if (file.content_type && file.content_type.startsWith("video/")) {
-    visual = '<video class="media-thumb" src="' + escapeHtml(url) + '" controls></video>';
-  } else {
-    visual = '<img class="media-thumb" src="' + escapeHtml(url) + '" loading="lazy" onerror="this.style.display=\'none\'">';
-  }
-  return (
-    '<div class="media-card">' + visual +
-    '<div class="media-info">' +
-    '<div class="media-name">' + escapeHtml(name) + '</div>' +
-    '<div class="button-row">' +
-    '<button class="btn btn-primary btn-small" onclick="useMediaUrl(\'' + escapeHtml(url) + '\')">Use</button>' +
-    '<button class="btn btn-danger btn-small" onclick="deleteMedia(\'' + escapeHtml(file.id || file.key || file.name || "") + '\')">Delete</button>' +
-    '</div>' +
-    '</div>' +
-    '</div>'
-  );
-}
-
-function useMediaUrl(url) {
-  if (!url) {
-    showToast("Media URL موجود نہیں۔");
-    return;
-  }
-  const type = $("itemType").value;
-  if (["image", "donation", "advertisement"].includes(type)) {
-    $("imageUrl").value = url;
-  } else if (type === "video") {
-    $("videoUrl").value = url;
-  } else {
-    $("imageUrl").value = url;
-  }
-  showToast("Media URL editor میں ڈال دیا گیا۔");
-}
-
-async function uploadMedia() {
-  const file = $("mediaFile").files[0];
-  if (!file) {
-    showToast("پہلے file select کریں۔");
-    return;
-  }
-  const form = new FormData();
-  form.append("file", file);
-  try {
-    await api("/api/admin/media", { method: "POST", body: form });
-    $("mediaFile").value = "";
-    showToast("Media upload ہو گیا۔");
-    await loadMedia();
-  } catch (error) {
-    showToast("Upload failed: " + error.message);
-  }
-}
-
-async function deleteMedia(id) {
-  if (!id) return;
-  if (!confirm("کیا یہ media delete کرنا ہے؟")) return;
-  try {
-    await api("/api/admin/media/" + encodeURIComponent(id), { method: "DELETE" });
-    showToast("Media delete ہو گیا۔");
-    await loadMedia();
-  } catch (error) {
-    showToast("Delete failed: " + error.message);
-  }
-}
-
-async function loadStatus() {
-  const output = $("systemStatus");
-  try {
-    const data = await api("/api/admin/status");
-    output.textContent = JSON.stringify(data, null, 2);
-  } catch (error) {
-    output.textContent = JSON.stringify({ success: false, error: error.message }, null, 2);
-  }
-}
-
-setInterval(() => {
-  if (!$("app").classList.contains("hidden")) {
-    updateScheduleStatus();
-  }
-}, 30000);
-
-(function startup() {
-  const saved = localStorage.getItem("mayotube_admin_token");
-  if (saved) {
-    $("tokenInput").value = saved;
-    $("rememberToken").checked = true;
-  }
-})();
-</script>
-</body>
-</html>
+</div>  <!-- TOAST -->  <div id="toast"></div>  <script>  
+  
+/* =========================================================  
+   GLOBAL  
+   ========================================================= */  
+  
+let adminToken = "";  
+let cmsContent = {  
+    items: [],  
+    home_enabled: true  
+};  
+  
+let draggedId = null;  
+  
+const TRASH_KEY = "mayotube_admin_recycle_bin_v1";  
+  
+function $(id) {  
+    return document.getElementById(id);  
+}  
+  
+  
+/* =========================================================  
+   TOAST  
+   ========================================================= */  
+  
+let toastTimer = null;  
+  
+function showToast(message) {  
+  
+    const toast = $("toast");  
+  
+    toast.textContent = message;  
+  
+    toast.classList.add("show");  
+  
+    clearTimeout(toastTimer);  
+  
+    toastTimer = setTimeout(() => {  
+  
+        toast.classList.remove("show");  
+  
+    }, 2800);  
+}  
+  
+  
+/* =========================================================  
+   SAFE HTML  
+   ========================================================= */  
+  
+function escapeHtml(value) {  
+  
+    return String(value ?? "")  
+        .replace(/&/g, "&amp;")  
+        .replace(/</g, "&lt;")  
+        .replace(/>/g, "&gt;")  
+        .replace(/"/g, "&quot;")  
+        .replace(/'/g, "&#039;");  
+  
+}  
+  
+  
+/* =========================================================  
+   URL SAFETY  
+   ========================================================= */  
+  
+function safePreviewUrl(value) {  
+  
+    if (!value) {  
+        return "";  
+    }  
+  
+    try {  
+  
+        const url = new URL(value);  
+  
+        if (  
+            url.protocol === "http:" ||  
+            url.protocol === "https:"  
+        ) {  
+            return url.href;  
+        }  
+  
+    } catch (e) {}  
+  
+    return "";  
+  
+}  
+  
+  
+/* =========================================================  
+   API  
+   ========================================================= */  
+  
+async function api(path, options = {}) {  
+  
+    const headers = {  
+        ...(options.headers || {}),  
+        "Authorization": "Bearer " + adminToken  
+    };  
+  
+    if (  
+        options.body &&  
+        !(options.body instanceof FormData)  
+    ) {  
+        headers["Content-Type"] = "application/json";  
+    }  
+  
+    const response = await fetch(path, {  
+        ...options,  
+        headers  
+    });  
+  
+    const text = await response.text();  
+  
+    let data;  
+  
+    try {  
+        data = JSON.parse(text);  
+    } catch (e) {  
+        data = {  
+            raw: text  
+        };  
+    }  
+  
+    if (!response.ok) {  
+  
+        throw new Error(  
+            data.message ||  
+            data.error ||  
+            data.raw ||  
+            "Request failed"  
+        );  
+  
+    }  
+  
+    return data;  
+  
+}  
+  
+  
+/* =========================================================  
+   LOGIN  
+   ========================================================= */  
+  
+function login() {  
+  
+    const token = $("tokenInput").value.trim();  
+  
+    if (!token) {  
+  
+        $("loginError").textContent =  
+            "Admin Token درج کریں۔";  
+  
+        return;  
+    }  
+  
+    adminToken = token;  
+  
+    if ($("rememberToken").checked) {  
+  
+        localStorage.setItem(  
+            "mayotube_admin_token",  
+            token  
+        );  
+  
+    }  
+  
+    $("loginError").textContent = "";  
+  
+    $("loginScreen").classList.add("hidden");  
+  
+    $("app").classList.remove("hidden");  
+  
+    initialize();  
+  
+}  
+  
+  
+/* =========================================================  
+   LOGOUT  
+   ========================================================= */  
+  
+function logout() {  
+  
+    adminToken = "";  
+  
+    sessionStorage.removeItem(  
+        "mayotube_admin_token"  
+    );  
+  
+    $("app").classList.add("hidden");  
+  
+    $("loginScreen").classList.remove("hidden");  
+  
+    $("tokenInput").value = "";  
+  
+}  
+  
+  
+/* =========================================================  
+   INIT  
+   ========================================================= */  
+  
+async function initialize() {  
+  
+    updateColorLabels();  
+  
+    $("boxBackgroundColor").addEventListener(  
+        "input",  
+        updateColorLabels  
+    );  
+  
+    $("boxTextColor").addEventListener(  
+        "input",  
+        updateColorLabels  
+    );  
+  
+    $("buttonColor").addEventListener(  
+        "input",  
+        updateColorLabels  
+    );  
+  
+    $("buttonTextColor").addEventListener(  
+        "input",  
+        updateColorLabels  
+    );  
+  
+    $("scheduleStart").addEventListener(  
+        "change",  
+        updateScheduleStatus  
+    );  
+  
+    $("scheduleEnd").addEventListener(  
+        "change",  
+        updateScheduleStatus  
+    );  
+  
+    clearForm();  
+  
+    await loadAll();  
+  
+}  
+  
+  
+/* =========================================================  
+   LOAD ALL  
+   ========================================================= */  
+  
+async function loadAll() {  
+  
+    try {  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+        await loadMedia();  
+  
+        await loadStatus();  
+  
+        $("connectionText").textContent =  
+            "Connected";  
+  
+    } catch (error) {  
+  
+        console.error(error);  
+  
+        $("connectionText").textContent =  
+            "Connection Error";  
+  
+        showToast(  
+            "Error: " + error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   CONTENT  
+   ========================================================= */  
+  
+async function loadContent() {  
+  
+    const data = await api(  
+        "/api/admin/content"  
+    );  
+  
+    cmsContent = data || {};  
+  
+    if (!Array.isArray(cmsContent.items)) {  
+        cmsContent.items = [];  
+    }  
+  
+    cmsContent.items.sort(  
+        (a, b) =>  
+            Number(a.order || 0) -  
+            Number(b.order || 0)  
+    );  
+  
+    $("homeEnabled").checked =  
+        cmsContent.home_enabled !== false;  
+  
+    $("homeStatusText").textContent =  
+        cmsContent.home_enabled !== false  
+            ? "Home content is ON"  
+            : "Home content is OFF";  
+  
+    updateStats();  
+  
+    renderItems();  
+  
+    renderTrash();  
+  
+}  
+  
+  
+/* =========================================================  
+   STATS  
+   ========================================================= */  
+  
+function updateStats() {  
+  
+    const items = cmsContent.items || [];  
+  
+    const enabled =  
+        items.filter(  
+            item => item.enabled !== false  
+        ).length;  
+  
+    const disabled =  
+        items.length - enabled;  
+  
+    $("statTotal").textContent =  
+        items.length;  
+  
+    $("statEnabled").textContent =  
+        enabled;  
+  
+    $("statDisabled").textContent =  
+        disabled;  
+  
+    $("statTrash").textContent =  
+        getTrash().length;  
+  
+}  
+  
+  
+/* =========================================================  
+   HOME TOGGLE  
+   ========================================================= */  
+  
+async function toggleHome() {  
+  
+    const enabled =  
+        $("homeEnabled").checked;  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/home/toggle",  
+            {  
+                method: "PATCH",  
+                body: JSON.stringify({  
+                    enabled  
+                })  
+            }  
+        );  
+  
+        $("homeStatusText").textContent =  
+            enabled  
+                ? "Home content is ON"  
+                : "Home content is OFF";  
+  
+        showToast(  
+            enabled  
+                ? "Home ON کر دیا گیا۔"  
+                : "Home OFF کر دیا گیا۔"  
+        );  
+  
+        await loadHomePreview();  
+  
+    } catch (error) {  
+  
+        $("homeEnabled").checked =  
+            !enabled;  
+  
+        showToast(  
+            "Home toggle failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   EDITOR FIELDS  
+   ========================================================= */  
+  
+function updateEditorFields() {  
+  
+    const type =  
+        $("itemType").value;  
+  
+    const imageTypes = [  
+        "image",  
+        "donation",  
+        "advertisement"  
+    ];  
+  
+    const videoTypes = [  
+        "video"  
+    ];  
+  
+    const linkTypes = [  
+        "button",  
+        "link",  
+        "website",  
+        "youtube",  
+        "channel",  
+        "donation",  
+        "advertisement"  
+    ];  
+  
+    $("fieldImageUrl").style.display =  
+        imageTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldVideoUrl").style.display =  
+        videoTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldLinkUrl").style.display =  
+        linkTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldButtonText").style.display =  
+        [  
+            "button",  
+            "donation",  
+            "advertisement"  
+        ].includes(type)  
+            ? ""  
+            : "none";  
+  
+}  
+  
+  
+/* =========================================================  
+   BOX DESIGN  
+   ========================================================= */  
+  
+function getBoxStyleFromForm() {  
+  
+    return {  
+  
+        boxStyle:  
+            $("boxStyle").value ||  
+            "card",  
+  
+        backgroundColor:  
+            $("boxBackgroundColor").value ||  
+            "#181818",  
+  
+        textColor:  
+            $("boxTextColor").value ||  
+            "#ffffff",  
+  
+        textAlign:  
+            $("boxTextAlign").value ||  
+            "right",  
+  
+        borderRadius:  
+            Number(  
+                $("boxRadius").value || 13  
+            ),  
+  
+        boxHeight:  
+            Number(  
+                $("boxHeight").value || 0  
+            ),  
+  
+        boxWidth:  
+            Number(  
+                $("boxWidth").value || 100  
+            ),  
+  
+        padding:  
+            Number(  
+                $("boxPadding").value || 11  
+            ),  
+  
+        shadow:  
+            $("boxShadow").value ||  
+            "medium",  
+  
+        border:  
+            $("boxBorder").value ||  
+            "subtle",  
+  
+        imageHeight:  
+            Number(  
+                $("imageHeight").value || 230  
+            ),  
+  
+        imageFit:  
+            $("boxImageFit").value ||  
+            "cover",  
+  
+        videoHeight:  
+            Number(  
+                $("videoHeight").value || 240  
+            ),  
+  
+        videoFit:  
+            $("videoFit").value ||  
+            "contain",  
+  
+        videoAutoplay:  
+            $("videoAutoplay").checked,  
+  
+        videoLoop:  
+            $("videoLoop").checked,  
+  
+        buttonColor:  
+            $("buttonColor").value ||  
+            "#6d28d9",  
+  
+        buttonTextColor:  
+            $("buttonTextColor").value ||  
+            "#ffffff"  
+  
+    };  
+  
+}  
+  
+  
+/* =========================================================  
+   APPLY DESIGN  
+   ========================================================= */  
+  
+function applyBoxStyleToForm(style) {  
+  
+    style = style || {};  
+  
+    $("boxStyle").value =  
+        style.boxStyle ||  
+        "card";  
+  
+    $("boxBackgroundColor").value =  
+        style.backgroundColor ||  
+        "#181818";  
+  
+    $("boxTextColor").value =  
+        style.textColor ||  
+        "#ffffff";  
+  
+    $("boxTextAlign").value =  
+        style.textAlign ||  
+        "right";  
+  
+    $("boxRadius").value =  
+        style.borderRadius !== undefined  
+            ? style.borderRadius  
+            : 13;  
+  
+    $("boxHeight").value =  
+        style.boxHeight !== undefined  
+            ? style.boxHeight  
+            : 0;  
+  
+    $("boxWidth").value =  
+        style.boxWidth !== undefined  
+            ? style.boxWidth  
+            : 100;  
+  
+    $("boxPadding").value =  
+        style.padding !== undefined  
+            ? style.padding  
+            : 11;  
+  
+    $("boxShadow").value =  
+        style.shadow ||  
+        "medium";  
+  
+    $("boxBorder").value =  
+        style.border ||  
+        "subtle";  
+  
+    $("imageHeight").value =  
+        style.imageHeight !== undefined  
+            ? style.imageHeight  
+            : 230;  
+  
+    $("boxImageFit").value =  
+        style.imageFit ||  
+        "cover";  
+  
+    $("videoHeight").value =  
+        style.videoHeight !== undefined  
+            ? style.videoHeight  
+            : 240;  
+  
+    $("videoFit").value =  
+        style.videoFit ||  
+        "contain";  
+  
+    $("videoAutoplay").checked =  
+        style.videoAutoplay === true;  
+  
+    $("videoLoop").checked =  
+        style.videoLoop === true;  
+  
+    $("buttonColor").value =  
+        style.buttonColor ||  
+        "#6d28d9";  
+  
+    $("buttonTextColor").value =  
+        style.buttonTextColor ||  
+        "#ffffff";  
+  
+    updateColorLabels();  
+  
+}  
+  
+  
+/* =========================================================  
+   COLOR LABELS  
+   ========================================================= */  
+  
+function updateColorLabels() {  
+  
+    if ($("boxBackgroundColor")) {  
+  
+        $("boxBackgroundColorValue")  
+            .textContent =  
+            $("boxBackgroundColor").value;  
+  
+    }  
+  
+    if ($("boxTextColor")) {  
+  
+        $("boxTextColorValue")  
+            .textContent =  
+            $("boxTextColor").value;  
+  
+    }  
+  
+    if ($("buttonColor")) {  
+  
+        $("buttonColorValue")  
+            .textContent =  
+            $("buttonColor").value;  
+  
+    }  
+  
+    if ($("buttonTextColor")) {  
+  
+        $("buttonTextColorValue")  
+            .textContent =  
+            $("buttonTextColor").value;  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   PREVIEW SHADOW  
+   ========================================================= */  
+  
+function getPreviewShadow(shadow) {  
+  
+    switch (shadow) {  
+  
+        case "small":  
+            return "0 2px 8px rgba(0,0,0,.25)";  
+  
+        case "medium":  
+            return "0 6px 18px rgba(0,0,0,.35)";  
+  
+        case "large":  
+            return "0 10px 30px rgba(0,0,0,.50)";  
+  
+        default:  
+            return "none";  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   PREVIEW BOX STYLE  
+   ========================================================= */  
+  
+function getPreviewBoxStyle(item) {  
+  
+    const style =  
+        item.style || {};  
+  
+    const boxStyle =  
+        style.boxStyle ||  
+        "card";  
+  
+    let background =  
+        style.backgroundColor ||  
+        "#181818";  
+  
+    if (boxStyle === "flat") {  
+  
+        background =  
+            style.backgroundColor ||  
+            "#101010";  
+  
+    }  
+  
+    if (boxStyle === "transparent") {  
+  
+        background =  
+            "transparent";  
+  
+    }  
+  
+    const width =  
+        Math.max(  
+            10,  
+            Math.min(  
+                100,  
+                Number(  
+                    style.boxWidth || 100  
+                )  
+            )  
+        );  
+  
+    const height =  
+        Number(  
+            style.boxHeight || 0  
+        );  
+  
+    const padding =  
+        Number(  
+            style.padding || 11  
+        );  
+  
+    const radius =  
+        Number(  
+            style.borderRadius || 13  
+        );  
+  
+    const textColor =  
+        style.textColor ||  
+        "#ffffff";  
+  
+    const textAlign =  
+        style.textAlign ||  
+        "right";  
+  
+    let border =  
+        "1px solid rgba(255,255,255,.07)";  
+  
+    if (style.border === "none") {  
+        border = "none";  
+    }  
+  
+    if (style.border === "strong") {  
+        border =  
+            "1px solid rgba(255,255,255,.22)";  
+    }  
+  
+    return {  
+  
+        background,  
+  
+        width: width + "%",  
+  
+        minHeight:  
+            height > 0  
+                ? height + "px"  
+                : "auto",  
+  
+        padding:  
+            padding + "px",  
+  
+        borderRadius:  
+            radius + "px",  
+  
+        boxShadow:  
+            getPreviewShadow(  
+                style.shadow ||  
+                "medium"  
+            ),  
+  
+        border,  
+  
+        color:  
+            textColor,  
+  
+        textAlign  
+  
+    };  
+  
+}  
+  
+  
+/* =========================================================  
+   CLEAR FORM  
+   ========================================================= */  
+  
+function clearForm() {  
+  
+    $("itemId").value = "";  
+  
+    $("itemType").value =  
+        "message";  
+  
+    $("itemOrder").value =  
+        getNextOrder();  
+  
+    $("itemTitle").value =  
+        "";  
+  
+    $("itemMessage").value =  
+        "";  
+  
+    $("itemDescription").value =  
+        "";  
+  
+    $("imageUrl").value =  
+        "";  
+  
+    $("videoUrl").value =  
+        "";  
+  
+    $("linkUrl").value =  
+        "";  
+  
+    $("buttonText").value =  
+        "";  
+  
+    $("itemEnabled").checked =  
+        true;  
+  
+    applyBoxStyleToForm({  
+  
+        boxStyle: "card",  
+  
+        backgroundColor: "#181818",  
+  
+        textColor: "#ffffff",  
+  
+        textAlign: "right",  
+  
+        borderRadius: 13,  
+  
+        boxHeight: 0,  
+  
+        boxWidth: 100,  
+  
+        padding: 11,  
+  
+        shadow: "medium",  
+  
+        border: "subtle",  
+  
+        imageHeight: 230,  
+  
+        imageFit: "cover",  
+  
+        videoHeight: 240,  
+  
+        videoFit: "contain",  
+  
+        videoAutoplay: false,  
+  
+        videoLoop: false,  
+  
+        buttonColor: "#6d28d9",  
+  
+        buttonTextColor: "#ffffff"  
+  
+    });  
+  
+    $("scheduleStart").value =  
+        "";  
+  
+    $("scheduleEnd").value =  
+        "";  
+  
+    updateScheduleStatus();  
+  
+    updateEditorFields();  
+  
+}  
+  
+  
+/* =========================================================  
+   NEXT ORDER  
+   ========================================================= */  
+  
+function getNextOrder() {  
+  
+    const items =  
+        cmsContent.items || [];  
+  
+    if (!items.length) {  
+        return 1;  
+    }  
+  
+    return Math.max(  
+        ...items.map(  
+            item =>  
+                Number(item.order || 0)  
+        )  
+    ) + 1;  
+  
+}  
+  
+  
+/* =========================================================  
+   EDIT ITEM  
+   ========================================================= */  
+  
+function editItem(id) {  
+  
+    const item =  
+        cmsContent.items.find(  
+            x => String(x.id) === String(id)  
+        );  
+  
+    if (!item) {  
+        return;  
+    }  
+  
+    $("itemId").value =  
+        item.id || "";  
+  
+    $("itemType").value =  
+        item.type ||  
+        "message";  
+  
+    $("itemOrder").value =  
+        item.order !== undefined  
+            ? item.order  
+            : 0;  
+  
+    $("itemTitle").value =  
+        item.title || "";  
+  
+    $("itemMessage").value =  
+        item.message || "";  
+  
+    $("itemDescription").value =  
+        item.description || "";  
+  
+    $("imageUrl").value =  
+        item.image_url || "";  
+  
+    $("videoUrl").value =  
+        item.video_url || "";  
+  
+    $("linkUrl").value =  
+        item.link_url || "";  
+  
+    $("buttonText").value =  
+        item.button_text || "";  
+  
+    $("itemEnabled").checked =  
+        item.enabled !== false;  
+  
+    applyBoxStyleToForm(  
+        item.style || {}  
+    );  
+  
+    const schedule =  
+        item.schedule || {};  
+  
+    $("scheduleStart").value =  
+        schedule.start || "";  
+  
+    $("scheduleEnd").value =  
+        schedule.end || "";  
+  
+    updateScheduleStatus();  
+  
+    updateEditorFields();  
+  
+    window.scrollTo({  
+        top: 0,  
+        behavior: "smooth"  
+    });  
+  
+    showToast(  
+        "Content edit mode میں ہے۔"  
+    );  
+  
+}  
+  
+  
+/* =========================================================  
+   SAVE ITEM  
+   ========================================================= */  
+  
+async function saveItem() {  
+  
+    const id =  
+        $("itemId").value.trim();  
+  
+    const item = {  
+  
+        type:  
+            $("itemType").value,  
+  
+        title:  
+            $("itemTitle").value.trim(),  
+  
+        message:  
+            $("itemMessage").value.trim(),  
+  
+        description:  
+            $("itemDescription").value.trim(),  
+  
+        image_url:  
+            $("imageUrl").value.trim(),  
+  
+        video_url:  
+            $("videoUrl").value.trim(),  
+  
+        link_url:  
+            $("linkUrl").value.trim(),  
+  
+        button_text:  
+            $("buttonText").value.trim(),  
+  
+        order:  
+            Number(  
+                $("itemOrder").value || 0  
+            ),  
+  
+        enabled:  
+            $("itemEnabled").checked,  
+  
+        style:  
+            getBoxStyleFromForm(),  
+  
+        schedule: {  
+  
+            start:  
+                $("scheduleStart").value ||  
+                "",  
+  
+            end:  
+                $("scheduleEnd").value ||  
+                ""  
+  
+        }  
+  
+    };  
+  
+  
+    try {  
+  
+        let result;  
+  
+        if (id) {  
+  
+            result = await api(  
+                "/api/admin/content/" +  
+                encodeURIComponent(id),  
+                {  
+                    method: "PUT",  
+                    body: JSON.stringify(item)  
+                }  
+            );  
+  
+        } else {  
+  
+            result = await api(  
+                "/api/admin/content",  
+                {  
+                    method: "POST",  
+                    body: JSON.stringify(item)  
+                }  
+            );  
+  
+        }  
+  
+        showToast(  
+            id  
+                ? "Content update ہو گیا۔"  
+                : "Content create ہو گیا۔"  
+        );  
+  
+        clearForm();  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+    } catch (error) {  
+  
+        console.error(error);  
+  
+        showToast(  
+            "Save failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   ENABLE / DISABLE  
+   ========================================================= */  
+  
+async function toggleItem(id) {  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/content/" +  
+            encodeURIComponent(id) +  
+            "/toggle",  
+            {  
+                method: "PATCH"  
+            }  
+        );  
+  
+        showToast(  
+            "Status update ہو گیا۔"  
+        );  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Toggle failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   DUPLICATE  
+   ========================================================= */  
+  
+async function duplicateItem(id) {  
+  
+    const item =  
+        cmsContent.items.find(  
+            x => String(x.id) === String(id)  
+        );  
+  
+    if (!item) {  
+        return;  
+    }  
+  
+    const copy = {  
+  
+        type:  
+            item.type || "message",  
+  
+        title:  
+            (item.title || "Untitled") +  
+            " (Copy)",  
+  
+        message:  
+            item.message || "",  
+  
+        description:  
+            item.description || "",  
+  
+        image_url:  
+            item.image_url || "",  
+  
+        video_url:  
+            item.video_url || "",  
+  
+        link_url:  
+            item.link_url || "",  
+  
+        button_text:  
+            item.button_text || "",  
+  
+        order:  
+            getNextOrder(),  
+  
+        enabled:  
+            item.enabled !== false,  
+  
+        style:  
+            JSON.parse(  
+                JSON.stringify(  
+                    item.style || {}  
+                )  
+            ),  
+  
+        schedule:  
+            JSON.parse(  
+                JSON.stringify(  
+                    item.schedule || {}  
+                )  
+            )  
+  
+    };  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/content",  
+            {  
+                method: "POST",  
+                body: JSON.stringify(copy)  
+            }  
+        );  
+  
+        showToast(  
+            "Content duplicate ہو گیا۔"  
+        );  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Duplicate failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   RECYCLE BIN STORAGE  
+   ========================================================= */  
+  
+function getTrash() {  
+  
+    try {  
+  
+        return JSON.parse(  
+            localStorage.getItem(  
+                TRASH_KEY  
+            ) || "[]"  
+        );  
+  
+    } catch (e) {  
+  
+        return [];  
+  
+    }  
+  
+}  
+  
+  
+function setTrash(items) {  
+  
+    localStorage.setItem(  
+        TRASH_KEY,  
+        JSON.stringify(items)  
+    );  
+  
+    updateStats();  
+  
+}  
+  
+  
+/* =========================================================  
+   MOVE TO RECYCLE BIN  
+   ========================================================= */  
+  
+async function moveToTrash(id) {  
+  
+    const item =  
+        cmsContent.items.find(  
+            x => String(x.id) === String(id)  
+        );  
+  
+    if (!item) {  
+        return;  
+    }  
+  
+    const trash =  
+        getTrash();  
+  
+    const exists =  
+        trash.some(  
+            x =>  
+                String(x.item.id) ===  
+                String(id)  
+        );  
+  
+    if (!exists) {  
+  
+        trash.push({  
+  
+            deletedAt:  
+                new Date().toISOString(),  
+  
+            item:  
+                JSON.parse(  
+                    JSON.stringify(item)  
+                )  
+  
+        });  
+  
+        setTrash(trash);  
+  
+    }  
+  
+  
+    /*  
+       Permanent DELETE کے بجائے  
+       پہلے item کو disabled کیا جا رہا ہے۔  
+       اس طرح Restore ممکن رہے گا۔  
+    */  
+  
+    try {  
+  
+        const disabledItem = {  
+  
+            type:  
+                item.type || "message",  
+  
+            title:  
+                item.title || "",  
+  
+            message:  
+                item.message || "",  
+  
+            description:  
+                item.description || "",  
+  
+            image_url:  
+                item.image_url || "",  
+  
+            video_url:  
+                item.video_url || "",  
+  
+            link_url:  
+                item.link_url || "",  
+  
+            button_text:  
+                item.button_text || "",  
+  
+            order:  
+                item.order || 0,  
+  
+            enabled:  
+                false,  
+  
+            style:  
+                item.style || {},  
+  
+            schedule:  
+                item.schedule || {}  
+  
+        };  
+  
+        await api(  
+            "/api/admin/content/" +  
+            encodeURIComponent(id),  
+            {  
+                method: "PUT",  
+                body: JSON.stringify(  
+                    disabledItem  
+                )  
+            }  
+        );  
+  
+        showToast(  
+            "Content Recycle Bin میں منتقل ہو گیا۔"  
+        );  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+        renderTrash();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Recycle Bin error: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   RESTORE  
+   ========================================================= */  
+  
+async function restoreTrash(index) {  
+  
+    const trash =  
+        getTrash();  
+  
+    const record =  
+        trash[index];  
+  
+    if (!record) {  
+        return;  
+    }  
+  
+    const item =  
+        record.item;  
+  
+    /*  
+       Existing ID کے ساتھ PUT کیا جاتا ہے۔  
+    */  
+  
+    const restored = {  
+  
+        type:  
+            item.type || "message",  
+  
+        title:  
+            item.title || "",  
+  
+        message:  
+            item.message || "",  
+  
+        description:  
+            item.description || "",  
+  
+        image_url:  
+            item.image_url || "",  
+  
+        video_url:  
+            item.video_url || "",  
+  
+        link_url:  
+            item.link_url || "",  
+  
+        button_text:  
+            item.button_text || "",  
+  
+        order:  
+            item.order || 0,  
+  
+        enabled:  
+            item.enabled !== false,  
+  
+        style:  
+            item.style || {},  
+  
+        schedule:  
+            item.schedule || {}  
+  
+    };  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/content/" +  
+            encodeURIComponent(item.id),  
+            {  
+                method: "PUT",  
+                body: JSON.stringify(  
+                    restored  
+                )  
+            }  
+        );  
+  
+        trash.splice(index, 1);  
+  
+        setTrash(trash);  
+  
+        showToast(  
+            "Content restore ہو گیا۔"  
+        );  
+  
+        await loadContent();  
+  
+        await loadHomePreview();  
+  
+        renderTrash();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Restore failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   EMPTY TRASH  
+   ========================================================= */  
+  
+function emptyTrash() {  
+  
+    if (!getTrash().length) {  
+  
+        showToast(  
+            "Recycle Bin پہلے ہی خالی ہے۔"  
+        );  
+  
+        return;  
+    }  
+  
+    if (  
+        !confirm(  
+            "کیا آپ واقعی Recycle Bin خالی کرنا چاہتے ہیں؟"  
+        )  
+    ) {  
+        return;  
+    }  
+  
+    setTrash([]);  
+  
+    renderTrash();  
+  
+    showToast(  
+        "Recycle Bin خالی کر دیا گیا۔"  
+    );  
+  
+}  
+  
+  
+/* =========================================================  
+   RENDER TRASH  
+   ========================================================= */  
+  
+function renderTrash() {  
+  
+    const container =  
+        $("trashList");  
+  
+    const trash =  
+        getTrash();  
+  
+    updateStats();  
+  
+    if (!trash.length) {  
+  
+        container.innerHTML =  
+            '<div class="loading">' +  
+            'Recycle Bin خالی ہے۔' +  
+            '</div>';  
+  
+        return;  
+  
+    }  
+  
+    container.innerHTML =  
+        trash.map(  
+            (record, index) => {  
+  
+                const item =  
+                    record.item || {};  
+  
+                return (  
+  
+                    '<div class="trash-card">' +  
+  
+                        '<div style="font-weight:800">' +  
+  
+                            escapeHtml(  
+                                item.title ||  
+                                "Untitled"  
+                            ) +  
+  
+                        '</div>' +  
+  
+                        '<div style="color:#888;font-size:11px;margin-top:5px">' +  
+  
+                            escapeHtml(  
+                                item.type ||  
+                                "unknown"  
+                            ) +  
+  
+                            " • " +  
+  
+                            escapeHtml(  
+                                record.deletedAt ||  
+                                ""  
+                            ) +  
+  
+                        '</div>' +  
+  
+                        '<div class="item-actions">' +  
+  
+                            '<button class="btn btn-success btn-small" onclick="restoreTrash(' +  
+                                index +  
+                            ')">↩️ Restore</button>' +  
+  
+                        '</div>' +  
+  
+                    '</div>'  
+  
+                );  
+  
+            }  
+        ).join("");  
+  
+}  
+  
+  
+/* =========================================================  
+   SEARCH / FILTER  
+   ========================================================= */  
+  
+function getFilteredItems() {  
+  
+    let items =  
+        [...(cmsContent.items || [])];  
+  
+    const search =  
+        (  
+            $("searchItems").value ||  
+            ""  
+        )  
+        .trim()  
+        .toLowerCase();  
+  
+    const type =  
+        $("filterType").value;  
+  
+    const status =  
+        $("filterStatus").value;  
+  
+  
+    if (search) {  
+  
+        items =  
+            items.filter(item => {  
+  
+                const text = [  
+  
+                    item.title,  
+                    item.message,  
+                    item.description,  
+                    item.type,  
+                    item.link_url  
+  
+                ]  
+                .join(" ")  
+                .toLowerCase();  
+  
+                return text.includes(search);  
+  
+            });  
+  
+    }  
+  
+  
+    if (type !== "all") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.type === type  
+            );  
+  
+    }  
+  
+  
+    if (status === "enabled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.enabled !== false  
+            );  
+  
+    }  
+  
+  
+    if (status === "disabled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.enabled === false  
+            );  
+  
+    }  
+  
+  
+    if (status === "scheduled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    hasSchedule(item)  
+            );  
+  
+    }  
+  
+  
+    items.sort(  
+        (a, b) =>  
+            Number(a.order || 0) -  
+            Number(b.order || 0)  
+    );  
+  
+    return items;  
+  
+}  
+  
+  
+/* =========================================================  
+   RENDER ITEMS  
+   ========================================================= */  
+  
+function renderItems() {  
+  
+    const container =  
+        $("itemsList");  
+  
+    const items =  
+        getFilteredItems();  
+  
+    if (!items.length) {  
+  
+        container.innerHTML =  
+            '<div class="loading">' +  
+            'کوئی content نہیں ملا۔' +  
+            '</div>';  
+  
+        return;  
+  
+    }  
+  
+    container.innerHTML =  
+        items.map(  
+            item =>  
+                buildItemCard(item)  
+        ).join("");  
+  
+    setupDragAndDrop();  
+  
+}  
+  
+  
+/* =========================================================  
+   BUILD ITEM CARD  
+   ========================================================= */  
+  
+function buildItemCard(item) {  
+  
+    const enabled =  
+        item.enabled !== false;  
+  
+    const scheduled =  
+        hasSchedule(item);  
+  
+    let statusBadge =  
+        enabled  
+            ? '<span class="badge badge-green">🟢 Enabled</span>'  
+            : '<span class="badge badge-red">🔴 Disabled</span>';  
+  
+    if (scheduled) {  
+  
+        statusBadge +=  
+            '<span class="badge badge-purple">📅 Scheduled</span>';  
+  
+    }  
+  
+    const preview =  
+        item.message ||  
+        item.description ||  
+        item.link_url ||  
+        "";  
+  
+    return (  
+  
+        '<div' +  
+  
+            ' class="item-card"' +  
+  
+            ' draggable="true"' +  
+  
+            ' data-id="' +  
+                escapeHtml(item.id) +  
+            '"' +  
+  
+        '>' +  
+  
+            '<div class="item-head">' +  
+  
+                '<div class="drag-handle" title="Drag">' +  
+                    "☷" +  
+                '</div>' +  
+  
+                '<div class="item-main">' +  
+  
+                    '<div class="item-title">' +  
+  
+                        escapeHtml(  
+                            item.title ||  
+                            "Untitled"  
+                        ) +  
+  
+                    '</div>' +  
+  
+                    '<div class="item-meta">' +  
+  
+                        '<span class="badge">' +  
+  
+                            escapeHtml(  
+                                item.type ||  
+                                "unknown"  
+                            ) +  
+  
+                        '</span>' +  
+  
+                        '<span class="badge">' +  
+  
+                            "Order " +  
+  
+                            escapeHtml(  
+                                item.order ||  
+                                0  
+                            ) +  
+  
+                        '</span>' +  
+  
+                        statusBadge +  
+  
+                    '</div>' +  
+  
+                '</div>' +  
+  
+            '</div>' +  
+  
+            (  
+                preview  
+                    ? (  
+                        '<div class="item-preview">' +  
+                            escapeHtml(  
+                                String(preview)  
+                                    .substring(0, 300)  
+                            ) +  
+                        '</div>'  
+                    )  
+                    : ""  
+            ) +  
+  
+            '<div class="item-actions">' +  
+  
+                '<button class="btn btn-primary btn-small" onclick="editItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">✏️ Edit</button>' +  
+  
+                '<button class="btn btn-success btn-small" onclick="toggleItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">' +  
+                    (  
+                        enabled  
+                            ? "🔴 Disable"  
+                            : "🟢 Enable"  
+                    ) +  
+                '</button>' +  
+  
+                '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">📋 Duplicate</button>' +  
+  
+                '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">🗑️ Delete</button>' +  
+  
+            '</div>' +  
+  
+        '</div>'  
+  
+    );  
+  
+}  
+  
+  
+/* =========================================================  
+   DRAG & DROP  
+   ========================================================= */  
+  
+function setupDragAndDrop() {  
+  
+    const cards =  
+        document.querySelectorAll(  
+            ".item-card"  
+        );  
+  
+    cards.forEach(card => {  
+  
+        card.addEventListener(  
+            "dragstart",  
+            () => {  
+  
+                draggedId =  
+                    card.dataset.id;  
+  
+                card.classList.add(  
+                    "dragging"  
+                );  
+  
+            }  
+        );  
+  
+  
+        card.addEventListener(  
+            "dragend",  
+            () => {  
+  
+                card.classList.remove(  
+                    "dragging"  
+                );  
+  
+                document  
+                    .querySelectorAll(  
+                        ".item-card"  
+                    )  
+                    .forEach(  
+                        c =>  
+                            c.classList.remove(  
+                                "drag-over"  
+                            )  
+                    );  
+  
+            }  
+        );  
+  
+  
+        card.addEventListener(  
+            "dragover",  
+            event => {  
+  
+                event.preventDefault();  
+  
+                card.classList.add(  
+                    "drag-over"  
+                );  
+  
+            }  
+        );  
+  
+  
+        card.addEventListener(  
+            "dragleave",  
+            () => {  
+  
+                card.classList.remove(  
+                    "drag-over"  
+                );  
+  
+            }  
+        );  
+  
+  
+        card.addEventListener(  
+            "drop",  
+            async event => {  
+  
+                event.preventDefault();  
+  
+                card.classList.remove(  
+                    "drag-over"  
+                );  
+  
+                const targetId =  
+                    card.dataset.id;  
+  
+                if (  
+                    !draggedId ||  
+                    draggedId === targetId  
+                ) {  
+                    return;  
+                }  
+  
+                await reorderItems(  
+                    draggedId,  
+                    targetId  
+                );  
+  
+            }  
+        );  
+  
+    });  
+  
+}  
+  
+  
+/* =========================================================  
+   REORDER  
+   ========================================================= */  
+  
+async function reorderItems(  
+    draggedId,  
+    targetId  
+) {  
+  
+    const items =  
+        [...cmsContent.items];  
+  
+    const fromIndex =  
+        items.findIndex(  
+            x =>  
+                String(x.id) ===  
+                String(draggedId)  
+        );  
+  
+    const toIndex =  
+        items.findIndex(  
+            x =>  
+                String(x.id) ===  
+                String(targetId)  
+        );  
+  
+    if (  
+        fromIndex < 0 ||  
+        toIndex < 0  
+    ) {  
+        return;  
+    }  
+  
+    const [moved] =  
+        items.splice(  
+            fromIndex,  
+            1  
+        );  
+  
+    items.splice(  
+        toIndex,  
+        0,  
+        moved  
+    );  
+  
+  
+    /*  
+       1,2,3,4...  
+       order دوبارہ بنایا جاتا ہے۔  
+    */  
+  
+    items.forEach(  
+        (item, index) => {  
+  
+            item.order =  
+                index + 1;  
+  
+        }  
+    );  
+  
+  
+    try {  
+  
+        /*  
+           Backend میں ہر item update۔  
+        */  
+  
+        for (const item of items) {  
+  
+            await api(  
+                "/api/admin/content/" +  
+                encodeURIComponent(item.id),  
+                {  
+                    method: "PUT",  
+                    body: JSON.stringify({  
+  
+                        type:  
+                            item.type || "message",  
+  
+                        title:  
+                            item.title || "",  
+  
+                        message:  
+                            item.message || "",  
+  
+                        description:  
+                            item.description || "",  
+  
+                        image_url:  
+                            item.image_url || "",  
+  
+                        video_url:  
+                            item.video_url || "",  
+  
+                        link_url:  
+                            item.link_url || "",  
+  
+                        button_text:  
+                            item.button_text || "",  
+  
+                        order:  
+                            item.order,  
+  
+                        enabled:  
+                            item.enabled !== false,  
+  
+                        style:  
+                            item.style || {},  
+  
+                        schedule:  
+                            item.schedule || {}  
+  
+                    })  
+                }  
+            );  
+  
+        }  
+  
+        cmsContent.items =  
+            items;  
+  
+        renderItems();  
+  
+        await loadHomePreview();  
+  
+        showToast(  
+            "Content order update ہو گیا۔"  
+        );  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Order update failed: " +  
+            error.message  
+        );  
+  
+        await loadContent();  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   SCHEDULE  
+   ========================================================= */  
+  
+function hasSchedule(item) {  
+  
+    const schedule =  
+        item.schedule || {};  
+  
+    return Boolean(  
+        schedule.start ||  
+        schedule.end  
+    );  
+  
+}  
+  
+  
+function isScheduleActive(item) {  
+  
+    const schedule =  
+        item.schedule || {};  
+  
+    const now =  
+        new Date();  
+  
+    if (schedule.start) {  
+  
+        const start =  
+            new Date(  
+                schedule.start  
+            );  
+  
+        if (  
+            !isNaN(start.getTime()) &&  
+            now < start  
+        ) {  
+            return false;  
+        }  
+  
+    }  
+  
+    if (schedule.end) {  
+  
+        const end =  
+            new Date(  
+                schedule.end  
+            );  
+  
+        if (  
+            !isNaN(end.getTime()) &&  
+            now > end  
+        ) {  
+            return false;  
+        }  
+  
+    }  
+  
+    return true;  
+  
+}  
+  
+  
+function updateScheduleStatus() {  
+  
+    const start =  
+        $("scheduleStart").value;  
+  
+    const end =  
+        $("scheduleEnd").value;  
+  
+    const status =  
+        $("scheduleStatus");  
+  
+  
+    if (!start && !end) {  
+  
+        status.textContent =  
+            "No schedule";  
+  
+        status.className =  
+            "schedule-status";  
+  
+        return;  
+  
+    }  
+  
+  
+    const now =  
+        new Date();  
+  
+    let active = true;  
+  
+  
+    if (start) {  
+  
+        const startDate =  
+            new Date(start);  
+  
+        if (  
+            !isNaN(startDate) &&  
+            now < startDate  
+        ) {  
+            active = false;  
+        }  
+  
+    }  
+  
+  
+    if (end) {  
+  
+        const endDate =  
+            new Date(end);  
+  
+        if (  
+            !isNaN(endDate) &&  
+            now > endDate  
+        ) {  
+            active = false;  
+        }  
+  
+    }  
+  
+  
+    status.textContent =  
+        active  
+            ? "🟢 Schedule ابھی active ہے"  
+            : "🔴 Schedule ابھی active نہیں ہے";  
+  
+    status.className =  
+        "schedule-status " +  
+        (  
+            active  
+                ? "schedule-active"  
+                : "schedule-inactive"  
+        );  
+  
+}  
+  
+  
+/* =========================================================  
+   HOME PREVIEW  
+   ========================================================= */  
+  
+async function loadHomePreview() {  
+  
+    const container =  
+        $("homePreview");  
+  
+    try {  
+  
+        const data =  
+            await api(  
+                "/api/home-content"  
+            );  
+  
+        renderHomePreview(data);  
+  
+    } catch (error) {  
+  
+        console.error(error);  
+  
+        container.innerHTML =  
+            '<div class="preview-empty">' +  
+                escapeHtml(  
+                    error.message  
+                ) +  
+            '</div>';  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   RENDER HOME PREVIEW  
+   ========================================================= */  
+  
+function renderHomePreview(data) {  
+  
+    const container =  
+        $("homePreview");  
+  
+    let items =  
+        data &&  
+        Array.isArray(data.items)  
+            ? data.items  
+            : Array.isArray(data)  
+                ? data  
+                : [];  
+  
+  
+    items =  
+        items  
+            .filter(  
+                item =>  
+                    item.enabled !== false  
+            )  
+            .filter(  
+                item =>  
+                    isScheduleActive(item)  
+            )  
+            .sort(  
+                (a, b) =>  
+                    Number(a.order || 0) -  
+                    Number(b.order || 0)  
+            );  
+  
+  
+    if (!items.length) {  
+  
+        container.innerHTML =  
+            '<div class="preview-empty">' +  
+                'Home پر ابھی کوئی active content نہیں ہے۔' +  
+            '</div>';  
+  
+        return;  
+  
+    }  
+  
+  
+    container.innerHTML =  
+        items.map(  
+            item =>  
+                buildPreviewCard(item)  
+        ).join("");  
+  
+}  
+  
+  
+/* =========================================================  
+   BUILD PREVIEW CARD  
+   ========================================================= */  
+  
+function buildPreviewCard(item) {  
+  
+    const design =  
+        getPreviewBoxStyle(item);  
+  
+    const style =  
+        item.style || {};  
+  
+    const imageHeight =  
+        Number(  
+            style.imageHeight !== undefined  
+                ? style.imageHeight  
+                : 230  
+        );  
+  
+    const imageFit =  
+        style.imageFit ||  
+        "cover";  
+  
+    const videoHeight =  
+        Number(  
+            style.videoHeight !== undefined  
+                ? style.videoHeight  
+                : 240  
+        );  
+  
+    const videoFit =  
+        style.videoFit ||  
+        "contain";  
+  
+    const imageUrl =  
+        safePreviewUrl(  
+            item.image_url  
+        );  
+  
+    const videoUrl =  
+        safePreviewUrl(  
+            item.video_url  
+        );  
+  
+    const linkUrl =  
+        safePreviewUrl(  
+            item.link_url  
+        );  
+  
+    const buttonColor =  
+        style.buttonColor ||  
+        "#6d28d9";  
+  
+    const buttonTextColor =  
+        style.buttonTextColor ||  
+        "#ffffff";  
+  
+  
+    let html =  
+  
+        '<div class="preview-card"' +  
+  
+            ' style="' +  
+  
+                'background:' +  
+                escapeHtml(  
+                    design.background  
+                ) +  
+                ';' +  
+  
+                'width:' +  
+                escapeHtml(  
+                    design.width  
+                ) +  
+                ';' +  
+  
+                'min-height:' +  
+                escapeHtml(  
+                    design.minHeight  
+                ) +  
+                ';' +  
+  
+                'padding:' +  
+                escapeHtml(  
+                    design.padding  
+                ) +  
+                ';' +  
+  
+                'border-radius:' +  
+                escapeHtml(  
+                    design.borderRadius  
+                ) +  
+                ';' +  
+  
+                'box-shadow:' +  
+                escapeHtml(  
+                    design.boxShadow  
+                ) +  
+                ';' +  
+  
+                'border:' +  
+                escapeHtml(  
+                    design.border  
+                ) +  
+                ';' +  
+  
+                'color:' +  
+                escapeHtml(  
+                    design.color  
+                ) +  
+                ';' +  
+  
+                'text-align:' +  
+                escapeHtml(  
+                    design.textAlign  
+                ) +  
+  
+            '"' +  
+  
+        '>';  
+  
+  
+    if (item.title) {  
+  
+        html +=  
+  
+            '<div class="preview-card-title">' +  
+  
+                escapeHtml(  
+                    item.title  
+                ) +  
+  
+            '</div>';  
+  
+    }  
+  
+  
+    html +=  
+  
+        '<div class="preview-card-type">' +  
+  
+            escapeHtml(  
+                item.type ||  
+                ""  
+            ) +  
+  
+        '</div>';  
+  
+  
+    if (item.message) {  
+  
+        html +=  
+  
+            '<div class="preview-card-message">' +  
+  
+                escapeHtml(  
+                    item.message  
+                ) +  
+  
+            '</div>';  
+  
+    }  
+  
+  
+    if (item.description) {  
+  
+        html +=  
+  
+            '<div class="preview-card-message">' +  
+  
+                escapeHtml(  
+                    item.description  
+                ) +  
+  
+            '</div>';  
+  
+    }  
+  
+  
+    if (imageUrl) {  
+  
+        html +=  
+  
+            '<img' +  
+  
+                ' class="preview-card-image"' +  
+  
+                ' src="' +  
+                    escapeHtml(  
+                        imageUrl  
+                    ) +  
+                '"' +  
+  
+                ' style="' +  
+  
+                    'height:' +  
+                    escapeHtml(  
+                        imageHeight + "px"  
+                    ) +  
+                    ';' +  
+  
+                    'object-fit:' +  
+                    escapeHtml(  
+                        imageFit  
+                    ) +  
+                    ';' +  
+  
+                '"' +  
+  
+                ' loading="lazy"' +  
+  
+                ' onerror="this.style.display=\'none\'"' +  
+  
+            '>';  
+  
+    }  
+  
+  
+    if (videoUrl) {  
+  
+        html +=  
+  
+            '<video' +  
+  
+                ' class="preview-card-video"' +  
+  
+                ' src="' +  
+                    escapeHtml(  
+                        videoUrl  
+                    ) +  
+                '"' +  
+  
+                ' controls' +  
+  
+                ' preload="metadata"' +  
+  
+                ' style="' +  
+  
+                    'height:' +  
+                    escapeHtml(  
+                        videoHeight + "px"  
+                    ) +  
+                    ';' +  
+  
+                    'object-fit:' +  
+                    escapeHtml(  
+                        videoFit  
+                    ) +  
+                    ';' +  
+  
+                '"' +  
+  
+                (  
+                    style.videoAutoplay  
+                        ? " autoplay muted"  
+                        : ""  
+                ) +  
+  
+                (  
+                    style.videoLoop  
+                        ? " loop"  
+                        : ""  
+                ) +  
+  
+            '></video>';  
+  
+    }  
+  
+  
+    if (linkUrl) {  
+  
+        html +=  
+  
+            '<a' +  
+  
+                ' class="preview-card-link"' +  
+  
+                ' href="' +  
+                    escapeHtml(  
+                        linkUrl  
+                    ) +  
+                '"' +  
+  
+                ' target="_blank"' +  
+  
+                ' rel="noopener noreferrer"' +  
+  
+            '>' +  
+  
+                escapeHtml(  
+                    item.link_url  
+                ) +  
+  
+            '</a>';  
+  
+    }  
+  
+  
+    if (  
+        item.button_text &&  
+        linkUrl  
+    ) {  
+  
+        html +=  
+  
+            '<a' +  
+  
+                ' class="preview-card-button"' +  
+  
+                ' href="' +  
+                    escapeHtml(  
+                        linkUrl  
+                    ) +  
+                '"' +  
+  
+                ' target="_blank"' +  
+  
+                ' rel="noopener noreferrer"' +  
+  
+                ' style="' +  
+  
+                    'background:' +  
+                    escapeHtml(  
+                        buttonColor  
+                    ) +  
+                    ';' +  
+  
+                    'color:' +  
+                    escapeHtml(  
+                        buttonTextColor  
+                    ) +  
+  
+                '"' +  
+  
+            '>' +  
+  
+                escapeHtml(  
+                    item.button_text  
+                ) +  
+  
+            '</a>';  
+  
+    }  
+  
+  
+    html +=  
+        "</div>";  
+  
+    return html;  
+  
+}  
+  
+  
+/* =========================================================  
+   MEDIA  
+   ========================================================= */  
+  
+async function loadMedia() {  
+  
+    const container =  
+        $("mediaList");  
+  
+    try {  
+  
+        const data =  
+            await api(  
+                "/api/admin/media"  
+            );  
+  
+        const media =  
+            Array.isArray(data)  
+                ? data  
+                : (  
+                    Array.isArray(data.media)  
+                        ? data.media  
+                        : []  
+                );  
+  
+        renderMedia(media);  
+  
+    } catch (error) {  
+  
+        container.innerHTML =  
+            '<div class="loading">' +  
+                escapeHtml(  
+                    error.message  
+                ) +  
+            '</div>';  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   RENDER MEDIA  
+   ========================================================= */  
+  
+function renderMedia(media) {  
+  
+    const container =  
+        $("mediaList");  
+  
+    if (!media.length) {  
+  
+        container.innerHTML =  
+            '<div class="loading">' +  
+                'No media found.' +  
+            '</div>';  
+  
+        return;  
+  
+    }  
+  
+  
+    container.innerHTML =  
+        media.map(  
+            file =>  
+                buildMediaCard(file)  
+        ).join("");  
+  
+}  
+  
+  
+/* =========================================================  
+   MEDIA CARD  
+   ========================================================= */  
+  
+function buildMediaCard(file) {  
+  
+    const url =  
+        safePreviewUrl(  
+            file.url ||  
+            file.public_url ||  
+            file.href ||  
+            ""  
+        );  
+  
+    const name =  
+        file.name ||  
+        file.filename ||  
+        "Media";  
+  
+  
+    let visual = "";  
+  
+    if (  
+        file.content_type &&  
+        file.content_type.startsWith(  
+            "video/"  
+        )  
+    ) {  
+  
+        visual =  
+  
+            '<video' +  
+  
+                ' class="media-thumb"' +  
+  
+                ' src="' +  
+                    escapeHtml(url) +  
+                '"' +  
+  
+                ' controls' +  
+  
+            '></video>';  
+  
+    } else {  
+  
+        visual =  
+  
+            '<img' +  
+  
+                ' class="media-thumb"' +  
+  
+                ' src="' +  
+                    escapeHtml(url) +  
+                '"' +  
+  
+                ' loading="lazy"' +  
+  
+                ' onerror="this.style.display=\'none\'"' +  
+  
+            '>';  
+  
+    }  
+  
+  
+    return (  
+  
+        '<div class="media-card">' +  
+  
+            visual +  
+  
+            '<div class="media-info">' +  
+  
+                '<div class="media-name">' +  
+  
+                    escapeHtml(name) +  
+  
+                '</div>' +  
+  
+                '<div class="button-row">' +  
+  
+                    '<button class="btn btn-primary btn-small" onclick="useMediaUrl(\'' +  
+                        escapeHtml(url) +  
+                    '\')">' +  
+  
+                        "Use" +  
+  
+                    '</button>' +  
+  
+                    '<button class="btn btn-danger btn-small" onclick="deleteMedia(\'' +  
+                        escapeHtml(  
+                            file.id ||  
+                            file.key ||  
+                            file.name ||  
+                            ""  
+                        ) +  
+                    '\')">' +  
+  
+                        "Delete" +  
+  
+                    '</button>' +  
+  
+                '</div>' +  
+  
+            '</div>' +  
+  
+        '</div>'  
+  
+    );  
+  
+}  
+  
+  
+/* =========================================================  
+   USE MEDIA  
+   ========================================================= */  
+  
+function useMediaUrl(url) {  
+  
+    if (!url) {  
+  
+        showToast(  
+            "Media URL موجود نہیں۔"  
+        );  
+  
+        return;  
+    }  
+  
+    const type =  
+        $("itemType").value;  
+  
+  
+    if (  
+        [  
+            "image",  
+            "donation",  
+            "advertisement"  
+        ].includes(type)  
+    ) {  
+  
+        $("imageUrl").value =  
+            url;  
+  
+    } else if (type === "video") {  
+  
+        $("videoUrl").value =  
+            url;  
+  
+    } else {  
+  
+        $("imageUrl").value =  
+            url;  
+  
+    }  
+  
+  
+    showToast(  
+        "Media URL editor میں ڈال دیا گیا۔"  
+    );  
+  
+}  
+  
+  
+/* =========================================================  
+   UPLOAD MEDIA  
+   ========================================================= */  
+  
+async function uploadMedia() {  
+  
+    const file =  
+        $("mediaFile").files[0];  
+  
+    if (!file) {  
+  
+        showToast(  
+            "پہلے file select کریں۔"  
+        );  
+  
+        return;  
+    }  
+  
+  
+    const form =  
+        new FormData();  
+  
+    form.append(  
+        "file",  
+        file  
+    );  
+  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/media",  
+            {  
+                method: "POST",  
+                body: form  
+            }  
+        );  
+  
+        $("mediaFile").value =  
+            "";  
+  
+        showToast(  
+            "Media upload ہو گیا۔"  
+        );  
+  
+        await loadMedia();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Upload failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   DELETE MEDIA  
+   ========================================================= */  
+  
+async function deleteMedia(id) {  
+  
+    if (!id) {  
+        return;  
+    }  
+  
+    if (  
+        !confirm(  
+            "کیا یہ media delete کرنا ہے؟"  
+        )  
+    ) {  
+        return;  
+    }  
+  
+    try {  
+  
+        await api(  
+            "/api/admin/media/" +  
+            encodeURIComponent(id),  
+            {  
+                method: "DELETE"  
+            }  
+        );  
+  
+        showToast(  
+            "Media delete ہو گیا۔"  
+        );  
+  
+        await loadMedia();  
+  
+    } catch (error) {  
+  
+        showToast(  
+            "Delete failed: " +  
+            error.message  
+        );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   SYSTEM STATUS  
+   ========================================================= */  
+  
+async function loadStatus() {  
+  
+    const output =  
+        $("systemStatus");  
+  
+    try {  
+  
+        const data =  
+            await api(  
+                "/api/admin/status"  
+            );  
+  
+        output.textContent =  
+            JSON.stringify(  
+                data,  
+                null,  
+                2  
+            );  
+  
+    } catch (error) {  
+  
+        output.textContent =  
+            JSON.stringify(  
+                {  
+                    success: false,  
+                    error:  
+                        error.message  
+                },  
+                null,  
+                2  
+            );  
+  
+    }  
+  
+}  
+  
+  
+/* =========================================================  
+   AUTO REFRESH PREVIEW  
+   ========================================================= */  
+  
+setInterval(  
+    () => {  
+  
+        if (  
+            !$("app").classList.contains(  
+                "hidden"  
+            )  
+        ) {  
+  
+            /*  
+               Schedule کا status  
+               automatically update ہو۔  
+            */  
+  
+            updateScheduleStatus();  
+  
+        }  
+  
+    },  
+    30000  
+);  
+  
+  
+/* =========================================================  
+   STARTUP  
+   ========================================================= */  
+  
+(function startup() {  
+  
+    const saved =  
+        localStorage.getItem(  
+            "mayotube_admin_token"  
+        );  
+  
+    if (saved) {  
+  
+        $("tokenInput").value =  
+            saved;  
+  
+        $("rememberToken").checked =  
+            true;  
+  
+    }  
+  
+})();  
+  
+</script>  </body>  </html>
