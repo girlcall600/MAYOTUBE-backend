@@ -322,7 +322,7 @@ def load_blob_json():
 
         result = client.get(
             CMS_CONTENT_PATH,
-            access="public"
+            access="private"
         )
 
         if result is None:
@@ -423,7 +423,7 @@ def save_blob_json(
     result = client.put(
         CMS_CONTENT_PATH,
         raw,
-        access="public",
+        access="private",
         content_type="application/json",
         add_random_suffix=False,
         overwrite=True
@@ -2028,7 +2028,7 @@ def admin_upload_media():
         result = client.put(
             pathname,
             file_bytes,
-            access="public",
+            access="private",
             content_type=(
                 content_type
                 or "application/octet-stream"
