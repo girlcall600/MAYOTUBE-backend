@@ -1,2218 +1,3 @@
-<!DOCTYPE html>
-<html lang="ur" dir="rtl">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <title>MAYOTUBE ADMIN</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            background: #090909;
-            color: #ffffff;
-            font-family:
-                Arial,
-                "Noto Nastaliq Urdu",
-                "Noto Sans Arabic",
-                sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-        }
-
-        button,
-        input,
-        select,
-        textarea {
-            font-family: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 980px;
-            margin: auto;
-            padding: 14px;
-        }
-
-        /* =====================================================
-           LOGIN
-           ===================================================== */
-
-        #loginScreen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-            background:
-                radial-gradient(
-                    circle at top,
-                    #252525 0,
-                    #090909 55%
-                );
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 430px;
-            background: #151515;
-            border: 1px solid #303030;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, .45);
-        }
-
-        .login-logo {
-            text-align: center;
-            font-size: 27px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .login-subtitle {
-            text-align: center;
-            color: #999;
-            font-size: 13px;
-            margin-bottom: 25px;
-        }
-
-        /* =====================================================
-           INPUTS
-           ===================================================== */
-
-        .input-group {
-            margin-bottom: 12px;
-        }
-
-        .input-group label {
-            display: block;
-            color: #cfcfcf;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 7px;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            background: #0e0e0e;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 10px;
-            padding: 12px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 0 2px rgba(124, 58, 237, .15);
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .muted {
-            color: #777;
-            font-size: 11px;
-            margin-top: 5px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .form-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        /* =====================================================
-           BUTTONS
-           ===================================================== */
-
-        .btn {
-            border: 0;
-            border-radius: 10px;
-            padding: 11px 15px;
-            color: #fff;
-            background: #272727;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .btn:hover {
-            filter: brightness(1.15);
-        }
-
-        .btn-primary {
-            background: #6d28d9;
-        }
-
-        .btn-success {
-            background: #15803d;
-        }
-
-        .btn-danger {
-            background: #b91c1c;
-        }
-
-        .btn-warning {
-            background: #a16207;
-        }
-
-        .btn-blue {
-            background: #1d4ed8;
-        }
-
-        .btn-small {
-            padding: 7px 10px;
-            font-size: 11px;
-        }
-
-        .button-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        /* =====================================================
-           HEADER
-           ===================================================== */
-
-        .topbar {
-            background: #151515;
-            border: 1px solid #2d2d2d;
-            border-radius: 15px;
-            padding: 14px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .brand {
-            font-size: 19px;
-            font-weight: 900;
-        }
-
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: #aaa;
-            font-size: 12px;
-        }
-
-        .status-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 8px rgba(34, 197, 94, .6);
-        }
-
-        /* =====================================================
-           CARDS
-           ===================================================== */
-
-        .admin-card {
-            background: #151515;
-            border: 1px solid #2c2c2c;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 13px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 900;
-            margin-bottom: 13px;
-        }
-
-        .card-subtitle {
-            color: #888;
-            font-size: 12px;
-            margin-top: -8px;
-            margin-bottom: 14px;
-        }
-
-        /* =====================================================
-           HOME CONTROL
-           ===================================================== */
-
-        .home-control {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .home-info strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .home-info span {
-            color: #888;
-            font-size: 12px;
-        }
-
-        .switch {
-            position: relative;
-            width: 58px;
-            height: 32px;
-            flex-shrink: 0;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            inset: 0;
-            background: #333;
-            border-radius: 30px;
-            transition: .2s;
-        }
-
-        .slider:before {
-            content: "";
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            right: 4px;
-            top: 4px;
-            background: #fff;
-            border-radius: 50%;
-            transition: .2s;
-        }
-
-        .switch input:checked + .slider {
-            background: #16a34a;
-        }
-
-        .switch input:checked + .slider:before {
-            transform: translateX(-26px);
-        }
-
-        /* =====================================================
-           STATS
-           ===================================================== */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .stat {
-            background: #0e0e0e;
-            border: 1px solid #292929;
-            border-radius: 12px;
-            padding: 13px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 22px;
-            font-weight: 900;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            color: #888;
-            font-size: 11px;
-        }
-
-        /* =====================================================
-           EDITOR
-           ===================================================== */
-
-        .editor-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .full {
-            grid-column: 1 / -1;
-        }
-
-        /* =====================================================
-           BOX DESIGN CONTROLS
-           ===================================================== */
-
-        .design-controls {
-            background: #101010;
-            border: 1px solid #303030;
-            border-radius: 14px;
-            padding: 14px;
-            margin-top: 5px;
-        }
-
-        .design-controls-title {
-            font-size: 15px;
-            font-weight: 900;
-            margin-bottom: 13px;
-        }
-
-        .design-section {
-            border-top: 1px solid #292929;
-            padding-top: 13px;
-            margin-top: 13px;
-        }
-
-        .design-section:first-child {
-            border-top: 0;
-            padding-top: 0;
-            margin-top: 0;
-        }
-
-        .color-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .color-row input[type="color"] {
-            width: 52px;
-            height: 43px;
-            padding: 3px;
-            border-radius: 9px;
-            cursor: pointer;
-        }
-
-        .range-value {
-            min-width: 65px;
-            text-align: center;
-            color: #a78bfa;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        /* =====================================================
-           SCHEDULE
-           ===================================================== */
-
-        .schedule-box {
-            background: #0d0d0d;
-            border: 1px solid #292929;
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        .schedule-status {
-            margin-top: 8px;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .schedule-active {
-            color: #22c55e;
-        }
-
-        .schedule-inactive {
-            color: #ef4444;
-        }
-
-        /* =====================================================
-           LIST
-           ===================================================== */
-
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .toolbar input,
-        .toolbar select {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        .items-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .item-card {
-            background: #0e0e0e;
-            border: 1px solid #2c2c2c;
-            border-radius: 13px;
-            padding: 12px;
-            transition: .15s;
-        }
-
-        .item-card.dragging {
-            opacity: .45;
-            border-color: #7c3aed;
-        }
-
-        .item-card.drag-over {
-            border-color: #22c55e;
-            transform: scale(1.01);
-        }
-
-        .item-head {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .drag-handle {
-            cursor: grab;
-            color: #777;
-            font-size: 20px;
-            padding: 2px 5px;
-            user-select: none;
-        }
-
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .item-main {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .item-title {
-            font-size: 14px;
-            font-weight: 900;
-            word-break: break-word;
-        }
-
-        .item-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 6px;
-        }
-
-        .badge {
-            display: inline-flex;
-            padding: 4px 7px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            background: #252525;
-            color: #aaa;
-        }
-
-        .badge-green {
-            color: #86efac;
-            background: rgba(22, 101, 52, .3);
-        }
-
-        .badge-red {
-            color: #fca5a5;
-            background: rgba(127, 29, 29, .3);
-        }
-
-        .badge-purple {
-            color: #c4b5fd;
-            background: rgba(76, 29, 149, .3);
-        }
-
-        .item-preview {
-            margin-top: 9px;
-            color: #999;
-            font-size: 12px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .item-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        /* =====================================================
-           LIVE PREVIEW
-           ===================================================== */
-
-        .preview-wrapper {
-            background: #080808;
-            border: 1px solid #282828;
-            border-radius: 14px;
-            padding: 12px;
-            overflow: hidden;
-        }
-
-        .preview-phone {
-            max-width: 440px;
-            margin: auto;
-            background: #101010;
-            border-radius: 18px;
-            padding: 12px;
-            min-height: 200px;
-        }
-
-        .preview-card {
-            margin: 0 auto 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,.07);
-            transition: .15s;
-        }
-
-        .preview-card-title {
-            font-size: 16px;
-            font-weight: 900;
-            margin-bottom: 8px;
-        }
-
-        .preview-card-type {
-            color: #888;
-            font-size: 10px;
-            margin-bottom: 7px;
-        }
-
-        .preview-card-message {
-            font-size: 13px;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .preview-card-image {
-            width: 100%;
-            display: block;
-            border-radius: 10px;
-            margin-top: 9px;
-            background: #080808;
-        }
-
-        .preview-card-video {
-            width: 100%;
-            max-height: 500px;
-            display: block;
-            border-radius: 10px;
-            margin-top: 9px;
-            background: #000;
-        }
-
-        .preview-card-link {
-            display: block;
-            margin-top: 9px;
-            color: #93c5fd;
-            word-break: break-all;
-            font-size: 12px;
-        }
-
-        .preview-card-button {
-            display: inline-block;
-            margin-top: 10px;
-            background: #6d28d9;
-            color: white;
-            padding: 9px 14px;
-            border-radius: 9px;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .preview-empty {
-            text-align: center;
-            color: #777;
-            padding: 35px 10px;
-            font-size: 13px;
-        }
-
-        /* =====================================================
-           MEDIA
-           ===================================================== */
-
-        .media-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .media-card {
-            background: #0e0e0e;
-            border: 1px solid #292929;
-            border-radius: 11px;
-            overflow: hidden;
-        }
-
-        .media-thumb {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            background: #050505;
-        }
-
-        .media-info {
-            padding: 8px;
-        }
-
-        .media-name {
-            font-size: 11px;
-            word-break: break-word;
-            color: #ccc;
-        }
-
-        /* =====================================================
-           RECYCLE BIN
-           ===================================================== */
-
-        .trash-card {
-            background: #130b0b;
-            border: 1px solid #452020;
-            border-radius: 12px;
-            padding: 11px;
-            margin-bottom: 8px;
-        }
-
-        /* =====================================================
-           TOAST
-           ===================================================== */
-
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #202020;
-            border: 1px solid #3b3b3b;
-            color: #fff;
-            padding: 12px 17px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            z-index: 99999;
-            opacity: 0;
-            transition: .25s;
-            max-width: calc(100% - 30px);
-            text-align: center;
-        }
-
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* =====================================================
-           LOADING
-           ===================================================== */
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #888;
-            font-size: 13px;
-        }
-
-        /* =====================================================
-           RESPONSIVE
-           ===================================================== */
-
-        @media (max-width: 700px) {
-
-            .container {
-                padding: 9px;
-            }
-
-            .editor-grid,
-            .form-grid,
-            .form-grid-3 {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .media-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .topbar {
-                padding: 12px;
-            }
-
-            .brand {
-                font-size: 16px;
-            }
-
-            .admin-card {
-                padding: 12px;
-            }
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<!-- =========================================================
-     LOGIN
-     ========================================================= -->
-
-<div id="loginScreen">
-
-    <div class="login-card">
-
-        <div class="login-logo">
-            MAYOTUBE ADMIN
-        </div>
-
-        <div class="login-subtitle">
-            Secure Content Management Panel
-        </div>
-
-        <div class="input-group">
-
-            <label for="tokenInput">
-                Admin Token
-            </label>
-
-            <input
-                id="tokenInput"
-                type="password"
-                placeholder="Admin Token"
-                autocomplete="off"
-            >
-
-        </div>
-
-        <label
-            style="
-                display:flex;
-                align-items:center;
-                gap:8px;
-                color:#aaa;
-                font-size:12px;
-                margin-bottom:14px;
-            "
-        >
-
-            <input
-                id="rememberToken"
-                type="checkbox"
-                style="width:auto"
-            >
-
-            Remember Token
-
-        </label>
-
-        <button
-            class="btn btn-primary"
-            style="width:100%"
-            onclick="login()"
-        >
-            🔐 Login
-        </button>
-
-        <div
-            id="loginError"
-            style="
-                color:#f87171;
-                font-size:12px;
-                margin-top:12px;
-                text-align:center;
-            "
-        ></div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     APP
-     ========================================================= -->
-
-<div id="app" class="hidden">
-
-    <div class="container">
-
-        <!-- TOPBAR -->
-
-        <div class="topbar">
-
-            <div>
-
-                <div class="brand">
-                    MAYOTUBE ADMIN
-                </div>
-
-                <div class="status">
-
-                    <span class="status-dot"></span>
-
-                    <span id="connectionText">
-                        Connected
-                    </span>
-
-                </div>
-
-            </div>
-
-            <button
-                class="btn btn-danger btn-small"
-                onclick="logout()"
-            >
-                Logout
-            </button>
-
-        </div>
-
-
-        <!-- =================================================
-             HOME CONTROL
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                🏠 Home Control
-            </div>
-
-            <div class="home-control">
-
-                <div class="home-info">
-
-                    <strong>
-                        Home Content
-                    </strong>
-
-                    <span id="homeStatusText">
-                        Loading...
-                    </span>
-
-                </div>
-
-                <label class="switch">
-
-                    <input
-                        id="homeEnabled"
-                        type="checkbox"
-                        onchange="toggleHome()"
-                    >
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             STATISTICS
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                📊 Statistics
-            </div>
-
-            <div class="stats-grid">
-
-                <div class="stat">
-                    <div
-                        id="statTotal"
-                        class="stat-number"
-                    >0</div>
-
-                    <div class="stat-label">
-                        Total
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div
-                        id="statEnabled"
-                        class="stat-number"
-                    >0</div>
-
-                    <div class="stat-label">
-                        Enabled
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div
-                        id="statDisabled"
-                        class="stat-number"
-                    >0</div>
-
-                    <div class="stat-label">
-                        Disabled
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div
-                        id="statTrash"
-                        class="stat-number"
-                    >0</div>
-
-                    <div class="stat-label">
-                        Recycle Bin
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             CONTENT EDITOR
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                ✏️ Content Editor
-            </div>
-
-            <div class="card-subtitle">
-                Content بنائیں، Design کریں اور Schedule کریں۔
-            </div>
-
-            <input
-                id="itemId"
-                type="hidden"
-            >
-
-            <div class="editor-grid">
-
-                <!-- TYPE -->
-
-                <div class="input-group">
-
-                    <label for="itemType">
-                        Content Type
-                    </label>
-
-                    <select
-                        id="itemType"
-                        onchange="updateEditorFields()"
-                    >
-
-                        <option value="message">
-                            Message
-                        </option>
-
-                        <option value="announcement">
-                            Announcement
-                        </option>
-
-                        <option value="notification">
-                            Notification
-                        </option>
-
-                        <option value="image">
-                            Image
-                        </option>
-
-                        <option value="video">
-                            Video
-                        </option>
-
-                        <option value="youtube">
-                            YouTube
-                        </option>
-
-                        <option value="audio">
-                            Audio
-                        </option>
-
-                        <option value="button">
-                            Button
-                        </option>
-
-                        <option value="link">
-                            Link
-                        </option>
-
-                        <option value="donation">
-                            Donation
-                        </option>
-
-                        <option value="advertisement">
-                            Advertisement
-                        </option>
-
-                        <option value="website">
-                            Website
-                        </option>
-
-                        <option value="channel">
-                            Channel
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- ORDER -->
-
-                <div class="input-group">
-
-                    <label for="itemOrder">
-                        Order
-                    </label>
-
-                    <input
-                        id="itemOrder"
-                        type="number"
-                        value="0"
-                    >
-
-                    <div class="muted">
-                        Drag & Drop سے بھی ترتیب تبدیل کر سکتے ہیں۔
-                    </div>
-
-                </div>
-
-
-                <!-- TITLE -->
-
-                <div class="input-group full">
-
-                    <label for="itemTitle">
-                        Title
-                    </label>
-
-                    <input
-                        id="itemTitle"
-                        type="text"
-                        placeholder="Content title"
-                    >
-
-                </div>
-
-
-                <!-- MESSAGE -->
-
-                <div
-                    id="fieldMessage"
-                    class="input-group full"
-                >
-
-                    <label for="itemMessage">
-                        Message
-                    </label>
-
-                    <textarea
-                        id="itemMessage"
-                        placeholder="Message..."
-                    ></textarea>
-
-                </div>
-
-
-                <!-- DESCRIPTION -->
-
-                <div
-                    id="fieldDescription"
-                    class="input-group full"
-                >
-
-                    <label for="itemDescription">
-                        Description
-                    </label>
-
-                    <textarea
-                        id="itemDescription"
-                        placeholder="Description..."
-                    ></textarea>
-
-                </div>
-
-
-                <!-- IMAGE -->
-
-                <div
-                    id="fieldImageUrl"
-                    class="input-group full"
-                >
-
-                    <label for="imageUrl">
-                        🖼️ Image URL
-                    </label>
-
-                    <input
-                        id="imageUrl"
-                        type="url"
-                        placeholder="https://..."
-                    >
-
-                </div>
-
-
-                <!-- VIDEO -->
-
-                <div
-                    id="fieldVideoUrl"
-                    class="input-group full"
-                >
-
-                    <label for="videoUrl">
-                        🎬 Video URL
-                    </label>
-
-                    <input
-                        id="videoUrl"
-                        type="url"
-                        placeholder="https://..."
-                    >
-
-                </div>
-
-
-                <!-- LINK -->
-
-                <div
-                    id="fieldLinkUrl"
-                    class="input-group full"
-                >
-
-                    <label for="linkUrl">
-                        🔗 Link URL
-                    </label>
-
-                    <input
-                        id="linkUrl"
-                        type="url"
-                        placeholder="https://..."
-                    >
-
-                </div>
-
-
-                <!-- BUTTON TEXT -->
-
-                <div
-                    id="fieldButtonText"
-                    class="input-group"
-                >
-
-                    <label for="buttonText">
-                        Button Text
-                    </label>
-
-                    <input
-                        id="buttonText"
-                        type="text"
-                        placeholder="Open"
-                    >
-
-                </div>
-
-
-                <!-- ENABLE -->
-
-                <div class="input-group">
-
-                    <label>
-                        Status
-                    </label>
-
-                    <label
-                        style="
-                            display:flex;
-                            align-items:center;
-                            gap:8px;
-                            background:#0d0d0d;
-                            padding:12px;
-                            border-radius:10px;
-                            border:1px solid #292929;
-                        "
-                    >
-
-                        <input
-                            id="itemEnabled"
-                            type="checkbox"
-                            checked
-                            style="width:auto"
-                        >
-
-                        🟢 Enabled
-
-                    </label>
-
-                </div>
-
-
-                <!-- =================================================
-                     BOX DESIGN
-                     ================================================= -->
-
-                <div class="input-group full">
-
-                    <div class="design-controls">
-
-                        <div class="design-controls-title">
-                            📦 Box Design Controls
-                        </div>
-
-
-                        <!-- BOX STYLE -->
-
-                        <div class="design-section">
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="boxStyle">
-                                        Box Style
-                                    </label>
-
-                                    <select id="boxStyle">
-
-                                        <option value="card">
-                                            Card
-                                        </option>
-
-                                        <option value="flat">
-                                            Flat
-                                        </option>
-
-                                        <option value="transparent">
-                                            Transparent
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxTextAlign">
-                                        Text Alignment
-                                    </label>
-
-                                    <select id="boxTextAlign">
-
-                                        <option value="right">
-                                            Right
-                                        </option>
-
-                                        <option value="center">
-                                            Center
-                                        </option>
-
-                                        <option value="left">
-                                            Left
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- COLORS -->
-
-                        <div class="design-section">
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label>
-                                        Background Color
-                                    </label>
-
-                                    <div class="color-row">
-
-                                        <input
-                                            id="boxBackgroundColor"
-                                            type="color"
-                                            value="#181818"
-                                        >
-
-                                        <span
-                                            id="boxBackgroundColorValue"
-                                            class="range-value"
-                                        >
-                                            #181818
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label>
-                                        Text Color
-                                    </label>
-
-                                    <div class="color-row">
-
-                                        <input
-                                            id="boxTextColor"
-                                            type="color"
-                                            value="#ffffff"
-                                        >
-
-                                        <span
-                                            id="boxTextColorValue"
-                                            class="range-value"
-                                        >
-                                            #ffffff
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- SIZE -->
-
-                        <div class="design-section">
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="boxWidth">
-                                        Box Width
-                                    </label>
-
-                                    <input
-                                        id="boxWidth"
-                                        type="number"
-                                        min="10"
-                                        max="100"
-                                        value="100"
-                                    >
-
-                                    <div class="muted">
-                                        Percentage
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxHeight">
-                                        Box Height
-                                    </label>
-
-                                    <input
-                                        id="boxHeight"
-                                        type="number"
-                                        min="0"
-                                        max="2000"
-                                        value="0"
-                                    >
-
-                                    <div class="muted">
-                                        0 = Auto
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxPadding">
-                                        Padding
-                                    </label>
-
-                                    <input
-                                        id="boxPadding"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value="11"
-                                    >
-
-                                    <div class="muted">
-                                        px
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxRadius">
-                                        Border Radius
-                                    </label>
-
-                                    <input
-                                        id="boxRadius"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value="13"
-                                    >
-
-                                    <div class="muted">
-                                        px
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- SHADOW -->
-
-                        <div class="design-section">
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="boxShadow">
-                                        Shadow
-                                    </label>
-
-                                    <select id="boxShadow">
-
-                                        <option value="none">
-                                            None
-                                        </option>
-
-                                        <option value="small">
-                                            Small
-                                        </option>
-
-                                        <option
-                                            value="medium"
-                                            selected
-                                        >
-                                            Medium
-                                        </option>
-
-                                        <option value="large">
-                                            Large
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxBorder">
-                                        Border
-                                    </label>
-
-                                    <select id="boxBorder">
-
-                                        <option value="none">
-                                            None
-                                        </option>
-
-                                        <option
-                                            value="subtle"
-                                            selected
-                                        >
-                                            Subtle
-                                        </option>
-
-                                        <option value="strong">
-                                            Strong
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- IMAGE CONTROLS -->
-
-                        <div class="design-section">
-
-                            <div
-                                style="
-                                    font-weight:800;
-                                    margin-bottom:10px;
-                                    font-size:13px;
-                                "
-                            >
-                                🖼️ Image Controls
-                            </div>
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="imageHeight">
-                                        Image Height
-                                    </label>
-
-                                    <input
-                                        id="imageHeight"
-                                        type="number"
-                                        min="0"
-                                        max="1500"
-                                        value="230"
-                                    >
-
-                                    <div class="muted">
-                                        px
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="boxImageFit">
-                                        Image Fit
-                                    </label>
-
-                                    <select id="boxImageFit">
-
-                                        <option value="cover">
-                                            Cover
-                                        </option>
-
-                                        <option value="contain">
-                                            Contain
-                                        </option>
-
-                                        <option value="fill">
-                                            Fill
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- VIDEO CONTROLS -->
-
-                        <div class="design-section">
-
-                            <div
-                                style="
-                                    font-weight:800;
-                                    margin-bottom:10px;
-                                    font-size:13px;
-                                "
-                            >
-                                🎬 Video Controls
-                            </div>
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="videoHeight">
-                                        Video Height
-                                    </label>
-
-                                    <input
-                                        id="videoHeight"
-                                        type="number"
-                                        min="0"
-                                        max="1500"
-                                        value="240"
-                                    >
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="videoFit">
-                                        Video Fit
-                                    </label>
-
-                                    <select id="videoFit">
-
-                                        <option value="contain">
-                                            Contain
-                                        </option>
-
-                                        <option value="cover">
-                                            Cover
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label>
-                                        Autoplay
-                                    </label>
-
-                                    <label
-                                        style="
-                                            display:flex;
-                                            gap:8px;
-                                            align-items:center;
-                                            padding:11px;
-                                            background:#0d0d0d;
-                                            border-radius:9px;
-                                        "
-                                    >
-
-                                        <input
-                                            id="videoAutoplay"
-                                            type="checkbox"
-                                            style="width:auto"
-                                        >
-
-                                        Autoplay
-
-                                    </label>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label>
-                                        Loop
-                                    </label>
-
-                                    <label
-                                        style="
-                                            display:flex;
-                                            gap:8px;
-                                            align-items:center;
-                                            padding:11px;
-                                            background:#0d0d0d;
-                                            border-radius:9px;
-                                        "
-                                    >
-
-                                        <input
-                                            id="videoLoop"
-                                            type="checkbox"
-                                            style="width:auto"
-                                        >
-
-                                        Loop
-
-                                    </label>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- BUTTON LINK -->
-
-                        <div class="design-section">
-
-                            <div
-                                style="
-                                    font-weight:800;
-                                    margin-bottom:10px;
-                                    font-size:13px;
-                                "
-                            >
-                                🔗 Button / Link Controls
-                            </div>
-
-                            <div class="form-grid">
-
-                                <div class="input-group">
-
-                                    <label for="buttonColor">
-                                        Button Color
-                                    </label>
-
-                                    <div class="color-row">
-
-                                        <input
-                                            id="buttonColor"
-                                            type="color"
-                                            value="#6d28d9"
-                                        >
-
-                                        <span
-                                            id="buttonColorValue"
-                                            class="range-value"
-                                        >
-                                            #6d28d9
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div class="input-group">
-
-                                    <label for="buttonTextColor">
-                                        Button Text Color
-                                    </label>
-
-                                    <div class="color-row">
-
-                                        <input
-                                            id="buttonTextColor"
-                                            type="color"
-                                            value="#ffffff"
-                                        >
-
-                                        <span
-                                            id="buttonTextColorValue"
-                                            class="range-value"
-                                        >
-                                            #ffffff
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- SCHEDULE -->
-
-                        <div class="design-section">
-
-                            <div
-                                style="
-                                    font-weight:800;
-                                    margin-bottom:10px;
-                                    font-size:13px;
-                                "
-                            >
-                                📅 Scheduled Show / Hide
-                            </div>
-
-                            <div class="schedule-box">
-
-                                <div class="form-grid">
-
-                                    <div class="input-group">
-
-                                        <label for="scheduleStart">
-                                            Show From
-                                        </label>
-
-                                        <input
-                                            id="scheduleStart"
-                                            type="datetime-local"
-                                        >
-
-                                    </div>
-
-
-                                    <div class="input-group">
-
-                                        <label for="scheduleEnd">
-                                            Hide After
-                                        </label>
-
-                                        <input
-                                            id="scheduleEnd"
-                                            type="datetime-local"
-                                        >
-
-                                    </div>
-
-                                </div>
-
-                                <div
-                                    id="scheduleStatus"
-                                    class="schedule-status"
-                                >
-                                    No schedule
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- SAVE -->
-
-                <div class="input-group full">
-
-                    <div class="button-row">
-
-                        <button
-                            class="btn btn-primary"
-                            onclick="saveItem()"
-                        >
-                            💾 Save Content
-                        </button>
-
-                        <button
-                            class="btn"
-                            onclick="clearForm()"
-                        >
-                            ➕ New
-                        </button>
-
-                        <button
-                            class="btn"
-                            onclick="loadContent()"
-                        >
-                            🔄 Refresh
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             LIVE PREVIEW
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                👁️ Live Home Preview
-            </div>
-
-            <div class="card-subtitle">
-                Android Home پر enabled content کا preview۔
-            </div>
-
-            <div class="preview-wrapper">
-
-                <div
-                    id="homePreview"
-                    class="preview-phone"
-                >
-
-                    <div class="preview-empty">
-                        Loading preview...
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             CONTENT LIST
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                📦 Home Content
-            </div>
-
-            <div class="card-subtitle">
-                Drag & Drop کر کے Content کی ترتیب تبدیل کریں۔
-            </div>
-
-
-            <!-- SEARCH -->
-
-            <div class="toolbar">
-
-                <input
-                    id="searchItems"
-                    type="search"
-                    placeholder="🔍 Search content..."
-                    oninput="renderItems()"
-                >
-
-                <select
-                    id="filterType"
-                    onchange="renderItems()"
-                >
-
-                    <option value="all">
-                        All Types
-                    </option>
-
-                    <option value="message">
-                        Message
-                    </option>
-
-                    <option value="announcement">
-                        Announcement
-                    </option>
-
-                    <option value="notification">
-                        Notification
-                    </option>
-
-                    <option value="image">
-                        Image
-                    </option>
-
-                    <option value="video">
-                        Video
-                    </option>
-
-                    <option value="youtube">
-                        YouTube
-                    </option>
-
-                    <option value="audio">
-                        Audio
-                    </option>
-
-                    <option value="button">
-                        Button
-                    </option>
-
-                    <option value="link">
-                        Link
-                    </option>
-
-                    <option value="donation">
-                        Donation
-                    </option>
-
-                    <option value="advertisement">
-                        Advertisement
-                    </option>
-
-                    <option value="website">
-                        Website
-                    </option>
-
-                    <option value="channel">
-                        Channel
-                    </option>
-
-                </select>
-
-
-                <select
-                    id="filterStatus"
-                    onchange="renderItems()"
-                >
-
-                    <option value="all">
-                        All Status
-                    </option>
-
-                    <option value="enabled">
-                        Enabled
-                    </option>
-
-                    <option value="disabled">
-                        Disabled
-                    </option>
-
-                    <option value="scheduled">
-                        Scheduled
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div
-                id="itemsList"
-                class="items-list"
-            ></div>
-
-        </div>
-
-
-        <!-- =================================================
-             RECYCLE BIN
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                🗑️ Recycle Bin
-            </div>
-
-            <div class="card-subtitle">
-                Deleted content یہاں سے Restore کیا جا سکتا ہے۔
-            </div>
-
-            <div
-                id="trashList"
-            ></div>
-
-            <button
-                class="btn btn-danger btn-small"
-                onclick="emptyTrash()"
-            >
-                Empty Recycle Bin
-            </button>
-
-        </div>
-
-
-        <!-- =================================================
-             MEDIA MANAGER
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                📁 Media Manager
-            </div>
-
-            <div class="card-subtitle">
-                Images, videos اور دیگر media upload/manage کریں۔
-            </div>
-
-            <div class="input-group">
-
-                <input
-                    id="mediaFile"
-                    type="file"
-                    accept="image/*,video/*,audio/*"
-                >
-
-            </div>
-
-            <div class="button-row">
-
-                <button
-                    class="btn btn-primary"
-                    onclick="uploadMedia()"
-                >
-                    ⬆️ Upload
-                </button>
-
-                <button
-                    class="btn"
-                    onclick="loadMedia()"
-                >
-                    🔄 Refresh
-                </button>
-
-            </div>
-
-            <div
-                id="mediaList"
-                class="media-grid"
-                style="margin-top:13px"
-            ></div>
-
-        </div>
-
-
-        <!-- =================================================
-             SYSTEM STATUS
-             ================================================= -->
-
-        <div class="admin-card">
-
-            <div class="card-title">
-                ⚙️ System Status
-            </div>
-
-            <pre
-                id="systemStatus"
-                style="
-                    background:#080808;
-                    border:1px solid #292929;
-                    border-radius:10px;
-                    padding:12px;
-                    overflow:auto;
-                    white-space:pre-wrap;
-                    word-break:break-word;
-                    color:#aaa;
-                    font-size:11px;
-                "
-            >Loading...</pre>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- TOAST -->
-
-<div id="toast"></div>
-
-
 <script>
 
 /* =========================================================
@@ -2220,6 +5,7 @@
    ========================================================= */
 
 let adminToken = "";
+
 let cmsContent = {
     items: [],
     home_enabled: true
@@ -2227,7 +13,9 @@ let cmsContent = {
 
 let draggedId = null;
 
-const TRASH_KEY = "mayotube_admin_recycle_bin_v1";
+const TRASH_KEY =
+    "mayotube_admin_recycle_bin_v1";
+
 
 function $(id) {
     return document.getElementById(id);
@@ -2239,6 +27,7 @@ function $(id) {
    ========================================================= */
 
 let toastTimer = null;
+
 
 function showToast(message) {
 
@@ -2255,6 +44,7 @@ function showToast(message) {
         toast.classList.remove("show");
 
     }, 2800);
+
 }
 
 
@@ -2292,7 +82,9 @@ function safePreviewUrl(value) {
             url.protocol === "http:" ||
             url.protocol === "https:"
         ) {
+
             return url.href;
+
         }
 
     } catch (e) {}
@@ -2317,7 +109,10 @@ async function api(path, options = {}) {
         options.body &&
         !(options.body instanceof FormData)
     ) {
-        headers["Content-Type"] = "application/json";
+
+        headers["Content-Type"] =
+            "application/json";
+
     }
 
     const response = await fetch(path, {
@@ -2325,16 +120,21 @@ async function api(path, options = {}) {
         headers
     });
 
-    const text = await response.text();
+    const text =
+        await response.text();
 
     let data;
 
     try {
+
         data = JSON.parse(text);
+
     } catch (e) {
+
         data = {
             raw: text
         };
+
     }
 
     if (!response.ok) {
@@ -2359,7 +159,8 @@ async function api(path, options = {}) {
 
 function login() {
 
-    const token = $("tokenInput").value.trim();
+    const token =
+        $("tokenInput").value.trim();
 
     if (!token) {
 
@@ -2367,6 +168,7 @@ function login() {
             "Admin Token درج کریں۔";
 
         return;
+
     }
 
     adminToken = token;
@@ -2380,11 +182,16 @@ function login() {
 
     }
 
-    $("loginError").textContent = "";
+    $("loginError").textContent =
+        "";
 
-    $("loginScreen").classList.add("hidden");
+    $("loginScreen")
+        .classList
+        .add("hidden");
 
-    $("app").classList.remove("hidden");
+    $("app")
+        .classList
+        .remove("hidden");
 
     initialize();
 
@@ -2403,11 +210,16 @@ function logout() {
         "mayotube_admin_token"
     );
 
-    $("app").classList.add("hidden");
+    $("app")
+        .classList
+        .add("hidden");
 
-    $("loginScreen").classList.remove("hidden");
+    $("loginScreen")
+        .classList
+        .remove("hidden");
 
-    $("tokenInput").value = "";
+    $("tokenInput").value =
+        "";
 
 }
 
@@ -2484,7 +296,8 @@ async function loadAll() {
             "Connection Error";
 
         showToast(
-            "Error: " + error.message
+            "Error: " +
+            error.message
         );
 
     }
@@ -2498,14 +311,22 @@ async function loadAll() {
 
 async function loadContent() {
 
-    const data = await api(
-        "/api/admin/content"
-    );
+    const data =
+        await api(
+            "/api/admin/content"
+        );
 
-    cmsContent = data || {};
+    cmsContent =
+        data || {};
 
-    if (!Array.isArray(cmsContent.items)) {
+    if (
+        !Array.isArray(
+            cmsContent.items
+        )
+    ) {
+
         cmsContent.items = [];
+
     }
 
     cmsContent.items.sort(
@@ -2532,20 +353,108 @@ async function loadContent() {
 
 
 /* =========================================================
+   RECYCLE BIN STORAGE
+   ========================================================= */
+
+function getTrash() {
+
+    try {
+
+        const data =
+            JSON.parse(
+                localStorage.getItem(
+                    TRASH_KEY
+                ) || "[]"
+            );
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    } catch (e) {
+
+        return [];
+
+    }
+
+}
+
+
+function setTrash(items) {
+
+    localStorage.setItem(
+        TRASH_KEY,
+        JSON.stringify(items)
+    );
+
+    updateStats();
+
+}
+
+
+/* =========================================================
+   CHECK IF ITEM IS IN RECYCLE BIN
+   ========================================================= */
+
+function isInTrash(id) {
+
+    return getTrash().some(
+        record =>
+            String(
+                record?.item?.id
+            ) === String(id)
+    );
+
+}
+
+
+/* =========================================================
+   GET VISIBLE CONTENT
+   ========================================================= */
+
+function getVisibleContentItems() {
+
+    const trashIds =
+        new Set(
+            getTrash().map(
+                record =>
+                    String(
+                        record?.item?.id
+                    )
+            )
+        );
+
+    return (cmsContent.items || [])
+        .filter(
+            item =>
+                !trashIds.has(
+                    String(item.id)
+                )
+        );
+
+}
+
+
+/* =========================================================
    STATS
    ========================================================= */
 
 function updateStats() {
 
-    const items = cmsContent.items || [];
+    const items =
+        getVisibleContentItems();
 
     const enabled =
         items.filter(
-            item => item.enabled !== false
+            item =>
+                item.enabled !== false
         ).length;
 
     const disabled =
-        items.length - enabled;
+        items.filter(
+            item =>
+                item.enabled === false
+        ).length;
 
     $("statTotal").textContent =
         items.length;
@@ -2577,9 +486,11 @@ async function toggleHome() {
             "/api/admin/home/toggle",
             {
                 method: "PATCH",
-                body: JSON.stringify({
-                    enabled
-                })
+
+                body:
+                    JSON.stringify({
+                        enabled
+                    })
             }
         );
 
@@ -2981,19 +892,25 @@ function getPreviewBoxStyle(item) {
         "1px solid rgba(255,255,255,.07)";
 
     if (style.border === "none") {
-        border = "none";
+
+        border =
+            "none";
+
     }
 
     if (style.border === "strong") {
+
         border =
             "1px solid rgba(255,255,255,.22)";
+
     }
 
     return {
 
         background,
 
-        width: width + "%",
+        width:
+            width + "%",
 
         minHeight:
             height > 0
@@ -3030,7 +947,8 @@ function getPreviewBoxStyle(item) {
 
 function clearForm() {
 
-    $("itemId").value = "";
+    $("itemId").value =
+        "";
 
     $("itemType").value =
         "message";
@@ -3064,41 +982,59 @@ function clearForm() {
 
     applyBoxStyleToForm({
 
-        boxStyle: "card",
+        boxStyle:
+            "card",
 
-        backgroundColor: "#181818",
+        backgroundColor:
+            "#181818",
 
-        textColor: "#ffffff",
+        textColor:
+            "#ffffff",
 
-        textAlign: "right",
+        textAlign:
+            "right",
 
-        borderRadius: 13,
+        borderRadius:
+            13,
 
-        boxHeight: 0,
+        boxHeight:
+            0,
 
-        boxWidth: 100,
+        boxWidth:
+            100,
 
-        padding: 11,
+        padding:
+            11,
 
-        shadow: "medium",
+        shadow:
+            "medium",
 
-        border: "subtle",
+        border:
+            "subtle",
 
-        imageHeight: 230,
+        imageHeight:
+            230,
 
-        imageFit: "cover",
+        imageFit:
+            "cover",
 
-        videoHeight: 240,
+        videoHeight:
+            240,
 
-        videoFit: "contain",
+        videoFit:
+            "contain",
 
-        videoAutoplay: false,
+        videoAutoplay:
+            false,
 
-        videoLoop: false,
+        videoLoop:
+            false,
 
-        buttonColor: "#6d28d9",
+        buttonColor:
+            "#6d28d9",
 
-        buttonTextColor: "#ffffff"
+        buttonTextColor:
+            "#ffffff"
 
     });
 
@@ -3122,16 +1058,20 @@ function clearForm() {
 function getNextOrder() {
 
     const items =
-        cmsContent.items || [];
+        getVisibleContentItems();
 
     if (!items.length) {
+
         return 1;
+
     }
 
     return Math.max(
         ...items.map(
             item =>
-                Number(item.order || 0)
+                Number(
+                    item.order || 0
+                )
         )
     ) + 1;
 
@@ -3146,11 +1086,25 @@ function editItem(id) {
 
     const item =
         cmsContent.items.find(
-            x => String(x.id) === String(id)
+            x =>
+                String(x.id) ===
+                String(id)
         );
 
     if (!item) {
+
         return;
+
+    }
+
+    if (isInTrash(id)) {
+
+        showToast(
+            "یہ content Recycle Bin میں ہے۔ پہلے Restore کریں۔"
+        );
+
+        return;
+
     }
 
     $("itemId").value =
@@ -3227,6 +1181,19 @@ async function saveItem() {
     const id =
         $("itemId").value.trim();
 
+    if (
+        id &&
+        isInTrash(id)
+    ) {
+
+        showToast(
+            "Recycle Bin والے content کو پہلے Restore کریں۔"
+        );
+
+        return;
+
+    }
+
     const item = {
 
         type:
@@ -3285,24 +1252,32 @@ async function saveItem() {
 
         if (id) {
 
-            result = await api(
-                "/api/admin/content/" +
-                encodeURIComponent(id),
-                {
-                    method: "PUT",
-                    body: JSON.stringify(item)
-                }
-            );
+            result =
+                await api(
+                    "/api/admin/content/" +
+                    encodeURIComponent(id),
+                    {
+                        method:
+                            "PUT",
+
+                        body:
+                            JSON.stringify(item)
+                    }
+                );
 
         } else {
 
-            result = await api(
-                "/api/admin/content",
-                {
-                    method: "POST",
-                    body: JSON.stringify(item)
-                }
-            );
+            result =
+                await api(
+                    "/api/admin/content",
+                    {
+                        method:
+                            "POST",
+
+                        body:
+                            JSON.stringify(item)
+                    }
+                );
 
         }
 
@@ -3338,6 +1313,16 @@ async function saveItem() {
 
 async function toggleItem(id) {
 
+    if (isInTrash(id)) {
+
+        showToast(
+            "Recycle Bin والے content کا status تبدیل نہیں کیا جا سکتا۔"
+        );
+
+        return;
+
+    }
+
     try {
 
         await api(
@@ -3345,7 +1330,8 @@ async function toggleItem(id) {
             encodeURIComponent(id) +
             "/toggle",
             {
-                method: "PATCH"
+                method:
+                    "PATCH"
             }
         );
 
@@ -3375,41 +1361,63 @@ async function toggleItem(id) {
 
 async function duplicateItem(id) {
 
+    if (isInTrash(id)) {
+
+        showToast(
+            "Recycle Bin والے content کو duplicate نہیں کیا جا سکتا۔"
+        );
+
+        return;
+
+    }
+
     const item =
         cmsContent.items.find(
-            x => String(x.id) === String(id)
+            x =>
+                String(x.id) ===
+                String(id)
         );
 
     if (!item) {
+
         return;
+
     }
 
     const copy = {
 
         type:
-            item.type || "message",
+            item.type ||
+            "message",
 
         title:
-            (item.title || "Untitled") +
+            (item.title ||
+            "Untitled") +
             " (Copy)",
 
         message:
-            item.message || "",
+            item.message ||
+            "",
 
         description:
-            item.description || "",
+            item.description ||
+            "",
 
         image_url:
-            item.image_url || "",
+            item.image_url ||
+            "",
 
         video_url:
-            item.video_url || "",
+            item.video_url ||
+            "",
 
         link_url:
-            item.link_url || "",
+            item.link_url ||
+            "",
 
         button_text:
-            item.button_text || "",
+            item.button_text ||
+            "",
 
         order:
             getNextOrder(),
@@ -3438,8 +1446,11 @@ async function duplicateItem(id) {
         await api(
             "/api/admin/content",
             {
-                method: "POST",
-                body: JSON.stringify(copy)
+                method:
+                    "POST",
+
+                body:
+                    JSON.stringify(copy)
             }
         );
 
@@ -3464,41 +1475,6 @@ async function duplicateItem(id) {
 
 
 /* =========================================================
-   RECYCLE BIN STORAGE
-   ========================================================= */
-
-function getTrash() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                TRASH_KEY
-            ) || "[]"
-        );
-
-    } catch (e) {
-
-        return [];
-
-    }
-
-}
-
-
-function setTrash(items) {
-
-    localStorage.setItem(
-        TRASH_KEY,
-        JSON.stringify(items)
-    );
-
-    updateStats();
-
-}
-
-
-/* =========================================================
    MOVE TO RECYCLE BIN
    ========================================================= */
 
@@ -3506,104 +1482,153 @@ async function moveToTrash(id) {
 
     const item =
         cmsContent.items.find(
-            x => String(x.id) === String(id)
+            x =>
+                String(x.id) ===
+                String(id)
         );
 
     if (!item) {
+
         return;
+
     }
+
+
+    if (isInTrash(id)) {
+
+        showToast(
+            "یہ content پہلے ہی Recycle Bin میں ہے۔"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "کیا آپ اس content کو Recycle Bin میں منتقل کرنا چاہتے ہیں؟"
+        )
+    ) {
+
+        return;
+
+    }
+
 
     const trash =
         getTrash();
 
-    const exists =
-        trash.some(
-            x =>
-                String(x.item.id) ===
-                String(id)
+
+    /*
+       اصل item کی مکمل copy محفوظ کی جاتی ہے۔
+       یہی copy Restore کے وقت استعمال ہوگی۔
+    */
+
+    const originalItem =
+        JSON.parse(
+            JSON.stringify(item)
         );
-
-    if (!exists) {
-
-        trash.push({
-
-            deletedAt:
-                new Date().toISOString(),
-
-            item:
-                JSON.parse(
-                    JSON.stringify(item)
-                )
-
-        });
-
-        setTrash(trash);
-
-    }
 
 
     /*
-       Permanent DELETE کے بجائے
-       پہلے item کو disabled کیا جا رہا ہے۔
-       اس طرح Restore ممکن رہے گا۔
+       پہلے local Recycle Bin میں record محفوظ کریں۔
     */
 
+    trash.push({
+
+        deletedAt:
+            new Date().toISOString(),
+
+        item:
+            originalItem
+
+    });
+
+    setTrash(trash);
+
+
     try {
+
+        /*
+           Backend record کو ابھی permanently
+           delete نہیں کیا جا رہا۔
+
+           اسے disabled رکھا جا رہا ہے تاکہ
+           Restore ممکن رہے۔
+        */
 
         const disabledItem = {
 
             type:
-                item.type || "message",
+                originalItem.type ||
+                "message",
 
             title:
-                item.title || "",
+                originalItem.title ||
+                "",
 
             message:
-                item.message || "",
+                originalItem.message ||
+                "",
 
             description:
-                item.description || "",
+                originalItem.description ||
+                "",
 
             image_url:
-                item.image_url || "",
+                originalItem.image_url ||
+                "",
 
             video_url:
-                item.video_url || "",
+                originalItem.video_url ||
+                "",
 
             link_url:
-                item.link_url || "",
+                originalItem.link_url ||
+                "",
 
             button_text:
-                item.button_text || "",
+                originalItem.button_text ||
+                "",
 
             order:
-                item.order || 0,
+                originalItem.order ||
+                0,
 
             enabled:
                 false,
 
             style:
-                item.style || {},
+                originalItem.style ||
+                {},
 
             schedule:
-                item.schedule || {}
+                originalItem.schedule ||
+                {}
 
         };
+
 
         await api(
             "/api/admin/content/" +
             encodeURIComponent(id),
             {
-                method: "PUT",
-                body: JSON.stringify(
-                    disabledItem
-                )
+                method:
+                    "PUT",
+
+                body:
+                    JSON.stringify(
+                        disabledItem
+                    )
             }
         );
+
 
         showToast(
             "Content Recycle Bin میں منتقل ہو گیا۔"
         );
+
 
         await loadContent();
 
@@ -3611,7 +1636,32 @@ async function moveToTrash(id) {
 
         renderTrash();
 
+
     } catch (error) {
+
+        /*
+           اگر backend update fail ہو جائے
+           تو local Recycle Bin record بھی واپس
+           ہٹا دیا جائے گا۔
+        */
+
+        const updatedTrash =
+            getTrash().filter(
+                record =>
+                    String(
+                        record?.item?.id
+                    ) !== String(id)
+            );
+
+        setTrash(
+            updatedTrash
+        );
+
+
+        await loadContent();
+
+        renderTrash();
+
 
         showToast(
             "Recycle Bin error: " +
@@ -3624,7 +1674,7 @@ async function moveToTrash(id) {
 
 
 /* =========================================================
-   RESTORE
+   RESTORE FROM RECYCLE BIN
    ========================================================= */
 
 async function restoreTrash(index) {
@@ -3635,83 +1685,132 @@ async function restoreTrash(index) {
     const record =
         trash[index];
 
-    if (!record) {
+    if (
+        !record ||
+        !record.item
+    ) {
+
         return;
+
     }
 
     const item =
         record.item;
 
-    /*
-       Existing ID کے ساتھ PUT کیا جاتا ہے۔
-    */
+
+    if (!item.id) {
+
+        showToast(
+            "اس Recycle Bin item کی ID موجود نہیں۔"
+        );
+
+        return;
+
+    }
+
 
     const restored = {
 
         type:
-            item.type || "message",
+            item.type ||
+            "message",
 
         title:
-            item.title || "",
+            item.title ||
+            "",
 
         message:
-            item.message || "",
+            item.message ||
+            "",
 
         description:
-            item.description || "",
+            item.description ||
+            "",
 
         image_url:
-            item.image_url || "",
+            item.image_url ||
+            "",
 
         video_url:
-            item.video_url || "",
+            item.video_url ||
+            "",
 
         link_url:
-            item.link_url || "",
+            item.link_url ||
+            "",
 
         button_text:
-            item.button_text || "",
+            item.button_text ||
+            "",
 
         order:
-            item.order || 0,
+            item.order ||
+            0,
 
         enabled:
             item.enabled !== false,
 
         style:
-            item.style || {},
+            item.style ||
+            {},
 
         schedule:
-            item.schedule || {}
+            item.schedule ||
+            {}
 
     };
 
+
     try {
+
+        /*
+           Existing ID کے ساتھ backend میں
+           item دوبارہ enable/restore کیا جاتا ہے۔
+        */
 
         await api(
             "/api/admin/content/" +
-            encodeURIComponent(item.id),
+            encodeURIComponent(
+                item.id
+            ),
             {
-                method: "PUT",
-                body: JSON.stringify(
-                    restored
-                )
+                method:
+                    "PUT",
+
+                body:
+                    JSON.stringify(
+                        restored
+                    )
             }
         );
 
-        trash.splice(index, 1);
 
-        setTrash(trash);
+        /*
+           Backend restore کامیاب ہونے کے بعد
+           ہی Recycle Bin سے record نکالا جائے۔
+        */
+
+        trash.splice(
+            index,
+            1
+        );
+
+        setTrash(
+            trash
+        );
+
 
         showToast(
             "Content restore ہو گیا۔"
         );
+
 
         await loadContent();
 
         await loadHomePreview();
 
         renderTrash();
+
 
     } catch (error) {
 
@@ -3726,35 +1825,255 @@ async function restoreTrash(index) {
 
 
 /* =========================================================
-   EMPTY TRASH
+   PERMANENT DELETE
    ========================================================= */
 
-function emptyTrash() {
+async function permanentlyDeleteTrash(index) {
 
-    if (!getTrash().length) {
+    const trash =
+        getTrash();
+
+    const record =
+        trash[index];
+
+    if (
+        !record ||
+        !record.item
+    ) {
+
+        return;
+
+    }
+
+    const item =
+        record.item;
+
+
+    if (!item.id) {
+
+        /*
+           اگر ID ہی نہیں تو local record
+           permanently remove کیا جا سکتا ہے۔
+        */
+
+        trash.splice(
+            index,
+            1
+        );
+
+        setTrash(
+            trash
+        );
+
+        renderTrash();
+
+        showToast(
+            "Recycle Bin record delete ہو گیا۔"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "کیا آپ واقعی اس content کو ہمیشہ کے لیے delete کرنا چاہتے ہیں؟\n\nیہ عمل واپس نہیں کیا جا سکے گا۔"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        /*
+           اب پہلی بار backend سے واقعی DELETE ہوگا۔
+        */
+
+        await api(
+            "/api/admin/content/" +
+            encodeURIComponent(
+                item.id
+            ),
+            {
+                method:
+                    "DELETE"
+            }
+        );
+
+
+        /*
+           Backend delete کامیاب ہونے کے بعد
+           local Recycle Bin سے بھی remove کریں۔
+        */
+
+        trash.splice(
+            index,
+            1
+        );
+
+        setTrash(
+            trash
+        );
+
+
+        showToast(
+            "Content ہمیشہ کے لیے delete ہو گیا۔"
+        );
+
+
+        await loadContent();
+
+        await loadHomePreview();
+
+        renderTrash();
+
+
+    } catch (error) {
+
+        showToast(
+            "Permanent delete failed: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EMPTY RECYCLE BIN
+   ========================================================= */
+
+async function emptyTrash() {
+
+    const trash =
+        getTrash();
+
+
+    if (!trash.length) {
 
         showToast(
             "Recycle Bin پہلے ہی خالی ہے۔"
         );
 
         return;
+
     }
+
 
     if (
         !confirm(
-            "کیا آپ واقعی Recycle Bin خالی کرنا چاہتے ہیں؟"
+            "کیا آپ واقعی Recycle Bin کے تمام items کو ہمیشہ کے لیے delete کرنا چاہتے ہیں؟\n\nیہ عمل واپس نہیں کیا جا سکے گا۔"
         )
     ) {
+
         return;
+
     }
 
-    setTrash([]);
+
+    let remaining = [];
+
+    let deletedCount =
+        0;
+
+
+    /*
+       ہر item کو backend سے individually
+       permanently DELETE کیا جائے گا۔
+    */
+
+    for (
+        const record of trash
+    ) {
+
+        const item =
+            record?.item;
+
+
+        if (!item?.id) {
+
+            deletedCount++;
+
+            continue;
+
+        }
+
+
+        try {
+
+            await api(
+                "/api/admin/content/" +
+                encodeURIComponent(
+                    item.id
+                ),
+                {
+                    method:
+                        "DELETE"
+                }
+            );
+
+            deletedCount++;
+
+        } catch (error) {
+
+            /*
+               اگر کوئی item delete نہ ہو سکے
+               تو اسے Recycle Bin میں باقی رکھیں۔
+            */
+
+            remaining.push(
+                record
+            );
+
+            console.error(
+                "Permanent delete failed:",
+                item.id,
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+       صرف وہ items باقی رہیں گے جنہیں
+       backend سے delete نہیں کیا جا سکا۔
+    */
+
+    setTrash(
+        remaining
+    );
+
+
+    await loadContent();
+
+    await loadHomePreview();
 
     renderTrash();
 
-    showToast(
-        "Recycle Bin خالی کر دیا گیا۔"
-    );
+
+    if (remaining.length) {
+
+        showToast(
+            deletedCount +
+            " item delete ہوئے، " +
+            remaining.length +
+            " item باقی رہ گئے۔"
+        );
+
+    } else {
+
+        showToast(
+            "Recycle Bin مکمل خالی کر دیا گیا۔"
+        );
+
+    }
 
 }
 
@@ -3773,23 +2092,26 @@ function renderTrash() {
 
     updateStats();
 
+
     if (!trash.length) {
 
         container.innerHTML =
             '<div class="loading">' +
-            'Recycle Bin خالی ہے۔' +
+                'Recycle Bin خالی ہے۔' +
             '</div>';
 
         return;
 
     }
 
+
     container.innerHTML =
         trash.map(
             (record, index) => {
 
                 const item =
-                    record.item || {};
+                    record?.item || {};
+
 
                 return (
 
@@ -3803,6 +2125,7 @@ function renderTrash() {
                             ) +
 
                         '</div>' +
+
 
                         '<div style="color:#888;font-size:11px;margin-top:5px">' +
 
@@ -3820,11 +2143,51 @@ function renderTrash() {
 
                         '</div>' +
 
+
+                        '<div style="color:#666;font-size:10px;margin-top:5px;word-break:break-all">' +
+
+                            "ID: " +
+
+                            escapeHtml(
+                                item.id ||
+                                ""
+                            ) +
+
+                        '</div>' +
+
+
                         '<div class="item-actions">' +
 
-                            '<button class="btn btn-success btn-small" onclick="restoreTrash(' +
-                                index +
-                            ')">↩️ Restore</button>' +
+
+                            '<button' +
+
+                                ' class="btn btn-success btn-small"' +
+
+                                ' onclick="restoreTrash(' +
+                                    index +
+                                ')"' +
+
+                            '>' +
+
+                                '↩️ Restore' +
+
+                            '</button>' +
+
+
+                            '<button' +
+
+                                ' class="btn btn-danger btn-small"' +
+
+                                ' onclick="permanentlyDeleteTrash(' +
+                                    index +
+                                ')"' +
+
+                            '>' +
+
+                                '🗑️ Delete Permanently' +
+
+                            '</button>' +
+
 
                         '</div>' +
 
@@ -3844,8 +2207,14 @@ function renderTrash() {
 
 function getFilteredItems() {
 
+    /*
+       سب سے پہلے Recycle Bin والے items کو
+       main list سے مکمل طور پر نکال دیں۔
+    */
+
     let items =
-        [...(cmsContent.items || [])];
+        getVisibleContentItems();
+
 
     const search =
         (
@@ -3855,8 +2224,10 @@ function getFilteredItems() {
         .trim()
         .toLowerCase();
 
+
     const type =
         $("filterType").value;
+
 
     const status =
         $("filterStatus").value;
@@ -3865,23 +2236,32 @@ function getFilteredItems() {
     if (search) {
 
         items =
-            items.filter(item => {
+            items.filter(
+                item => {
 
-                const text = [
+                    const text = [
 
-                    item.title,
-                    item.message,
-                    item.description,
-                    item.type,
-                    item.link_url
+                        item.title,
 
-                ]
-                .join(" ")
-                .toLowerCase();
+                        item.message,
 
-                return text.includes(search);
+                        item.description,
 
-            });
+                        item.type,
+
+                        item.link_url
+
+                    ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                    return text.includes(
+                        search
+                    );
+
+                }
+            );
 
     }
 
@@ -3932,9 +2312,14 @@ function getFilteredItems() {
 
     items.sort(
         (a, b) =>
-            Number(a.order || 0) -
-            Number(b.order || 0)
+            Number(
+                a.order || 0
+            ) -
+            Number(
+                b.order || 0
+            )
     );
+
 
     return items;
 
@@ -3953,22 +2338,25 @@ function renderItems() {
     const items =
         getFilteredItems();
 
+
     if (!items.length) {
 
         container.innerHTML =
             '<div class="loading">' +
-            'کوئی content نہیں ملا۔' +
+                'کوئی content نہیں ملا۔' +
             '</div>';
 
         return;
 
     }
 
+
     container.innerHTML =
         items.map(
             item =>
                 buildItemCard(item)
         ).join("");
+
 
     setupDragAndDrop();
 
@@ -3987,10 +2375,12 @@ function buildItemCard(item) {
     const scheduled =
         hasSchedule(item);
 
+
     let statusBadge =
         enabled
             ? '<span class="badge badge-green">🟢 Enabled</span>'
             : '<span class="badge badge-red">🔴 Disabled</span>';
+
 
     if (scheduled) {
 
@@ -3999,11 +2389,13 @@ function buildItemCard(item) {
 
     }
 
+
     const preview =
         item.message ||
         item.description ||
         item.link_url ||
         "";
+
 
     return (
 
@@ -4014,18 +2406,26 @@ function buildItemCard(item) {
             ' draggable="true"' +
 
             ' data-id="' +
-                escapeHtml(item.id) +
+                escapeHtml(
+                    item.id
+                ) +
             '"' +
 
         '>' +
 
+
             '<div class="item-head">' +
 
+
                 '<div class="drag-handle" title="Drag">' +
+
                     "☷" +
+
                 '</div>' +
 
+
                 '<div class="item-main">' +
+
 
                     '<div class="item-title">' +
 
@@ -4036,7 +2436,9 @@ function buildItemCard(item) {
 
                     '</div>' +
 
+
                     '<div class="item-meta">' +
+
 
                         '<span class="badge">' +
 
@@ -4046,6 +2448,7 @@ function buildItemCard(item) {
                             ) +
 
                         '</span>' +
+
 
                         '<span class="badge">' +
 
@@ -4058,52 +2461,119 @@ function buildItemCard(item) {
 
                         '</span>' +
 
+
                         statusBadge +
+
 
                     '</div>' +
 
+
                 '</div>' +
 
+
             '</div>' +
+
 
             (
                 preview
                     ? (
+
                         '<div class="item-preview">' +
+
                             escapeHtml(
-                                String(preview)
-                                    .substring(0, 300)
+                                String(
+                                    preview
+                                )
+                                .substring(
+                                    0,
+                                    300
+                                )
                             ) +
+
                         '</div>'
+
                     )
                     : ""
             ) +
 
+
             '<div class="item-actions">' +
 
-                '<button class="btn btn-primary btn-small" onclick="editItem(\'' +
-                    escapeHtml(item.id) +
-                '\')">✏️ Edit</button>' +
 
-                '<button class="btn btn-success btn-small" onclick="toggleItem(\'' +
-                    escapeHtml(item.id) +
-                '\')">' +
+                '<button' +
+
+                    ' class="btn btn-primary btn-small"' +
+
+                    ' onclick="editItem(\'' +
+                        escapeHtml(
+                            item.id
+                        ) +
+                    '\')"' +
+
+                '>' +
+
+                    '✏️ Edit' +
+
+                '</button>' +
+
+
+                '<button' +
+
+                    ' class="btn btn-success btn-small"' +
+
+                    ' onclick="toggleItem(\'' +
+                        escapeHtml(
+                            item.id
+                        ) +
+                    '\')"' +
+
+                '>' +
+
                     (
                         enabled
                             ? "🔴 Disable"
                             : "🟢 Enable"
                     ) +
+
                 '</button>' +
 
-                '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' +
-                    escapeHtml(item.id) +
-                '\')">📋 Duplicate</button>' +
 
-                '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' +
-                    escapeHtml(item.id) +
-                '\')">🗑️ Delete</button>' +
+                '<button' +
+
+                    ' class="btn btn-blue btn-small"' +
+
+                    ' onclick="duplicateItem(\'' +
+                        escapeHtml(
+                            item.id
+                        ) +
+                    '\')"' +
+
+                '>' +
+
+                    '📋 Duplicate' +
+
+                '</button>' +
+
+
+                '<button' +
+
+                    ' class="btn btn-danger btn-small"' +
+
+                    ' onclick="moveToTrash(\'' +
+                        escapeHtml(
+                            item.id
+                        ) +
+                    '\')"' +
+
+                '>' +
+
+                    '🗑️ Delete' +
+
+                '</button>' +
+
 
             '</div>' +
+
 
         '</div>'
 
@@ -4123,101 +2593,109 @@ function setupDragAndDrop() {
             ".item-card"
         );
 
-    cards.forEach(card => {
 
-        card.addEventListener(
-            "dragstart",
-            () => {
-
-                draggedId =
-                    card.dataset.id;
-
-                card.classList.add(
-                    "dragging"
-                );
-
-            }
-        );
+    cards.forEach(
+        card => {
 
 
-        card.addEventListener(
-            "dragend",
-            () => {
+            card.addEventListener(
+                "dragstart",
+                () => {
 
-                card.classList.remove(
-                    "dragging"
-                );
+                    draggedId =
+                        card.dataset.id;
 
-                document
-                    .querySelectorAll(
-                        ".item-card"
-                    )
-                    .forEach(
-                        c =>
-                            c.classList.remove(
-                                "drag-over"
-                            )
+                    card.classList.add(
+                        "dragging"
                     );
 
-            }
-        );
-
-
-        card.addEventListener(
-            "dragover",
-            event => {
-
-                event.preventDefault();
-
-                card.classList.add(
-                    "drag-over"
-                );
-
-            }
-        );
-
-
-        card.addEventListener(
-            "dragleave",
-            () => {
-
-                card.classList.remove(
-                    "drag-over"
-                );
-
-            }
-        );
-
-
-        card.addEventListener(
-            "drop",
-            async event => {
-
-                event.preventDefault();
-
-                card.classList.remove(
-                    "drag-over"
-                );
-
-                const targetId =
-                    card.dataset.id;
-
-                if (
-                    !draggedId ||
-                    draggedId === targetId
-                ) {
-                    return;
                 }
+            );
 
-                await reorderItems(
-                    draggedId,
-                    targetId
-                );
 
-            }
-        );
+            card.addEventListener(
+                "dragend",
+                () => {
 
-    });
+                    card.classList.remove(
+                        "dragging"
+                    );
+
+                    document
+                        .querySelectorAll(
+                            ".item-card"
+                        )
+                        .forEach(
+                            c =>
+                                c.classList.remove(
+                                    "drag-over"
+                                )
+                        );
+
+                }
+            );
+
+
+            card.addEventListener(
+                "dragover",
+                event => {
+
+                    event.preventDefault();
+
+                    card.classList.add(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            card.addEventListener(
+                "dragleave",
+                () => {
+
+                    card.classList.remove(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            card.addEventListener(
+                "drop",
+                async event => {
+
+                    event.preventDefault();
+
+                    card.classList.remove(
+                        "drag-over"
+                    );
+
+                    const targetId =
+                        card.dataset.id;
+
+
+                    if (
+                        !draggedId ||
+                        draggedId === targetId
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    await reorderItems(
+                        draggedId,
+                        targetId
+                    );
+
+                }
+            );
+
+        }
+    );
 
 }
 
@@ -4231,8 +2709,14 @@ async function reorderItems(
     targetId
 ) {
 
+    /*
+       صرف visible/main content استعمال کریں۔
+       Recycle Bin والے items کو reorder نہیں کیا جائے گا۔
+    */
+
     const items =
-        [...cmsContent.items];
+        [...getVisibleContentItems()];
+
 
     const fromIndex =
         items.findIndex(
@@ -4241,6 +2725,7 @@ async function reorderItems(
                 String(draggedId)
         );
 
+
     const toIndex =
         items.findIndex(
             x =>
@@ -4248,18 +2733,23 @@ async function reorderItems(
                 String(targetId)
         );
 
+
     if (
         fromIndex < 0 ||
         toIndex < 0
     ) {
+
         return;
+
     }
+
 
     const [moved] =
         items.splice(
             fromIndex,
             1
         );
+
 
     items.splice(
         toIndex,
@@ -4286,70 +2776,129 @@ async function reorderItems(
     try {
 
         /*
-           Backend میں ہر item update۔
+           Backend میں صرف visible items update ہوں۔
         */
 
-        for (const item of items) {
+        for (
+            const item of items
+        ) {
 
             await api(
                 "/api/admin/content/" +
-                encodeURIComponent(item.id),
+                encodeURIComponent(
+                    item.id
+                ),
                 {
-                    method: "PUT",
-                    body: JSON.stringify({
+                    method:
+                        "PUT",
 
-                        type:
-                            item.type || "message",
+                    body:
+                        JSON.stringify({
 
-                        title:
-                            item.title || "",
+                            type:
+                                item.type ||
+                                "message",
 
-                        message:
-                            item.message || "",
+                            title:
+                                item.title ||
+                                "",
 
-                        description:
-                            item.description || "",
+                            message:
+                                item.message ||
+                                "",
 
-                        image_url:
-                            item.image_url || "",
+                            description:
+                                item.description ||
+                                "",
 
-                        video_url:
-                            item.video_url || "",
+                            image_url:
+                                item.image_url ||
+                                "",
 
-                        link_url:
-                            item.link_url || "",
+                            video_url:
+                                item.video_url ||
+                                "",
 
-                        button_text:
-                            item.button_text || "",
+                            link_url:
+                                item.link_url ||
+                                "",
 
-                        order:
-                            item.order,
+                            button_text:
+                                item.button_text ||
+                                "",
 
-                        enabled:
-                            item.enabled !== false,
+                            order:
+                                item.order,
 
-                        style:
-                            item.style || {},
+                            enabled:
+                                item.enabled !== false,
 
-                        schedule:
-                            item.schedule || {}
+                            style:
+                                item.style ||
+                                {},
 
-                    })
+                            schedule:
+                                item.schedule ||
+                                {}
+
+                        })
                 }
             );
 
         }
 
+
+        /*
+           Local CMS list کو update کریں۔
+        */
+
+        const trashIds =
+            new Set(
+                getTrash().map(
+                    record =>
+                        String(
+                            record?.item?.id
+                        )
+                )
+            );
+
+
+        const trashItems =
+            cmsContent.items.filter(
+                item =>
+                    trashIds.has(
+                        String(item.id)
+                    )
+            );
+
+
         cmsContent.items =
-            items;
+            [
+                ...items,
+                ...trashItems
+            ];
+
+
+        cmsContent.items.sort(
+            (a, b) =>
+                Number(
+                    a.order || 0
+                ) -
+                Number(
+                    b.order || 0
+                )
+        );
+
 
         renderItems();
 
         await loadHomePreview();
 
+
         showToast(
             "Content order update ہو گیا۔"
         );
+
 
     } catch (error) {
 
@@ -4390,6 +2939,7 @@ function isScheduleActive(item) {
     const now =
         new Date();
 
+
     if (schedule.start) {
 
         const start =
@@ -4397,14 +2947,20 @@ function isScheduleActive(item) {
                 schedule.start
             );
 
+
         if (
-            !isNaN(start.getTime()) &&
+            !isNaN(
+                start.getTime()
+            ) &&
             now < start
         ) {
+
             return false;
+
         }
 
     }
+
 
     if (schedule.end) {
 
@@ -4413,19 +2969,29 @@ function isScheduleActive(item) {
                 schedule.end
             );
 
+
         if (
-            !isNaN(end.getTime()) &&
+            !isNaN(
+                end.getTime()
+            ) &&
             now > end
         ) {
+
             return false;
+
         }
 
     }
+
 
     return true;
 
 }
 
+
+/* =========================================================
+   SCHEDULE STATUS
+   ========================================================= */
 
 function updateScheduleStatus() {
 
@@ -4439,7 +3005,10 @@ function updateScheduleStatus() {
         $("scheduleStatus");
 
 
-    if (!start && !end) {
+    if (
+        !start &&
+        !end
+    ) {
 
         status.textContent =
             "No schedule";
@@ -4455,7 +3024,8 @@ function updateScheduleStatus() {
     const now =
         new Date();
 
-    let active = true;
+    let active =
+        true;
 
 
     if (start) {
@@ -4463,11 +3033,17 @@ function updateScheduleStatus() {
         const startDate =
             new Date(start);
 
+
         if (
-            !isNaN(startDate) &&
+            !isNaN(
+                startDate.getTime()
+            ) &&
             now < startDate
         ) {
-            active = false;
+
+            active =
+                false;
+
         }
 
     }
@@ -4478,11 +3054,17 @@ function updateScheduleStatus() {
         const endDate =
             new Date(end);
 
+
         if (
-            !isNaN(endDate) &&
+            !isNaN(
+                endDate.getTime()
+            ) &&
             now > endDate
         ) {
-            active = false;
+
+            active =
+                false;
+
         }
 
     }
@@ -4492,6 +3074,7 @@ function updateScheduleStatus() {
         active
             ? "🟢 Schedule ابھی active ہے"
             : "🔴 Schedule ابھی active نہیں ہے";
+
 
     status.className =
         "schedule-status " +
@@ -4513,6 +3096,7 @@ async function loadHomePreview() {
     const container =
         $("homePreview");
 
+
     try {
 
         const data =
@@ -4520,7 +3104,11 @@ async function loadHomePreview() {
                 "/api/home-content"
             );
 
-        renderHomePreview(data);
+
+        renderHomePreview(
+            data
+        );
+
 
     } catch (error) {
 
@@ -4528,9 +3116,11 @@ async function loadHomePreview() {
 
         container.innerHTML =
             '<div class="preview-empty">' +
+
                 escapeHtml(
                     error.message
                 ) +
+
             '</div>';
 
     }
@@ -4547,6 +3137,7 @@ function renderHomePreview(data) {
     const container =
         $("homePreview");
 
+
     let items =
         data &&
         Array.isArray(data.items)
@@ -4558,18 +3149,25 @@ function renderHomePreview(data) {
 
     items =
         items
+
             .filter(
                 item =>
                     item.enabled !== false
             )
+
             .filter(
                 item =>
                     isScheduleActive(item)
             )
+
             .sort(
                 (a, b) =>
-                    Number(a.order || 0) -
-                    Number(b.order || 0)
+                    Number(
+                        a.order || 0
+                    ) -
+                    Number(
+                        b.order || 0
+                    )
             );
 
 
@@ -4606,6 +3204,7 @@ function buildPreviewCard(item) {
     const style =
         item.style || {};
 
+
     const imageHeight =
         Number(
             style.imageHeight !== undefined
@@ -4613,9 +3212,11 @@ function buildPreviewCard(item) {
                 : 230
         );
 
+
     const imageFit =
         style.imageFit ||
         "cover";
+
 
     const videoHeight =
         Number(
@@ -4624,28 +3225,34 @@ function buildPreviewCard(item) {
                 : 240
         );
 
+
     const videoFit =
         style.videoFit ||
         "contain";
+
 
     const imageUrl =
         safePreviewUrl(
             item.image_url
         );
 
+
     const videoUrl =
         safePreviewUrl(
             item.video_url
         );
+
 
     const linkUrl =
         safePreviewUrl(
             item.link_url
         );
 
+
     const buttonColor =
         style.buttonColor ||
         "#6d28d9";
+
 
     const buttonTextColor =
         style.buttonTextColor ||
@@ -4791,7 +3398,8 @@ function buildPreviewCard(item) {
 
                     'height:' +
                     escapeHtml(
-                        imageHeight + "px"
+                        imageHeight +
+                        "px"
                     ) +
                     ';' +
 
@@ -4834,7 +3442,8 @@ function buildPreviewCard(item) {
 
                     'height:' +
                     escapeHtml(
-                        videoHeight + "px"
+                        videoHeight +
+                        "px"
                     ) +
                     ';' +
 
@@ -4942,6 +3551,7 @@ function buildPreviewCard(item) {
     html +=
         "</div>";
 
+
     return html;
 
 }
@@ -4956,6 +3566,7 @@ async function loadMedia() {
     const container =
         $("mediaList");
 
+
     try {
 
         const data =
@@ -4963,24 +3574,33 @@ async function loadMedia() {
                 "/api/admin/media"
             );
 
+
         const media =
             Array.isArray(data)
                 ? data
                 : (
-                    Array.isArray(data.media)
+                    Array.isArray(
+                        data.media
+                    )
                         ? data.media
                         : []
                 );
 
-        renderMedia(media);
+
+        renderMedia(
+            media
+        );
+
 
     } catch (error) {
 
         container.innerHTML =
             '<div class="loading">' +
+
                 escapeHtml(
                     error.message
                 ) +
+
             '</div>';
 
     }
@@ -4996,6 +3616,7 @@ function renderMedia(media) {
 
     const container =
         $("mediaList");
+
 
     if (!media.length) {
 
@@ -5032,13 +3653,16 @@ function buildMediaCard(file) {
             ""
         );
 
+
     const name =
         file.name ||
         file.filename ||
         "Media";
 
 
-    let visual = "";
+    let visual =
+        "";
+
 
     if (
         file.content_type &&
@@ -5054,7 +3678,9 @@ function buildMediaCard(file) {
                 ' class="media-thumb"' +
 
                 ' src="' +
-                    escapeHtml(url) +
+                    escapeHtml(
+                        url
+                    ) +
                 '"' +
 
                 ' controls' +
@@ -5070,7 +3696,9 @@ function buildMediaCard(file) {
                 ' class="media-thumb"' +
 
                 ' src="' +
-                    escapeHtml(url) +
+                    escapeHtml(
+                        url
+                    ) +
                 '"' +
 
                 ' loading="lazy"' +
@@ -5092,14 +3720,18 @@ function buildMediaCard(file) {
 
                 '<div class="media-name">' +
 
-                    escapeHtml(name) +
+                    escapeHtml(
+                        name
+                    ) +
 
                 '</div>' +
 
                 '<div class="button-row">' +
 
                     '<button class="btn btn-primary btn-small" onclick="useMediaUrl(\'' +
-                        escapeHtml(url) +
+                        escapeHtml(
+                            url
+                        ) +
                     '\')">' +
 
                         "Use" +
@@ -5143,7 +3775,9 @@ function useMediaUrl(url) {
         );
 
         return;
+
     }
+
 
     const type =
         $("itemType").value;
@@ -5160,7 +3794,9 @@ function useMediaUrl(url) {
         $("imageUrl").value =
             url;
 
-    } else if (type === "video") {
+    } else if (
+        type === "video"
+    ) {
 
         $("videoUrl").value =
             url;
@@ -5189,6 +3825,7 @@ async function uploadMedia() {
     const file =
         $("mediaFile").files[0];
 
+
     if (!file) {
 
         showToast(
@@ -5196,11 +3833,13 @@ async function uploadMedia() {
         );
 
         return;
+
     }
 
 
     const form =
         new FormData();
+
 
     form.append(
         "file",
@@ -5213,19 +3852,26 @@ async function uploadMedia() {
         await api(
             "/api/admin/media",
             {
-                method: "POST",
-                body: form
+                method:
+                    "POST",
+
+                body:
+                    form
             }
         );
 
+
         $("mediaFile").value =
             "";
+
 
         showToast(
             "Media upload ہو گیا۔"
         );
 
+
         await loadMedia();
+
 
     } catch (error) {
 
@@ -5246,16 +3892,22 @@ async function uploadMedia() {
 async function deleteMedia(id) {
 
     if (!id) {
+
         return;
+
     }
+
 
     if (
         !confirm(
             "کیا یہ media delete کرنا ہے؟"
         )
     ) {
+
         return;
+
     }
+
 
     try {
 
@@ -5263,15 +3915,19 @@ async function deleteMedia(id) {
             "/api/admin/media/" +
             encodeURIComponent(id),
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
+
 
         showToast(
             "Media delete ہو گیا۔"
         );
 
+
         await loadMedia();
+
 
     } catch (error) {
 
@@ -5294,12 +3950,14 @@ async function loadStatus() {
     const output =
         $("systemStatus");
 
+
     try {
 
         const data =
             await api(
                 "/api/admin/status"
             );
+
 
         output.textContent =
             JSON.stringify(
@@ -5308,12 +3966,15 @@ async function loadStatus() {
                 2
             );
 
+
     } catch (error) {
 
         output.textContent =
             JSON.stringify(
                 {
-                    success: false,
+                    success:
+                        false,
+
                     error:
                         error.message
                 },
@@ -5327,22 +3988,17 @@ async function loadStatus() {
 
 
 /* =========================================================
-   AUTO REFRESH PREVIEW
+   AUTO REFRESH
    ========================================================= */
 
 setInterval(
     () => {
 
         if (
-            !$("app").classList.contains(
-                "hidden"
-            )
+            !$("app")
+                .classList
+                .contains("hidden")
         ) {
-
-            /*
-               Schedule کا status
-               automatically update ہو۔
-            */
 
             updateScheduleStatus();
 
@@ -5364,6 +4020,7 @@ setInterval(
             "mayotube_admin_token"
         );
 
+
     if (saved) {
 
         $("tokenInput").value =
@@ -5377,7 +4034,3 @@ setInterval(
 })();
 
 </script>
-
-</body>
-
-</html>
