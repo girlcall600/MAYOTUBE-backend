@@ -34,68 +34,26 @@ def admin_login():
     <html>
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>MAYOTUBE Admin Login</title>
+        <title>MAYOTUBE Admin</title>
         <style>
-            body{
-                margin:0;
-                min-height:100vh;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background:#111;
-                color:#fff;
-                font-family:Arial,sans-serif;
-            }
-            .box{
-                width:90%;
-                max-width:400px;
-                padding:25px;
-                box-sizing:border-box;
-                background:#1d1d1d;
-                border-radius:16px;
-            }
-            h2{
-                text-align:center;
-                margin-top:0;
-            }
-            input{
-                width:100%;
-                padding:14px;
-                margin:12px 0;
-                box-sizing:border-box;
-                border:0;
-                border-radius:8px;
-                background:#333;
-                color:#fff;
-            }
-            button{
-                width:100%;
-                padding:14px;
-                border:0;
-                border-radius:8px;
-                background:#fff;
-                color:#111;
-                font-weight:bold;
-                cursor:pointer;
-            }
-            p{
-                text-align:center;
-                color:#aaa;
-            }
+            body{font-family:Arial;background:#f2f2f2;margin:0;padding:30px}
+            .box{max-width:420px;margin:50px auto;background:white;padding:25px;
+                 border-radius:14px;box-shadow:0 4px 15px #bbb}
+            h2{text-align:center}
+            input,button{width:100%;padding:13px;margin-top:12px;
+                         box-sizing:border-box;border-radius:8px}
+            input{border:1px solid #ccc}
+            button{border:0;background:#111;color:white;font-size:16px}
+            .error{color:red;text-align:center}
         </style>
     </head>
     <body>
         <div class="box">
             <h2>MAYOTUBE ADMIN</h2>
-            <p>Owner Only</p>
             <form method="post" action="/admin/login">
-                <input
-                    type="password"
-                    name="token"
-                    placeholder="Admin Token"
-                    required
-                    autocomplete="off">
-                <button type="submit">LOGIN</button>
+                <input type="password" name="token"
+                       placeholder="Owner Admin Token" required>
+                <button type="submit">Login</button>
             </form>
         </div>
     </body>
@@ -104,26 +62,21 @@ def admin_login():
 
 
 @app.post("/admin/login")
-def admin_login_submit():
-    if not ADMIN_TOKEN:
-        return "Admin security is not configured.", 500
-
+def admin_login_post():
     token = request.form.get("token", "")
 
-    if not hmac.compare_digest(token, ADMIN_TOKEN):
-        return """
-        <html>
-        <body style="background:#111;color:white;font-family:Arial;text-align:center;padding:50px">
-            <h2>Login Failed</h2>
-            <p>Invalid Admin Token.</p>
-            <a href="/admin" style="color:white">Try Again</a>
-        </body>
-        </html>
-        """, 401
+    if ADMIN_TOKEN and hmac.compare_digest(token, ADMIN_TOKEN):
+        session["admin"] = True
+        return redirect(url_for("admin_dashboard"))
 
-    session.clear()
-    session["admin"] = True
-    return redirect(url_for("admin_dashboard"))
+    return """
+    <h3 style="text-align:center;color:red">
+        Invalid Admin Token
+    </h3>
+    <p style="text-align:center">
+        <a href="/admin">Try Again</a>
+    </p>
+    """, 401
 
 
 @app.get("/admin/dashboard")
@@ -136,40 +89,47 @@ def admin_dashboard():
     <html>
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>MAYOTUBE Admin</title>
+        <title>MAYOTUBE Admin Dashboard</title>
         <style>
-            body{
-                margin:0;
-                background:#111;
-                color:#fff;
-                font-family:Arial,sans-serif;
-                padding:25px;
-            }
-            .box{
-                max-width:700px;
-                margin:auto;
-                background:#1d1d1d;
-                padding:25px;
-                border-radius:16px;
-            }
-            a{
-                display:inline-block;
-                margin-top:20px;
-                padding:12px 18px;
-                background:#fff;
-                color:#111;
-                text-decoration:none;
-                border-radius:8px;
-                font-weight:bold;
-            }
+            body{font-family:Arial;background:#f2f2f2;margin:0;padding:15px}
+            .box{max-width:700px;margin:auto}
+            .header{background:#111;color:white;padding:20px;border-radius:14px;
+                    margin-bottom:15px}
+            .card{background:white;padding:20px;margin-bottom:12px;
+                  border-radius:14px;box-shadow:0 2px 8px #ccc}
+            h2,h3{margin-top:0}
+            .status{color:green;font-weight:bold}
+            .btn{display:block;text-decoration:none;background:#111;color:white;
+                 text-align:center;padding:12px;border-radius:8px;margin-top:10px}
         </style>
     </head>
     <body>
         <div class="box">
-            <h1>MAYOTUBE ADMIN</h1>
-            <p>Owner Admin Login Successful ✅</p>
-            <p>Admin Dashboard will be added in the next step.</p>
-            <a href="/admin/logout">Logout</a>
+
+            <div class="header">
+                <h2>MAYOTUBE ADMIN</h2>
+                <div class="status">Owner Admin ✓</div>
+            </div>
+
+            <div class="card">
+                <h3>Homepage Content</h3>
+                <p>یہاں سے MAYOTUBE Homepage کا Content manage کیا جائے گا۔</p>
+            </div>
+
+            <div class="card">
+                <h3>Content Management</h3>
+                <p>Text, Image, Video, GIF, Notification, Ads, Music,
+                Gallery اور Live Channel کے tools اگلے مراحل میں شامل ہوں گے۔</p>
+            </div>
+
+            <div class="card">
+                <h3>System Status</h3>
+                <p class="status">Backend Online ✓</p>
+                <p class="status">Admin Authenticated ✓</p>
+            </div>
+
+            <a class="btn" href="/admin/logout">Logout</a>
+
         </div>
     </body>
     </html>
