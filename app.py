@@ -1,11 +1,72 @@
 import os
 import hmac
+import json
+import uuid
 from flask import Flask, jsonify, request, session, redirect, url_for
+from vercel.blob import BlobClient
 
 app = Flask(__name__)
 
 ADMIN_TOKEN = os.getenv("MAYOTUBE_ADMIN_TOKEN", "")
 app.secret_key = ADMIN_TOKEN or os.urandom(32)
+
+CONTENT_PATH = "cms/home_content.json"
+
+
+def admin_ok():
+    return bool(session.get("admin"))
+
+
+def blob_client():
+    token = os.getenv("BLOB_READ_WRITE_TOKEN", "")
+    if not token:
+        raise RuntimeError("BLOB_READ_WRITE_TOKEN is missing")
+    return BlobClient(token=token)
+
+
+def default_data():
+    return {
+        "app": "MAYOTUBE",
+        "count": 0,
+        "enabled": True,
+        "items": []
+    }
+
+
+def read_content():
+    client = blob_client()
+
+    try:
+        result = client.get(CONTENT_PATH, access="public")
+
+        if not result or result.status_code != 200:
+            return default_data()
+
+        data = b"".join(result.stream)
+        return json.loads(data.decode("utf-8"))
+
+    except Exception:
+        return default_data()
+
+
+def write_content(data):
+    client = blob_client()
+
+    raw = json.dumps(
+        data,
+        ensure_ascii=False,
+        separators=(",", ":")
+    ).encode("utf-8")
+
+    blob = client.put(
+        CONTENT_PATH,
+        raw,
+        access="public",
+        content_type="application/json",
+        allow_overwrite=True
+    )
+
+    return blob
 
 
 @app.get("/")
@@ -26,7 +87,7 @@ def health():
 
 @app.get("/admin")
 def admin_login():
-    if session.get("admin"):
+    if admin_ok():
         return redirect(url_for("admin_dashboard"))
 
     return """
@@ -143,7 +204,7 @@ Invalid Admin Token
 @app.get("/admin/dashboard")
 def admin_dashboard():
 
-    if not session.get("admin"):
+    if not admin_ok():
         return redirect(url_for("admin_login"))
 
     return """
@@ -269,6 +330,16 @@ button{
     font-size:16px;
 }
 
+.save{
+    margin-top:20px;
+    background:#16803c;
+}
+
+.load{
+    margin-top:10px;
+    background:#2457a6;
+}
+
 .type-info{
     width:100%;
     margin-top:15px;
@@ -285,6 +356,38 @@ button{
     text-align:center !important;
     color:green;
     font-weight:bold;
+}
+
+.result{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    background:#f5f5f5;
+    border-radius:8px;
+    text-align:center;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
+
+.item{
+    background:#fafafa;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:12px;
+    margin-top:10px;
+}
+
+.item-title{
+    font-weight:bold;
+    text-align:center;
+}
+
+.item-data{
+    margin-top:8px;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    font-size:13px;
 }
 
 .logout{
@@ -402,6 +505,25 @@ Live Channel
 <div class="card">
 
 <h3>
+Saved Homepage Content
+</h3>
+
+<div id="savedContent">
+Loading...
+</div>
+
+<button
+class="load"
+onclick="loadContent()">
+Load Content
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>
 System Status
 </h3>
 
@@ -441,6 +563,33 @@ function field(title,html){
 }
 
 
+const colorFields =
+    field(
+        "Title Color",
+        `<input type="color" name="title_color" value="#111111">`
+    )
+    +
+    field(
+        "Message Color",
+        `<input type="color" name="message_color" value="#111111">`
+    )
+    +
+    field(
+        "Description Color",
+        `<input type="color" name="description_color" value="#111111">`
+    )
+    +
+    field(
+        "Button Text Color",
+        `<input type="color" name="button_text_color" value="#ffffff">`
+    )
+    +
+    field(
+        "Button Background Color",
+        `<input type="color" name="button_background_color" value="#111111">`
+    );
+
+
 const fields = {
 
 url:
@@ -463,7 +612,11 @@ field(
 name="button_text"
 placeholder="Open">
 `
-),
+)
+
++
+
+colorFields,
 
 
 youtube:
@@ -519,7 +672,11 @@ field(
 name="button_text"
 placeholder="Watch">
 `
-),
+)
+
++
+
+colorFields,
 
 
 message:
@@ -553,7 +710,11 @@ field(
 name="button_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 donation:
@@ -587,7 +748,11 @@ field(
 name="button_text"
 placeholder="Donate">
 `
-),
+)
+
++
+
+colorFields,
 
 
 audio:
@@ -621,7 +786,11 @@ field(
 name="cover_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 notification:
@@ -655,7 +824,11 @@ field(
 name="button_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 image:
@@ -689,7 +862,11 @@ field(
 name="click_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 video:
@@ -734,7 +911,11 @@ field(
 name="description"
 placeholder="Video Description"></textarea>
 `
-),
+)
+
++
+
+colorFields,
 
 
 gif:
@@ -768,7 +949,11 @@ field(
 name="click_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 ad:
@@ -802,7 +987,11 @@ field(
 name="title"
 placeholder="Advertisement">
 `
-),
+)
+
++
+
+colorFields,
 
 
 music:
@@ -836,7 +1025,11 @@ field(
 name="artist"
 placeholder="Artist Name">
 `
-),
+)
+
++
+
+colorFields,
 
 
 gallery:
@@ -870,7 +1063,11 @@ field(
 name="thumbnail_url"
 placeholder="https://...">
 `
-),
+)
+
++
+
+colorFields,
 
 
 live:
@@ -906,6 +1103,10 @@ placeholder="https://...">
 `
 )
 
++
+
+colorFields
+
 };
 
 
@@ -932,9 +1133,194 @@ function showFields(){
         </div>
         `
         +
-        fields[type];
+        fields[type]
+        +
+        `
+        <button
+        class="save"
+        onclick="saveContent()">
+        Save Homepage Content
+        </button>
+        `;
 
 }
+
+
+async function saveContent(){
+
+    const type =
+        document.getElementById("contentType").value;
+
+    if(!type){
+
+        alert("Select Content Type");
+
+        return;
+
+    }
+
+    const data = {
+        type:type,
+        enabled:true,
+        order:Date.now(),
+        id:crypto.randomUUID(),
+        title:"",
+        message:"",
+        description:"",
+        button_text:"",
+        button_url:"",
+        url:"",
+        youtube_url:"",
+        thumbnail_url:"",
+        image_url:"",
+        video_url:"",
+        gif_url:"",
+        audio_url:"",
+        cover_url:"",
+        donation_message:"",
+        donation_url:"",
+        notification:"",
+        click_url:"",
+        media_url:"",
+        ad_url:"",
+        music_url:"",
+        artist:"",
+        channel_name:"",
+        live_url:"",
+        title_color:"#111111",
+        message_color:"#111111",
+        description_color:"#111111",
+        button_text_color:"#ffffff",
+        button_background_color:"#111111"
+    };
+
+    document
+        .querySelectorAll("#fields input,#fields textarea")
+        .forEach(el => {
+
+            if(el.name){
+                data[el.name] = el.value;
+            }
+
+        });
+
+    try{
+
+        const response =
+            await fetch("/api/admin/content",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify(data)
+
+            });
+
+        const result =
+            await response.json();
+
+        if(!response.ok){
+
+            alert(
+                result.error ||
+                "Save failed"
+            );
+
+            return;
+
+        }
+
+        alert("Content Saved ✓");
+
+        loadContent();
+
+    }catch(error){
+
+        alert(
+            "Connection error"
+        );
+
+    }
+
+}
+
+
+async function loadContent(){
+
+    const box =
+        document.getElementById("savedContent");
+
+    box.innerHTML="Loading...";
+
+    try{
+
+        const response =
+            await fetch("/api/admin/content");
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+
+            box.innerHTML =
+                "Load failed";
+
+            return;
+
+        }
+
+        if(!data.items || !data.items.length){
+
+            box.innerHTML =
+                "No saved content";
+
+            return;
+
+        }
+
+        box.innerHTML =
+            data.items.map(item => `
+
+            <div class="item">
+
+                <div class="item-title">
+                    ${item.type || "Content"}
+                </div>
+
+                <div class="item-data">
+${escapeHtml(JSON.stringify(item,null,2))}
+                </div>
+
+            </div>
+
+            `).join("");
+
+    }catch(error){
+
+        box.innerHTML =
+            "Connection error";
+
+    }
+
+}
+
+
+function escapeHtml(value){
+
+    return value
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+loadContent();
 
 </script>
 
@@ -942,6 +1328,132 @@ function showFields(){
 
 </html>
 """
+
+
+@app.get("/api/admin/content")
+def admin_content_get():
+
+    if not admin_ok():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    try:
+        return jsonify(read_content())
+
+    except Exception as e:
+        return jsonify({
+            "error": "Content load failed",
+            "message": str(e)
+        }), 500
+
+
+@app.post("/api/admin/content")
+def admin_content_post():
+
+    if not admin_ok():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "Invalid JSON"
+        }), 400
+
+    content_type = str(
+        data.get("type", "")
+    ).strip().lower()
+
+    if not content_type:
+        return jsonify({
+            "error": "Content type is required"
+        }), 400
+
+    content = read_content()
+
+    item = {
+        "id": str(
+            data.get("id") or uuid.uuid4()
+        ),
+        "type": content_type,
+        "enabled": bool(
+            data.get("enabled", True)
+        ),
+        "order": int(
+            data.get("order", 0)
+        )
+    }
+
+    for key, value in data.items():
+
+        if key in (
+            "id",
+            "type",
+            "enabled",
+            "order"
+        ):
+            continue
+
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            item[key] = value
+
+    content["items"].append(item)
+
+    content["count"] = len(
+        content["items"]
+    )
+
+    write_content(content)
+
+    return jsonify({
+        "success": True,
+        "message": "Content saved",
+        "item": item,
+        "count": content["count"]
+    })
+
+
+@app.get("/api/home-content")
+def public_home_content():
+
+    try:
+
+        data = read_content()
+
+        if not data.get("enabled", True):
+            return jsonify({
+                "app": "MAYOTUBE",
+                "count": 0,
+                "enabled": False,
+                "items": []
+            })
+
+        items = [
+            item for item in data.get("items", [])
+            if item.get("enabled", True)
+        ]
+
+        items.sort(
+            key=lambda item:
+            item.get("order", 0)
+        )
+
+        return jsonify({
+            "app": "MAYOTUBE",
+            "count": len(items),
+            "enabled": True,
+            "items": items
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "error": "Home content load failed",
+            "message": str(e)
+        }), 500
 
 
 @app.get("/admin/logout")
