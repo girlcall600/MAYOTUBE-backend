@@ -102,6 +102,57 @@ def health():
     })
 
 
+# =========================================================
+# PUBLIC HOME CONTENT API
+# =========================================================
+
+@app.get("/api/home/content")
+def public_home_content():
+
+    try:
+        data = load_content()
+
+        if not isinstance(data, dict):
+            return jsonify({
+                "app": "MAYOTUBE",
+                "count": 0,
+                "enabled": True,
+                "items": []
+            })
+
+        items = data.get("items", [])
+
+        if not isinstance(items, list):
+            items = []
+
+        enabled_items = [
+            item for item in items
+            if isinstance(item, dict)
+            and item.get("enabled", True) is True
+        ]
+
+        return jsonify({
+            "app": "MAYOTUBE",
+            "count": len(enabled_items),
+            "enabled": True,
+            "items": enabled_items
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "app": "MAYOTUBE",
+            "count": 0,
+            "enabled": True,
+            "items": [],
+            "error": "Home content unavailable"
+        }), 500
+
+
+# =========================================================
+# ADMIN CONTENT LOAD
+# =========================================================
+
 @app.get("/api/admin/content")
 def admin_content():
 
@@ -112,6 +163,10 @@ def admin_content():
 
     return jsonify(load_content())
 
+
+# =========================================================
+# ADMIN CONTENT SAVE
+# =========================================================
 
 @app.post("/api/admin/content/save")
 def admin_content_save():
@@ -134,7 +189,9 @@ def admin_content_save():
                 "error": "Invalid content data"
             }), 400
 
-        content_type = str(item.get("type", "")).strip()
+        content_type = str(
+            item.get("type", "")
+        ).strip()
 
         if not content_type:
             return jsonify({
@@ -143,29 +200,43 @@ def admin_content_save():
 
         data = load_content()
 
-        if not isinstance(data.get("items"), list):
+        if not isinstance(
+            data.get("items"),
+            list
+        ):
             data["items"] = []
 
-        item["id"] = len(data["items"]) + 1
+        item["id"] = len(
+            data["items"]
+        ) + 1
+
         item["enabled"] = True
 
         data["items"].append(item)
-        data["count"] = len(data["items"])
+        data["count"] = len(
+            data["items"]
+        )
 
         save_content(data)
 
         return jsonify({
             "success": True,
-            "message": "Content saved successfully",
+            "message":
+                "Content saved successfully",
             "data": data
         })
 
     except Exception as e:
+
         return jsonify({
             "error": "Content save failed",
             "details": str(e)[:200]
         }), 500
 
+
+# =========================================================
+# ADMIN CONTENT UPDATE
+# =========================================================
 
 @app.post("/api/admin/content/update")
 def admin_content_update():
@@ -177,22 +248,27 @@ def admin_content_update():
 
     if not BLOB_TOKEN:
         return jsonify({
-            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+            "error":
+                "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
-        item = request.get_json(silent=True)
+        item = request.get_json(
+            silent=True
+        )
 
         if not isinstance(item, dict):
             return jsonify({
-                "error": "Invalid content data"
+                "error":
+                    "Invalid content data"
             }), 400
 
         item_id = item.get("id")
 
         if item_id is None:
             return jsonify({
-                "error": "Content ID is required"
+                "error":
+                    "Content ID is required"
             }), 400
 
         data = load_content()
@@ -202,9 +278,14 @@ def admin_content_update():
 
         for index, old_item in enumerate(items):
 
-            if str(old_item.get("id")) == str(item_id):
+            if str(
+                old_item.get("id")
+            ) == str(item_id):
 
-                item["id"] = old_item.get("id")
+                item["id"] = old_item.get(
+                    "id"
+                )
+
                 item["enabled"] = old_item.get(
                     "enabled",
                     True
@@ -216,7 +297,8 @@ def admin_content_update():
 
         if not found:
             return jsonify({
-                "error": "Content not found"
+                "error":
+                    "Content not found"
             }), 404
 
         data["items"] = items
@@ -226,16 +308,23 @@ def admin_content_update():
 
         return jsonify({
             "success": True,
-            "message": "Content updated successfully",
+            "message":
+                "Content updated successfully",
             "data": data
         })
 
     except Exception as e:
+
         return jsonify({
-            "error": "Content update failed",
+            "error":
+                "Content update failed",
             "details": str(e)[:200]
         }), 500
 
+
+# =========================================================
+# ADMIN CONTENT DELETE
+# =========================================================
 
 @app.post("/api/admin/content/delete")
 def admin_content_delete():
@@ -247,16 +336,21 @@ def admin_content_delete():
 
     if not BLOB_TOKEN:
         return jsonify({
-            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+            "error":
+                "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
-        body = request.get_json(silent=True) or {}
+        body = request.get_json(
+            silent=True
+        ) or {}
+
         item_id = body.get("id")
 
         if item_id is None:
             return jsonify({
-                "error": "Content ID is required"
+                "error":
+                    "Content ID is required"
             }), 400
 
         data = load_content()
@@ -264,15 +358,21 @@ def admin_content_delete():
 
         new_items = [
             item for item in items
-            if str(item.get("id")) != str(item_id)
+            if str(
+                item.get("id")
+            ) != str(item_id)
         ]
 
         if len(new_items) == len(items):
             return jsonify({
-                "error": "Content not found"
+                "error":
+                    "Content not found"
             }), 404
 
-        for index, item in enumerate(new_items, 1):
+        for index, item in enumerate(
+            new_items,
+            1
+        ):
             item["id"] = index
 
         data["items"] = new_items
@@ -282,16 +382,23 @@ def admin_content_delete():
 
         return jsonify({
             "success": True,
-            "message": "Content deleted successfully",
+            "message":
+                "Content deleted successfully",
             "data": data
         })
 
     except Exception as e:
+
         return jsonify({
-            "error": "Content delete failed",
+            "error":
+                "Content delete failed",
             "details": str(e)[:200]
         }), 500
 
+
+# =========================================================
+# ADMIN CONTENT ENABLE / DISABLE
+# =========================================================
 
 @app.post("/api/admin/content/toggle")
 def admin_content_toggle():
@@ -303,16 +410,21 @@ def admin_content_toggle():
 
     if not BLOB_TOKEN:
         return jsonify({
-            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+            "error":
+                "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
-        body = request.get_json(silent=True) or {}
+        body = request.get_json(
+            silent=True
+        ) or {}
+
         item_id = body.get("id")
 
         if item_id is None:
             return jsonify({
-                "error": "Content ID is required"
+                "error":
+                    "Content ID is required"
             }), 400
 
         data = load_content()
@@ -323,19 +435,28 @@ def admin_content_toggle():
 
         for item in items:
 
-            if str(item.get("id")) == str(item_id):
+            if str(
+                item.get("id")
+            ) == str(item_id):
 
                 item["enabled"] = not bool(
-                    item.get("enabled", True)
+                    item.get(
+                        "enabled",
+                        True
+                    )
                 )
 
-                new_status = item["enabled"]
+                new_status = item[
+                    "enabled"
+                ]
+
                 found = True
                 break
 
         if not found:
             return jsonify({
-                "error": "Content not found"
+                "error":
+                    "Content not found"
             }), 404
 
         data["items"] = items
@@ -350,23 +471,33 @@ def admin_content_toggle():
         })
 
     except Exception as e:
+
         return jsonify({
-            "error": "Content status update failed",
+            "error":
+                "Content status update failed",
             "details": str(e)[:200]
         }), 500
 
+
+# =========================================================
+# ADMIN LOGIN
+# =========================================================
 
 @app.get("/admin")
 def admin_login():
 
     if admin_required():
-        return redirect(url_for("admin_dashboard"))
+        return redirect(
+            url_for("admin_dashboard")
+        )
 
     return """
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1">
 <title>MAYOTUBE Admin</title>
 <style>
 html,body{
@@ -420,7 +551,9 @@ type="password"
 name="token"
 placeholder="Owner Admin Token"
 required>
-<button type="submit">Login</button>
+<button type="submit">
+Login
+</button>
 </form>
 </div>
 </body>
@@ -431,13 +564,17 @@ required>
 @app.post("/admin/login")
 def admin_login_post():
 
-    token = request.form.get("token", "")
+    token = request.form.get(
+        "token",
+        ""
+    )
 
     if ADMIN_TOKEN and hmac.compare_digest(
         token,
         ADMIN_TOKEN
     ):
         session["admin"] = True
+
         return redirect(
             url_for("admin_dashboard")
         )
@@ -447,16 +584,24 @@ def admin_login_post():
 Invalid Admin Token
 </h3>
 <p style="text-align:center">
-<a href="/admin">Try Again</a>
+<a href="/admin">
+Try Again
+</a>
 </p>
 """, 401
 
+
+# =========================================================
+# ADMIN DASHBOARD
+# =========================================================
 
 @app.get("/admin/dashboard")
 def admin_dashboard():
 
     if not admin_required():
-        return redirect(url_for("admin_login"))
+        return redirect(
+            url_for("admin_login")
+        )
 
     return """
 <!DOCTYPE html>
@@ -686,7 +831,8 @@ Add Homepage Content
 Content Type
 </div>
 
-<select id="contentType"
+<select
+id="contentType"
 onchange="showFields()">
 
 <option value="">
@@ -842,13 +988,15 @@ const fields = {
 url:
 field(
 "URL",
-`<input name="url"
+`<input
+name="url"
 placeholder="https://example.com">`
 )
 +
 field(
 "Button Text",
-`<input name="button_text"
+`<input
+name="button_text"
 placeholder="Open">`
 ),
 
@@ -856,31 +1004,36 @@ placeholder="Open">`
 youtube:
 field(
 "YouTube URL",
-`<input name="youtube_url"
+`<input
+name="youtube_url"
 placeholder="https://youtube.com/watch?v=...">`
 )
 +
 field(
 "Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Video Title">`
 )
 +
 field(
 "Description",
-`<textarea name="description"
+`<textarea
+name="description"
 placeholder="Video Description"></textarea>`
 )
 +
 field(
 "Thumbnail URL",
-`<input name="thumbnail_url"
+`<input
+name="thumbnail_url"
 placeholder="https://...">`
 )
 +
 field(
 "Button Text",
-`<input name="button_text"
+`<input
+name="button_text"
 placeholder="Watch">`
 ),
 
@@ -888,19 +1041,22 @@ placeholder="Watch">`
 message:
 field(
 "Message",
-`<textarea name="message"
+`<textarea
+name="message"
 placeholder="Write your message"></textarea>`
 )
 +
 field(
 "Button Text",
-`<input name="button_text"
+`<input
+name="button_text"
 placeholder="Open">`
 )
 +
 field(
 "Button URL",
-`<input name="button_url"
+`<input
+name="button_url"
 placeholder="https://...">`
 ),
 
@@ -908,19 +1064,22 @@ placeholder="https://...">`
 donation:
 field(
 "Donation Message",
-`<textarea name="donation_message"
+`<textarea
+name="donation_message"
 placeholder="Support MAYOTUBE"></textarea>`
 )
 +
 field(
 "Donation URL",
-`<input name="donation_url"
+`<input
+name="donation_url"
 placeholder="https://...">`
 )
 +
 field(
 "Button Text",
-`<input name="button_text"
+`<input
+name="button_text"
 placeholder="Donate">`
 ),
 
@@ -928,19 +1087,22 @@ placeholder="Donate">`
 audio:
 field(
 "Audio URL",
-`<input name="audio_url"
+`<input
+name="audio_url"
 placeholder="https://...">`
 )
 +
 field(
 "Audio Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Audio Title">`
 )
 +
 field(
 "Cover Image URL",
-`<input name="cover_url"
+`<input
+name="cover_url"
 placeholder="https://...">`
 ),
 
@@ -948,19 +1110,22 @@ placeholder="https://...">`
 notification:
 field(
 "Notification Message",
-`<textarea name="notification"
+`<textarea
+name="notification"
 placeholder="Notification text"></textarea>`
 )
 +
 field(
 "Button Text",
-`<input name="button_text"
+`<input
+name="button_text"
 placeholder="Open">`
 )
 +
 field(
 "Button URL",
-`<input name="button_url"
+`<input
+name="button_url"
 placeholder="https://...">`
 ),
 
@@ -968,19 +1133,22 @@ placeholder="https://...">`
 image:
 field(
 "Image URL",
-`<input name="image_url"
+`<input
+name="image_url"
 placeholder="https://...">`
 )
 +
 field(
 "Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Image Title">`
 )
 +
 field(
 "Click URL",
-`<input name="click_url"
+`<input
+name="click_url"
 placeholder="https://...">`
 ),
 
@@ -988,25 +1156,29 @@ placeholder="https://...">`
 video:
 field(
 "Video URL",
-`<input name="video_url"
+`<input
+name="video_url"
 placeholder="https://...">`
 )
 +
 field(
 "Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Video Title">`
 )
 +
 field(
 "Thumbnail URL",
-`<input name="thumbnail_url"
+`<input
+name="thumbnail_url"
 placeholder="https://...">`
 )
 +
 field(
 "Description",
-`<textarea name="description"
+`<textarea
+name="description"
 placeholder="Video Description"></textarea>`
 ),
 
@@ -1014,19 +1186,22 @@ placeholder="Video Description"></textarea>`
 gif:
 field(
 "GIF URL",
-`<input name="gif_url"
+`<input
+name="gif_url"
 placeholder="https://...">`
 )
 +
 field(
 "Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="GIF Title">`
 )
 +
 field(
 "Click URL",
-`<input name="click_url"
+`<input
+name="click_url"
 placeholder="https://...">`
 ),
 
@@ -1034,19 +1209,22 @@ placeholder="https://...">`
 ad:
 field(
 "Advertisement Image/Media URL",
-`<input name="media_url"
+`<input
+name="media_url"
 placeholder="https://...">`
 )
 +
 field(
 "Advertisement URL",
-`<input name="ad_url"
+`<input
+name="ad_url"
 placeholder="https://...">`
 )
 +
 field(
 "Ad Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Advertisement">`
 ),
 
@@ -1054,19 +1232,22 @@ placeholder="Advertisement">`
 music:
 field(
 "Music URL",
-`<input name="music_url"
+`<input
+name="music_url"
 placeholder="https://...">`
 )
 +
 field(
 "Music Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Music Title">`
 )
 +
 field(
 "Artist",
-`<input name="artist"
+`<input
+name="artist"
 placeholder="Artist Name">`
 ),
 
@@ -1074,19 +1255,22 @@ placeholder="Artist Name">`
 gallery:
 field(
 "Gallery Video URL",
-`<input name="video_url"
+`<input
+name="video_url"
 placeholder="https://...">`
 )
 +
 field(
 "Title",
-`<input name="title"
+`<input
+name="title"
 placeholder="Gallery Video">`
 )
 +
 field(
 "Thumbnail URL",
-`<input name="thumbnail_url"
+`<input
+name="thumbnail_url"
 placeholder="https://...">`
 ),
 
@@ -1094,19 +1278,22 @@ placeholder="https://...">`
 live:
 field(
 "Live Channel URL",
-`<input name="live_url"
+`<input
+name="live_url"
 placeholder="https://...">`
 )
 +
 field(
 "Channel Name",
-`<input name="channel_name"
+`<input
+name="channel_name"
 placeholder="Channel Name">`
 )
 +
 field(
 "Thumbnail URL",
-`<input name="thumbnail_url"
+`<input
+name="thumbnail_url"
 placeholder="https://...">`
 )
 
@@ -1154,7 +1341,8 @@ function showFields(data={}){
                 );
 
             if(el){
-                el.value=data[key] ?? "";
+                el.value =
+                    data[key] ?? "";
             }
 
         }
@@ -1185,7 +1373,7 @@ function collectFields(){
     .forEach(
         function(el){
 
-            item[el.name]=
+            item[el.name] =
                 el.value.trim();
 
         }
@@ -1212,10 +1400,10 @@ async function saveContent(){
 
     if(!item){
 
-        message.className=
+        message.className =
             "status error";
 
-        message.textContent=
+        message.textContent =
             "Please select a Content Type.";
 
         return;
@@ -1256,10 +1444,10 @@ async function saveContent(){
             );
         }
 
-        message.className=
+        message.className =
             "status success";
 
-        message.textContent=
+        message.textContent =
             editingId === null
             ? "Content saved successfully ✓"
             : "Content updated successfully ✓";
@@ -1278,10 +1466,10 @@ async function saveContent(){
 
     }catch(error){
 
-        message.className=
+        message.className =
             "status error";
 
-        message.textContent=
+        message.textContent =
             error.message;
 
     }
@@ -1315,8 +1503,10 @@ async function loadContent(){
             );
         }
 
-        if(!data.items ||
-           data.items.length===0){
+        if(
+            !data.items ||
+            data.items.length===0
+        ){
 
             box.innerHTML=
                 `
@@ -1329,7 +1519,7 @@ async function loadContent(){
 
         }
 
-        box.innerHTML=
+        box.innerHTML =
             data.items.map(
                 function(item){
 
@@ -1370,9 +1560,11 @@ async function loadContent(){
                     <button
                     class="toggle"
                     onclick="toggleContent(${item.id})">
-                    ${item.enabled !== false
-                    ? "Disable"
-                    : "Enable"}
+                    ${
+                        item.enabled !== false
+                        ? "Disable"
+                        : "Enable"
+                    }
                     </button>
 
                     <button
@@ -1391,7 +1583,7 @@ async function loadContent(){
 
     }catch(error){
 
-        box.innerHTML=
+        box.innerHTML =
             `
             <div class="saved-item">
             Load failed:
@@ -1420,10 +1612,9 @@ function editContent(item){
             "message"
         );
 
-    message.className=
-        "status";
+    message.className="status";
 
-    message.textContent=
+    message.textContent =
         "Editing Content ID " +
         item.id;
 
@@ -1527,7 +1718,15 @@ loadContent();
 """
 
 
+# =========================================================
+# ADMIN LOGOUT
+# =========================================================
+
 @app.get("/admin/logout")
 def admin_logout():
+
     session.clear()
-    return redirect(url_for("admin_login"))
+
+    return redirect(
+        url_for("admin_login")
+    )
