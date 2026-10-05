@@ -41,7 +41,10 @@ def blob_request(method, data=None):
         headers=headers
     )
 
-    with urllib.request.urlopen(req, timeout=20) as response:
+    with urllib.request.urlopen(
+        req,
+        timeout=20
+    ) as response:
         return response.read()
 
 
@@ -55,38 +58,62 @@ def empty_content():
 
 
 def load_content():
+
     if not BLOB_TOKEN:
         return empty_content()
 
     try:
-        raw = blob_request("GET")
-        data = json.loads(raw.decode("utf-8"))
 
-        if not isinstance(data, dict):
+        raw = blob_request("GET")
+
+        data = json.loads(
+            raw.decode("utf-8")
+        )
+
+        if not isinstance(
+            data,
+            dict
+        ):
             return empty_content()
 
-        if not isinstance(data.get("items"), list):
+        if not isinstance(
+            data.get("items"),
+            list
+        ):
             data["items"] = []
 
-        data["count"] = len(data["items"])
+        data["count"] = len(
+            data["items"]
+        )
+
         return data
 
     except Exception:
+
         return empty_content()
 
 
 def save_content(data):
+
     raw = json.dumps(
         data,
         ensure_ascii=False,
         separators=(",", ":")
     ).encode("utf-8")
 
-    blob_request("PUT", raw)
+    blob_request(
+        "PUT",
+        raw
+    )
 
+
+# =========================================================
+# PUBLIC HOME
+# =========================================================
 
 @app.get("/")
 def home():
+
     return jsonify({
         "app": "MAYOTUBE",
         "status": "online"
@@ -95,107 +122,127 @@ def home():
 
 @app.get("/api/health")
 def health():
+
     return jsonify({
         "status": "ok",
         "service": "MAYOTUBE backend",
-        "blob_configured": bool(BLOB_TOKEN)
+        "blob_configured":
+            bool(BLOB_TOKEN)
     })
 
-
-# =========================================================
-# PUBLIC HOME CONTENT API
-# =========================================================
 
 @app.get("/api/home/content")
 def public_home_content():
 
     try:
+
         data = load_content()
 
-        if not isinstance(data, dict):
-            return jsonify({
-                "app": "MAYOTUBE",
-                "count": 0,
-                "enabled": True,
-                "items": []
-            })
+        items = data.get(
+            "items",
+            []
+        )
 
-        items = data.get("items", [])
-
-        if not isinstance(items, list):
+        if not isinstance(
+            items,
+            list
+        ):
             items = []
 
         enabled_items = [
             item for item in items
             if isinstance(item, dict)
-            and item.get("enabled", True) is True
+            and item.get(
+                "enabled",
+                True
+            ) is True
         ]
 
         return jsonify({
             "app": "MAYOTUBE",
-            "count": len(enabled_items),
+            "count":
+                len(enabled_items),
             "enabled": True,
-            "items": enabled_items
+            "items":
+                enabled_items
         })
 
-    except Exception as e:
+    except Exception:
 
         return jsonify({
             "app": "MAYOTUBE",
             "count": 0,
             "enabled": True,
             "items": [],
-            "error": "Home content unavailable"
+            "error":
+                "Home content unavailable"
         }), 500
 
 
 # =========================================================
-# ADMIN CONTENT LOAD
+# ADMIN CONTENT
 # =========================================================
 
 @app.get("/api/admin/content")
 def admin_content():
 
     if not admin_required():
+
         return jsonify({
-            "error": "Unauthorized"
+            "error":
+                "Unauthorized"
         }), 401
 
-    return jsonify(load_content())
+    return jsonify(
+        load_content()
+    )
 
-
-# =========================================================
-# ADMIN CONTENT SAVE
-# =========================================================
 
 @app.post("/api/admin/content/save")
 def admin_content_save():
 
     if not admin_required():
+
         return jsonify({
-            "error": "Unauthorized"
+            "error":
+                "Unauthorized"
         }), 401
 
     if not BLOB_TOKEN:
+
         return jsonify({
-            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+            "error":
+                "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
-        item = request.get_json(silent=True)
 
-        if not isinstance(item, dict):
+        item = request.get_json(
+            silent=True
+        )
+
+        if not isinstance(
+            item,
+            dict
+        ):
+
             return jsonify({
-                "error": "Invalid content data"
+                "error":
+                    "Invalid content data"
             }), 400
 
         content_type = str(
-            item.get("type", "")
+            item.get(
+                "type",
+                ""
+            )
         ).strip()
 
         if not content_type:
+
             return jsonify({
-                "error": "Content type is required"
+                "error":
+                    "Content type is required"
             }), 400
 
         data = load_content()
@@ -206,13 +253,14 @@ def admin_content_save():
         ):
             data["items"] = []
 
-        item["id"] = len(
-            data["items"]
-        ) + 1
+        item["id"] = (
+            len(data["items"]) + 1
+        )
 
         item["enabled"] = True
 
         data["items"].append(item)
+
         data["count"] = len(
             data["items"]
         )
@@ -223,41 +271,48 @@ def admin_content_save():
             "success": True,
             "message":
                 "Content saved successfully",
-            "data": data
+            "data":
+                data
         })
 
     except Exception as e:
 
         return jsonify({
-            "error": "Content save failed",
-            "details": str(e)[:200]
+            "error":
+                "Content save failed",
+            "details":
+                str(e)[:200]
         }), 500
 
-
-# =========================================================
-# ADMIN CONTENT UPDATE
-# =========================================================
 
 @app.post("/api/admin/content/update")
 def admin_content_update():
 
     if not admin_required():
+
         return jsonify({
-            "error": "Unauthorized"
+            "error":
+                "Unauthorized"
         }), 401
 
     if not BLOB_TOKEN:
+
         return jsonify({
             "error":
                 "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
+
         item = request.get_json(
             silent=True
         )
 
-        if not isinstance(item, dict):
+        if not isinstance(
+            item,
+            dict
+        ):
+
             return jsonify({
                 "error":
                     "Invalid content data"
@@ -266,17 +321,24 @@ def admin_content_update():
         item_id = item.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error":
                     "Content ID is required"
             }), 400
 
         data = load_content()
-        items = data.get("items", [])
+
+        items = data.get(
+            "items",
+            []
+        )
 
         found = False
 
-        for index, old_item in enumerate(items):
+        for index, old_item in enumerate(
+            items
+        ):
 
             if str(
                 old_item.get("id")
@@ -292,17 +354,23 @@ def admin_content_update():
                 )
 
                 items[index] = item
+
                 found = True
+
                 break
 
         if not found:
+
             return jsonify({
                 "error":
                     "Content not found"
             }), 404
 
         data["items"] = items
-        data["count"] = len(items)
+
+        data["count"] = len(
+            items
+        )
 
         save_content(data)
 
@@ -310,7 +378,8 @@ def admin_content_update():
             "success": True,
             "message":
                 "Content updated successfully",
-            "data": data
+            "data":
+                data
         })
 
     except Exception as e:
@@ -318,29 +387,30 @@ def admin_content_update():
         return jsonify({
             "error":
                 "Content update failed",
-            "details": str(e)[:200]
+            "details":
+                str(e)[:200]
         }), 500
 
-
-# =========================================================
-# ADMIN CONTENT DELETE
-# =========================================================
 
 @app.post("/api/admin/content/delete")
 def admin_content_delete():
 
     if not admin_required():
+
         return jsonify({
-            "error": "Unauthorized"
+            "error":
+                "Unauthorized"
         }), 401
 
     if not BLOB_TOKEN:
+
         return jsonify({
             "error":
                 "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
+
         body = request.get_json(
             silent=True
         ) or {}
@@ -348,13 +418,18 @@ def admin_content_delete():
         item_id = body.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error":
                     "Content ID is required"
             }), 400
 
         data = load_content()
-        items = data.get("items", [])
+
+        items = data.get(
+            "items",
+            []
+        )
 
         new_items = [
             item for item in items
@@ -364,6 +439,7 @@ def admin_content_delete():
         ]
 
         if len(new_items) == len(items):
+
             return jsonify({
                 "error":
                     "Content not found"
@@ -376,7 +452,10 @@ def admin_content_delete():
             item["id"] = index
 
         data["items"] = new_items
-        data["count"] = len(new_items)
+
+        data["count"] = len(
+            new_items
+        )
 
         save_content(data)
 
@@ -384,7 +463,8 @@ def admin_content_delete():
             "success": True,
             "message":
                 "Content deleted successfully",
-            "data": data
+            "data":
+                data
         })
 
     except Exception as e:
@@ -392,29 +472,30 @@ def admin_content_delete():
         return jsonify({
             "error":
                 "Content delete failed",
-            "details": str(e)[:200]
+            "details":
+                str(e)[:200]
         }), 500
 
-
-# =========================================================
-# ADMIN CONTENT ENABLE / DISABLE
-# =========================================================
 
 @app.post("/api/admin/content/toggle")
 def admin_content_toggle():
 
     if not admin_required():
+
         return jsonify({
-            "error": "Unauthorized"
+            "error":
+                "Unauthorized"
         }), 401
 
     if not BLOB_TOKEN:
+
         return jsonify({
             "error":
                 "BLOB_READ_WRITE_TOKEN is not configured"
         }), 500
 
     try:
+
         body = request.get_json(
             silent=True
         ) or {}
@@ -422,13 +503,18 @@ def admin_content_toggle():
         item_id = body.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error":
                     "Content ID is required"
             }), 400
 
         data = load_content()
-        items = data.get("items", [])
+
+        items = data.get(
+            "items",
+            []
+        )
 
         found = False
         new_status = False
@@ -451,23 +537,30 @@ def admin_content_toggle():
                 ]
 
                 found = True
+
                 break
 
         if not found:
+
             return jsonify({
                 "error":
                     "Content not found"
             }), 404
 
         data["items"] = items
-        data["count"] = len(items)
+
+        data["count"] = len(
+            items
+        )
 
         save_content(data)
 
         return jsonify({
             "success": True,
-            "enabled": new_status,
-            "data": data
+            "enabled":
+                new_status,
+            "data":
+                data
         })
 
     except Exception as e:
@@ -475,7 +568,153 @@ def admin_content_toggle():
         return jsonify({
             "error":
                 "Content status update failed",
-            "details": str(e)[:200]
+            "details":
+                str(e)[:200]
+        }), 500
+
+
+# =========================================================
+# MEDIA UPLOAD
+# =========================================================
+
+@app.post("/api/admin/media/upload")
+def admin_media_upload():
+
+    if not admin_required():
+
+        return jsonify({
+            "error":
+                "Unauthorized"
+        }), 401
+
+    if not BLOB_TOKEN:
+
+        return jsonify({
+            "error":
+                "BLOB_READ_WRITE_TOKEN is not configured"
+        }), 500
+
+    try:
+
+        file = request.files.get(
+            "file"
+        )
+
+        if not file:
+
+            return jsonify({
+                "error":
+                    "No file uploaded"
+            }), 400
+
+        filename = (
+            file.filename or ""
+        ).strip()
+
+        if not filename:
+
+            return jsonify({
+                "error":
+                    "Filename is required"
+            }), 400
+
+        filename = os.path.basename(
+            filename
+        )
+
+        extension = os.path.splitext(
+            filename
+        )[1].lower()
+
+        allowed = {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp",
+            ".gif",
+            ".mp4",
+            ".webm",
+            ".mov",
+            ".mp3",
+            ".wav",
+            ".m4a",
+            ".aac"
+        }
+
+        if extension not in allowed:
+
+            return jsonify({
+                "error":
+                    "File type is not allowed"
+            }), 400
+
+        file_data = file.read()
+
+        if not file_data:
+
+            return jsonify({
+                "error":
+                    "Empty file"
+            }), 400
+
+        max_size = 4 * 1024 * 1024
+
+        if len(file_data) > max_size:
+
+            return jsonify({
+                "error":
+                    "File is larger than 4 MB. Large media will use direct client upload."
+            }), 413
+
+        try:
+
+            from vercel.blob import BlobClient
+
+        except ImportError:
+
+            return jsonify({
+                "error":
+                    "Vercel Python SDK is not installed. requirements.txt must include vercel."
+            }), 500
+
+        content_type = (
+            file.mimetype or
+            "application/octet-stream"
+        )
+
+        client = BlobClient(
+            token=BLOB_TOKEN
+        )
+
+        blob = client.put(
+            f"media/{filename}",
+            file_data,
+            access="public",
+            content_type=content_type,
+            add_random_suffix=True
+        )
+
+        return jsonify({
+            "success": True,
+            "message":
+                "Media uploaded successfully",
+            "url":
+                blob.url,
+            "pathname":
+                blob.pathname,
+            "content_type":
+                content_type,
+            "filename":
+                filename
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "error":
+                "Media upload failed",
+            "details":
+                str(e)[:300]
         }), 500
 
 
@@ -487,8 +726,11 @@ def admin_content_toggle():
 def admin_login():
 
     if admin_required():
+
         return redirect(
-            url_for("admin_dashboard")
+            url_for(
+                "admin_dashboard"
+            )
         )
 
     return """
@@ -501,44 +743,44 @@ content="width=device-width,initial-scale=1">
 <title>MAYOTUBE Admin</title>
 <style>
 html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    max-width:100%;
-    overflow-x:hidden;
+margin:0;
+padding:0;
+width:100%;
+max-width:100%;
+overflow-x:hidden;
 }
 *{box-sizing:border-box}
 body{
-    font-family:Arial,sans-serif;
-    background:#f2f2f2;
-    padding:30px 15px;
+font-family:Arial,sans-serif;
+background:#f2f2f2;
+padding:30px 15px;
 }
 .box{
-    width:100%;
-    max-width:420px;
-    margin:50px auto;
-    background:white;
-    padding:25px;
-    border-radius:14px;
-    box-shadow:0 4px 15px #bbb;
+width:100%;
+max-width:420px;
+margin:50px auto;
+background:white;
+padding:25px;
+border-radius:14px;
+box-shadow:0 4px 15px #bbb;
 }
 h2{
-    margin:0 0 20px;
-    text-align:center;
+margin:0 0 20px;
+text-align:center;
 }
 input,button{
-    display:block;
-    width:100%;
-    padding:13px;
-    margin-top:12px;
-    border-radius:8px;
+display:block;
+width:100%;
+padding:13px;
+margin-top:12px;
+border-radius:8px;
 }
 input{border:1px solid #ccc}
 button{
-    border:0;
-    background:#111;
-    color:white;
-    font-size:16px;
+border:0;
+background:#111;
+color:white;
+font-size:16px;
 }
 </style>
 </head>
@@ -573,10 +815,13 @@ def admin_login_post():
         token,
         ADMIN_TOKEN
     ):
+
         session["admin"] = True
 
         return redirect(
-            url_for("admin_dashboard")
+            url_for(
+                "admin_dashboard"
+            )
         )
 
     return """
@@ -599,8 +844,11 @@ Try Again
 def admin_dashboard():
 
     if not admin_required():
+
         return redirect(
-            url_for("admin_login")
+            url_for(
+                "admin_login"
+            )
         )
 
     return """
@@ -617,186 +865,208 @@ content="width=device-width,initial-scale=1">
 <style>
 
 html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    max-width:100%;
-    overflow-x:hidden;
+margin:0;
+padding:0;
+width:100%;
+max-width:100%;
+overflow-x:hidden;
 }
 
 *{
-    box-sizing:border-box;
+box-sizing:border-box;
 }
 
 body{
-    font-family:Arial,sans-serif;
-    background:#f2f2f2;
-    padding:15px;
+font-family:Arial,sans-serif;
+background:#f2f2f2;
+padding:15px;
 }
 
 .box{
-    width:100%;
-    max-width:700px;
-    margin:0 auto;
+width:100%;
+max-width:700px;
+margin:0 auto;
 }
 
 .header{
-    background:#111;
-    color:white;
-    padding:20px;
-    border-radius:14px;
-    margin-bottom:15px;
-    text-align:center;
+background:#111;
+color:white;
+padding:20px;
+border-radius:14px;
+margin-bottom:15px;
+text-align:center;
 }
 
 .header h2{
-    margin:0 0 10px;
+margin:0 0 10px;
 }
 
 .card{
-    width:100%;
-    background:white;
-    padding:20px;
-    margin-bottom:12px;
-    border-radius:14px;
-    box-shadow:0 2px 8px #ccc;
-    overflow:hidden;
+width:100%;
+background:white;
+padding:20px;
+margin-bottom:12px;
+border-radius:14px;
+box-shadow:0 2px 8px #ccc;
+overflow:hidden;
 }
 
 .card h3{
-    margin:0 0 18px;
-    text-align:center !important;
+margin:0 0 18px;
+text-align:center !important;
 }
 
 .field{
-    width:100%;
-    margin-top:18px;
+width:100%;
+margin-top:18px;
 }
 
 .field-title{
-    display:block;
-    width:100%;
-    margin:0 0 8px;
-    text-align:center !important;
-    font-weight:bold;
-    font-size:16px;
-    line-height:1.4;
-    overflow-wrap:anywhere;
+display:block;
+width:100%;
+margin:0 0 8px;
+text-align:center !important;
+font-weight:bold;
+font-size:16px;
+line-height:1.4;
+overflow-wrap:anywhere;
 }
 
 input,
 textarea,
 select,
 button{
-    display:block;
-    width:100%;
-    max-width:100%;
-    min-width:0;
-    padding:12px;
-    margin:0;
-    border-radius:8px;
-    font-size:15px;
+display:block;
+width:100%;
+max-width:100%;
+min-width:0;
+padding:12px;
+margin:0;
+border-radius:8px;
+font-size:15px;
 }
 
 input,
 textarea,
 select{
-    border:1px solid #ccc;
-    background:white;
+border:1px solid #ccc;
+background:white;
 }
 
 textarea{
-    min-height:100px;
-    resize:vertical;
+min-height:100px;
+resize:vertical;
 }
 
 button{
-    border:0;
-    background:#111;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
+border:0;
+background:#111;
+color:white;
+font-size:16px;
+cursor:pointer;
 }
 
 .save{
-    margin-top:20px;
+margin-top:20px;
 }
 
 .load{
-    margin-top:12px;
-    background:#555;
+margin-top:12px;
+background:#555;
 }
 
 .status{
-    text-align:center;
-    font-weight:bold;
+text-align:center;
+font-weight:bold;
 }
 
 .success{color:green}
 .error{color:red}
 
 .type-info{
-    margin-top:15px;
-    padding:12px;
-    background:#f5f5f5;
-    border-radius:8px;
-    text-align:center;
-    overflow-wrap:anywhere;
+margin-top:15px;
+padding:12px;
+background:#f5f5f5;
+border-radius:8px;
+text-align:center;
+overflow-wrap:anywhere;
 }
 
 .saved-item{
-    width:100%;
-    margin-top:12px;
-    padding:15px;
-    background:#f7f7f7;
-    border-radius:10px;
-    overflow-wrap:anywhere;
-    word-break:break-word;
+width:100%;
+margin-top:12px;
+padding:15px;
+background:#f7f7f7;
+border-radius:10px;
+overflow-wrap:anywhere;
+word-break:break-word;
 }
 
 .saved-title{
-    text-align:center;
-    font-weight:bold;
-    margin-bottom:10px;
+text-align:center;
+font-weight:bold;
+margin-bottom:10px;
 }
 
 .action-row{
-    display:flex;
-    gap:8px;
-    margin-top:12px;
+display:flex;
+gap:8px;
+margin-top:12px;
 }
 
 .action-row button{
-    flex:1;
-    margin:0;
+flex:1;
+margin:0;
 }
 
 .edit{
-    background:#444;
+background:#444;
 }
 
 .delete{
-    background:#b00020;
+background:#b00020;
 }
 
 .toggle{
-    background:#087f23;
+background:#087f23;
 }
 
 .disabled{
-    opacity:.6;
+opacity:.6;
+}
+
+.upload-box{
+margin-top:20px;
+padding:15px;
+background:#f7f7f7;
+border-radius:10px;
+}
+
+.upload-box input{
+margin-top:10px;
+}
+
+.upload-btn{
+margin-top:12px;
+}
+
+.upload-result{
+margin-top:12px;
+font-size:14px;
+word-break:break-all;
+overflow-wrap:anywhere;
 }
 
 .logout{
-    display:block;
-    width:100%;
-    margin-top:15px;
-    padding:12px;
-    background:#ddd;
-    color:#111;
-    text-decoration:none;
-    text-align:center;
-    border-radius:8px;
+display:block;
+width:100%;
+margin-top:15px;
+padding:12px;
+background:#ddd;
+color:#111;
+text-decoration:none;
+text-align:center;
+border-radius:8px;
 }
 
 </style>
@@ -918,6 +1188,41 @@ style="margin-top:12px">
 <div class="card">
 
 <h3>
+Media Upload
+</h3>
+
+<div class="upload-box">
+
+<div class="field-title">
+Select Image / Video / GIF / Audio
+</div>
+
+<input
+id="mediaFile"
+type="file"
+accept="image/*,video/*,audio/*">
+
+<button
+class="upload-btn"
+onclick="uploadMedia()">
+
+Upload Media
+
+</button>
+
+<div
+id="uploadResult"
+class="upload-result">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
 Saved Homepage Content
 </h3>
 
@@ -971,14 +1276,14 @@ let editingId = null;
 
 function field(title,html){
 
-    return `
-    <div class="field">
-        <div class="field-title">
-            ${title}
-        </div>
-        ${html}
-    </div>
-    `;
+return `
+<div class="field">
+<div class="field-title">
+${title}
+</div>
+${html}
+</div>
+`;
 
 }
 
@@ -1302,409 +1607,501 @@ placeholder="https://...">`
 
 function showFields(data={}){
 
-    const type =
-        data.type ||
-        document.getElementById(
-            "contentType"
-        ).value;
+const type =
+data.type ||
+document.getElementById(
+"contentType"
+).value;
 
-    const box =
-        document.getElementById(
-            "fields"
-        );
+const box =
+document.getElementById(
+"fields"
+);
 
-    if(!type){
+if(!type){
 
-        box.innerHTML="";
-        return;
+box.innerHTML="";
+return;
 
-    }
+}
 
-    document.getElementById(
-        "contentType"
-    ).value=type;
+document.getElementById(
+"contentType"
+).value=type;
 
-    box.innerHTML=
-        `
-        <div class="type-info">
-        Selected: ${type.toUpperCase()}
-        </div>
-        `+
-        fields[type];
+box.innerHTML=
+`
+<div class="type-info">
+Selected:
+${type.toUpperCase()}
+</div>
+`
++
+fields[type];
 
-    Object.keys(data).forEach(
-        function(key){
+Object.keys(data).forEach(
+function(key){
 
-            const el =
-                box.querySelector(
-                    `[name="${key}"]`
-                );
+const el =
+box.querySelector(
+`[name="${key}"]`
+);
 
-            if(el){
-                el.value =
-                    data[key] ?? "";
-            }
+if(el){
+el.value =
+data[key] ?? "";
+}
 
-        }
-    );
+}
+);
 
 }
 
 
 function collectFields(){
 
-    const type =
-        document.getElementById(
-            "contentType"
-        ).value;
+const type =
+document.getElementById(
+"contentType"
+).value;
 
-    if(!type){
-        return null;
-    }
+if(!type){
+return null;
+}
 
-    const item={
-        type:type
-    };
+const item={
+type:type
+};
 
-    document
-    .querySelectorAll(
-        "#fields input,#fields textarea"
-    )
-    .forEach(
-        function(el){
+document
+.querySelectorAll(
+"#fields input,#fields textarea"
+)
+.forEach(
+function(el){
 
-            item[el.name] =
-                el.value.trim();
+item[el.name]=
+el.value.trim();
 
-        }
-    );
+}
+);
 
-    if(editingId !== null){
-        item.id=editingId;
-    }
+if(editingId !== null){
+item.id=editingId;
+}
 
-    return item;
+return item;
 
 }
 
 
 async function saveContent(){
 
-    const message =
-        document.getElementById(
-            "message"
-        );
+const message =
+document.getElementById(
+"message"
+);
 
-    const item =
-        collectFields();
+const item =
+collectFields();
 
-    if(!item){
+if(!item){
 
-        message.className =
-            "status error";
+message.className=
+"status error";
 
-        message.textContent =
-            "Please select a Content Type.";
+message.textContent=
+"Please select a Content Type.";
 
-        return;
+return;
 
-    }
+}
 
-    message.className="status";
-    message.textContent="Saving...";
+message.className="status";
+message.textContent="Saving...";
 
-    const endpoint =
-        editingId === null
-        ? "/api/admin/content/save"
-        : "/api/admin/content/update";
+const endpoint =
+editingId === null
+? "/api/admin/content/save"
+: "/api/admin/content/update";
 
-    try{
+try{
 
-        const response =
-            await fetch(
-                endpoint,
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                        "application/json"
-                    },
-                    body:
-                    JSON.stringify(item)
-                }
-            );
+const response =
+await fetch(
+endpoint,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:
+JSON.stringify(item)
+}
+);
 
-        const data =
-            await response.json();
+const data =
+await response.json();
 
-        if(!response.ok){
-            throw new Error(
-                data.error ||
-                "Save failed"
-            );
-        }
+if(!response.ok){
 
-        message.className =
-            "status success";
+throw new Error(
+data.error ||
+"Save failed"
+);
 
-        message.textContent =
-            editingId === null
-            ? "Content saved successfully ✓"
-            : "Content updated successfully ✓";
+}
 
-        editingId=null;
+message.className=
+"status success";
 
-        document.getElementById(
-            "contentType"
-        ).value="";
+message.textContent=
+editingId === null
+? "Content saved successfully ✓"
+: "Content updated successfully ✓";
 
-        document.getElementById(
-            "fields"
-        ).innerHTML="";
+editingId=null;
 
-        loadContent();
+document.getElementById(
+"contentType"
+).value="";
 
-    }catch(error){
+document.getElementById(
+"fields"
+).innerHTML="";
 
-        message.className =
-            "status error";
+loadContent();
 
-        message.textContent =
-            error.message;
+}catch(error){
 
-    }
+message.className=
+"status error";
+
+message.textContent=
+error.message;
+
+}
+
+}
+
+
+async function uploadMedia(){
+
+const file =
+document.getElementById(
+"mediaFile"
+).files[0];
+
+const result =
+document.getElementById(
+"uploadResult"
+);
+
+if(!file){
+
+result.className=
+"upload-result error";
+
+result.textContent=
+"Please select a file.";
+
+return;
+
+}
+
+result.className=
+"upload-result";
+
+result.textContent=
+"Uploading...";
+
+try{
+
+const form =
+new FormData();
+
+form.append(
+"file",
+file
+);
+
+const response =
+await fetch(
+"/api/admin/media/upload",
+{
+method:"POST",
+body:form
+}
+);
+
+const data =
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+data.error ||
+"Upload failed"
+);
+
+}
+
+result.className=
+"upload-result success";
+
+result.innerHTML=
+"Upload successful ✓<br>" +
+"URL:<br>" +
+data.url;
+
+}catch(error){
+
+result.className=
+"upload-result error";
+
+result.textContent=
+error.message;
+
+}
 
 }
 
 
 async function loadContent(){
 
-    const box =
-        document.getElementById(
-            "savedContent"
-        );
+const box =
+document.getElementById(
+"savedContent"
+);
 
-    box.innerHTML="Loading...";
+box.innerHTML="Loading...";
 
-    try{
+try{
 
-        const response =
-            await fetch(
-                "/api/admin/content"
-            );
+const response =
+await fetch(
+"/api/admin/content"
+);
 
-        const data =
-            await response.json();
+const data =
+await response.json();
 
-        if(!response.ok){
-            throw new Error(
-                data.error ||
-                "Load failed"
-            );
-        }
+if(!response.ok){
 
-        if(
-            !data.items ||
-            data.items.length===0
-        ){
+throw new Error(
+data.error ||
+"Load failed"
+);
 
-            box.innerHTML=
-                `
-                <div class="saved-item">
-                No saved content yet.
-                </div>
-                `;
+}
 
-            return;
+if(
+!data.items ||
+data.items.length===0
+){
 
-        }
+box.innerHTML=
+`
+<div class="saved-item">
+No saved content yet.
+</div>
+`;
 
-        box.innerHTML =
-            data.items.map(
-                function(item){
+return;
 
-                    const status =
-                        item.enabled !== false
-                        ? "Enabled"
-                        : "Disabled";
+}
 
-                    const cls =
-                        item.enabled !== false
-                        ? ""
-                        : "disabled";
+box.innerHTML =
+data.items.map(
+function(item){
 
-                    return `
-                    <div
-                    class="saved-item ${cls}">
+const status =
+item.enabled !== false
+? "Enabled"
+: "Disabled";
 
-                    <div class="saved-title">
-                    ${item.type.toUpperCase()}
-                    </div>
+const cls =
+item.enabled !== false
+? ""
+: "disabled";
 
-                    <div>
-                    ID: ${item.id}
-                    </div>
+return `
+<div
+class="saved-item ${cls}">
 
-                    <div>
-                    Status: ${status}
-                    </div>
+<div class="saved-title">
+${item.type.toUpperCase()}
+</div>
 
-                    <div class="action-row">
+<div>
+ID: ${item.id}
+</div>
 
-                    <button
-                    class="edit"
-                    onclick='editContent(${JSON.stringify(item)})'>
-                    Edit
-                    </button>
+<div>
+Status: ${status}
+</div>
 
-                    <button
-                    class="toggle"
-                    onclick="toggleContent(${item.id})">
-                    ${
-                        item.enabled !== false
-                        ? "Disable"
-                        : "Enable"
-                    }
-                    </button>
+<div class="action-row">
 
-                    <button
-                    class="delete"
-                    onclick="deleteContent(${item.id})">
-                    Delete
-                    </button>
+<button
+class="edit"
+onclick='editContent(${JSON.stringify(item)})'>
+Edit
+</button>
 
-                    </div>
+<button
+class="toggle"
+onclick="toggleContent(${item.id})">
+${
+item.enabled !== false
+? "Disable"
+: "Enable"
+}
+</button>
 
-                    </div>
-                    `;
+<button
+class="delete"
+onclick="deleteContent(${item.id})">
+Delete
+</button>
 
-                }
-            ).join("");
+</div>
 
-    }catch(error){
+</div>
+`;
 
-        box.innerHTML =
-            `
-            <div class="saved-item">
-            Load failed:
-            ${error.message}
-            </div>
-            `;
+}
+).join("");
 
-    }
+}catch(error){
+
+box.innerHTML=
+`
+<div class="saved-item">
+Load failed:
+${error.message}
+</div>
+`;
+
+}
 
 }
 
 
 function editContent(item){
 
-    editingId=item.id;
+editingId=item.id;
 
-    showFields(item);
+showFields(item);
 
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
 
-    const message =
-        document.getElementById(
-            "message"
-        );
+const message =
+document.getElementById(
+"message"
+);
 
-    message.className="status";
+message.className="status";
 
-    message.textContent =
-        "Editing Content ID " +
-        item.id;
+message.textContent =
+"Editing Content ID " +
+item.id;
 
 }
 
 
 async function deleteContent(id){
 
-    if(!confirm(
-        "Delete this content?"
-    )){
-        return;
-    }
+if(!confirm(
+"Delete this content?"
+)){
+return;
+}
 
-    try{
+try{
 
-        const response =
-            await fetch(
-                "/api/admin/content/delete",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                        "application/json"
-                    },
-                    body:
-                    JSON.stringify({
-                        id:id
-                    })
-                }
-            );
+const response =
+await fetch(
+"/api/admin/content/delete",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:
+JSON.stringify({
+id:id
+})
+}
+);
 
-        const data =
-            await response.json();
+const data =
+await response.json();
 
-        if(!response.ok){
-            throw new Error(
-                data.error ||
-                "Delete failed"
-            );
-        }
+if(!response.ok){
 
-        loadContent();
+throw new Error(
+data.error ||
+"Delete failed"
+);
 
-    }catch(error){
+}
 
-        alert(error.message);
+loadContent();
 
-    }
+}catch(error){
+
+alert(error.message);
+
+}
 
 }
 
 
 async function toggleContent(id){
 
-    try{
+try{
 
-        const response =
-            await fetch(
-                "/api/admin/content/toggle",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                        "application/json"
-                    },
-                    body:
-                    JSON.stringify({
-                        id:id
-                    })
-                }
-            );
+const response =
+await fetch(
+"/api/admin/content/toggle",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:
+JSON.stringify({
+id:id
+})
+}
+);
 
-        const data =
-            await response.json();
+const data =
+await response.json();
 
-        if(!response.ok){
-            throw new Error(
-                data.error ||
-                "Status update failed"
-            );
-        }
+if(!response.ok){
 
-        loadContent();
+throw new Error(
+data.error ||
+"Status update failed"
+);
 
-    }catch(error){
+}
 
-        alert(error.message);
+loadContent();
 
-    }
+}catch(error){
+
+alert(error.message);
+
+}
 
 }
 
@@ -1718,15 +2115,13 @@ loadContent();
 """
 
 
-# =========================================================
-# ADMIN LOGOUT
-# =========================================================
-
 @app.get("/admin/logout")
 def admin_logout():
 
     session.clear()
 
     return redirect(
-        url_for("admin_login")
+        url_for(
+            "admin_login"
+        )
     )
