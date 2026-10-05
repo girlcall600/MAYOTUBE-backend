@@ -30,34 +30,74 @@ def admin_login():
         return redirect(url_for("admin_dashboard"))
 
     return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>MAYOTUBE Admin</title>
-        <style>
-            body{font-family:Arial;background:#f2f2f2;margin:0;padding:30px}
-            .box{max-width:420px;margin:50px auto;background:white;padding:25px;
-                 border-radius:14px;box-shadow:0 4px 15px #bbb}
-            h2{text-align:center}
-            input,button{width:100%;padding:13px;margin-top:12px;
-                         box-sizing:border-box;border-radius:8px}
-            input{border:1px solid #ccc}
-            button{border:0;background:#111;color:white;font-size:16px}
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <h2>MAYOTUBE ADMIN</h2>
-            <form method="post" action="/admin/login">
-                <input type="password" name="token"
-                       placeholder="Owner Admin Token" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </body>
-    </html>
-    """
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAYOTUBE Admin</title>
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+*{
+    box-sizing:border-box;
+}
+body{
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+    padding:30px 15px;
+}
+.box{
+    width:100%;
+    max-width:420px;
+    min-width:0;
+    margin:50px auto;
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 4px 15px #bbb;
+    overflow:hidden;
+}
+h2{
+    text-align:center;
+    margin-top:0;
+}
+input,button{
+    display:block;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    padding:13px;
+    margin-top:12px;
+    border-radius:8px;
+}
+input{
+    border:1px solid #ccc;
+}
+button{
+    border:0;
+    background:#111;
+    color:white;
+    font-size:16px;
+}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>MAYOTUBE ADMIN</h2>
+    <form method="post" action="/admin/login">
+        <input type="password" name="token"
+               placeholder="Owner Admin Token" required>
+        <button type="submit">Login</button>
+    </form>
+</div>
+</body>
+</html>
+"""
 
 
 @app.post("/admin/login")
@@ -69,11 +109,11 @@ def admin_login_post():
         return redirect(url_for("admin_dashboard"))
 
     return """
-    <h3 style="text-align:center;color:red">Invalid Admin Token</h3>
-    <p style="text-align:center">
-        <a href="/admin">Try Again</a>
-    </p>
-    """, 401
+<h3 style="text-align:center;color:red">Invalid Admin Token</h3>
+<p style="text-align:center">
+<a href="/admin">Try Again</a>
+</p>
+""", 401
 
 
 @app.get("/admin/dashboard")
@@ -82,277 +122,411 @@ def admin_dashboard():
         return redirect(url_for("admin_login"))
 
     return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>MAYOTUBE Admin Dashboard</title>
-        <style>
-            body{font-family:Arial;background:#f2f2f2;margin:0;padding:15px}
-            .box{max-width:700px;margin:auto}
-            .header{background:#111;color:white;padding:20px;
-                    border-radius:14px;margin-bottom:15px}
-            .card{background:white;padding:20px;margin-bottom:12px;
-                  border-radius:14px;box-shadow:0 2px 8px #ccc}
-            h2,h3{margin-top:0}
-            label{display:block;margin-top:14px;font-weight:bold}
-            input,textarea,select,button{
-                width:100%;box-sizing:border-box;padding:12px;
-                margin-top:7px;border-radius:8px
-            }
-            input,textarea,select{border:1px solid #ccc;background:white}
-            textarea{min-height:100px;resize:vertical}
-            button{border:0;background:#111;color:white;font-size:16px}
-            .status{color:green;font-weight:bold}
-            .logout{display:block;text-align:center;margin-top:15px;
-                    padding:12px;background:#ddd;color:#111;
-                    text-decoration:none;border-radius:8px}
-            .type-info{background:#f5f5f5;padding:12px;border-radius:8px;
-                       margin-top:12px;color:#555}
-            .hidden{display:none}
-        </style>
-    </head>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAYOTUBE Admin Dashboard</title>
 
-    <body>
-        <div class="box">
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
 
-            <div class="header">
-                <h2>MAYOTUBE ADMIN</h2>
-                <div class="status">Owner Admin ✓</div>
-            </div>
+*{
+    box-sizing:border-box;
+    max-width:100%;
+}
 
-            <div class="card">
-                <h3>Add Homepage Content</h3>
+body{
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+    padding:15px;
+}
 
-                <label>Content Type</label>
+.box{
+    width:100%;
+    max-width:700px;
+    min-width:0;
+    margin:auto;
+    overflow:hidden;
+}
 
-                <select id="contentType" onchange="showFields()">
-                    <option value="">Select Content Type</option>
-                    <option value="url">URL / Web Link</option>
-                    <option value="youtube">YouTube Video</option>
-                    <option value="message">Message</option>
-                    <option value="donation">Donation</option>
-                    <option value="audio">Audio</option>
-                    <option value="notification">Notification</option>
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                    <option value="gif">GIF</option>
-                    <option value="ad">Advertisement</option>
-                    <option value="music">Music Link</option>
-                    <option value="gallery">Gallery Video</option>
-                    <option value="live">Live Channel</option>
-                </select>
+.header{
+    width:100%;
+    background:#111;
+    color:white;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:15px;
+    text-align:center;
+    overflow:hidden;
+}
 
-                <div id="fields"></div>
-            </div>
+.header h2{
+    margin:0;
+    text-align:center;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-            <div class="card">
-                <h3>System Status</h3>
-                <p class="status">Backend Online ✓</p>
-                <p class="status">Admin Authenticated ✓</p>
-            </div>
+.card{
+    width:100%;
+    min-width:0;
+    background:white;
+    padding:20px;
+    margin-bottom:12px;
+    border-radius:14px;
+    box-shadow:0 2px 8px #ccc;
+    overflow:hidden;
+}
 
-            <a class="logout" href="/admin/logout">Logout</a>
+h3{
+    margin-top:0;
+    text-align:center;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-        </div>
+label{
+    display:block;
+    width:100%;
+    margin-top:16px;
+    font-weight:bold;
+    text-align:center;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-        <script>
-            const fields = {
-                url: `
-                    <label>URL</label>
-                    <input name="url" placeholder="https://example.com">
+input,textarea,select,button{
+    display:block;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    padding:12px;
+    margin-top:7px;
+    border-radius:8px;
+    font-size:15px;
+}
 
-                    <label>Button Text</label>
-                    <input name="button_text" placeholder="Open">
-                `,
+input,textarea,select{
+    border:1px solid #ccc;
+    background:white;
+}
 
-                youtube: `
-                    <label>YouTube URL</label>
-                    <input name="youtube_url"
-                           placeholder="https://youtube.com/watch?v=...">
+input,textarea{
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-                    <label>Title</label>
-                    <input name="title" placeholder="Video Title">
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
 
-                    <label>Description</label>
-                    <textarea name="description"
-                              placeholder="Video Description"></textarea>
+button{
+    border:0;
+    background:#111;
+    color:white;
+    font-size:16px;
+}
 
-                    <label>Thumbnail URL</label>
-                    <input name="thumbnail_url"
-                           placeholder="https://...">
+.status{
+    text-align:center;
+    color:green;
+    font-weight:bold;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-                    <label>Button Text</label>
-                    <input name="button_text" placeholder="Watch">
-                `,
+.logout{
+    display:block;
+    width:100%;
+    max-width:100%;
+    text-align:center;
+    margin-top:15px;
+    padding:12px;
+    background:#ddd;
+    color:#111;
+    text-decoration:none;
+    border-radius:8px;
+}
 
-                message: `
-                    <label>Message</label>
-                    <textarea name="message"
-                              placeholder="Write your message"></textarea>
+.type-info{
+    width:100%;
+    max-width:100%;
+    background:#f5f5f5;
+    padding:12px;
+    border-radius:8px;
+    margin-top:12px;
+    color:#555;
+    text-align:center;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
 
-                    <label>Button Text</label>
-                    <input name="button_text" placeholder="Open">
+.hidden{
+    display:none;
+}
+</style>
+</head>
 
-                    <label>Button URL</label>
-                    <input name="button_url"
-                           placeholder="https://...">
-                `,
+<body>
 
-                donation: `
-                    <label>Donation Message</label>
-                    <textarea name="donation_message"
-                              placeholder="Support MAYOTUBE"></textarea>
+<div class="box">
 
-                    <label>Donation URL</label>
-                    <input name="donation_url"
-                           placeholder="https://...">
+<div class="header">
+    <h2>MAYOTUBE ADMIN</h2>
+    <div class="status">Owner Admin ✓</div>
+</div>
 
-                    <label>Button Text</label>
-                    <input name="button_text" placeholder="Donate">
-                `,
+<div class="card">
 
-                audio: `
-                    <label>Audio URL</label>
-                    <input name="audio_url"
-                           placeholder="https://...">
+<h3>Add Homepage Content</h3>
 
-                    <label>Audio Title</label>
-                    <input name="title" placeholder="Audio Title">
+<label>Content Type</label>
 
-                    <label>Cover Image URL</label>
-                    <input name="cover_url"
-                           placeholder="https://...">
-                `,
+<select id="contentType" onchange="showFields()">
+    <option value="">Select Content Type</option>
+    <option value="url">URL / Web Link</option>
+    <option value="youtube">YouTube Video</option>
+    <option value="message">Message</option>
+    <option value="donation">Donation</option>
+    <option value="audio">Audio</option>
+    <option value="notification">Notification</option>
+    <option value="image">Image</option>
+    <option value="video">Video</option>
+    <option value="gif">GIF</option>
+    <option value="ad">Advertisement</option>
+    <option value="music">Music Link</option>
+    <option value="gallery">Gallery Video</option>
+    <option value="live">Live Channel</option>
+</select>
 
-                notification: `
-                    <label>Notification Message</label>
-                    <textarea name="notification"
-                              placeholder="Notification text"></textarea>
+<div id="fields"></div>
 
-                    <label>Button Text</label>
-                    <input name="button_text" placeholder="Open">
+</div>
 
-                    <label>Button URL</label>
-                    <input name="button_url"
-                           placeholder="https://...">
-                `,
+<div class="card">
+    <h3>System Status</h3>
+    <p class="status">Backend Online ✓</p>
+    <p class="status">Admin Authenticated ✓</p>
+</div>
 
-                image: `
-                    <label>Image URL</label>
-                    <input name="image_url"
-                           placeholder="https://...">
+<a class="logout" href="/admin/logout">Logout</a>
 
-                    <label>Title</label>
-                    <input name="title" placeholder="Image Title">
+</div>
 
-                    <label>Click URL</label>
-                    <input name="click_url"
-                           placeholder="https://...">
-                `,
+<script>
 
-                video: `
-                    <label>Video URL</label>
-                    <input name="video_url"
-                           placeholder="https://...">
+const fields = {
 
-                    <label>Title</label>
-                    <input name="title" placeholder="Video Title">
+url: `
+<label>URL</label>
+<input name="url" placeholder="https://example.com">
 
-                    <label>Thumbnail URL</label>
-                    <input name="thumbnail_url"
-                           placeholder="https://...">
+<label>Button Text</label>
+<input name="button_text" placeholder="Open">
+`,
 
-                    <label>Description</label>
-                    <textarea name="description"
-                              placeholder="Video Description"></textarea>
-                `,
+youtube: `
+<label>YouTube URL</label>
+<input name="youtube_url"
+placeholder="https://youtube.com/watch?v=...">
 
-                gif: `
-                    <label>GIF URL</label>
-                    <input name="gif_url"
-                           placeholder="https://...">
+<label>Title</label>
+<input name="title" placeholder="Video Title">
 
-                    <label>Title</label>
-                    <input name="title" placeholder="GIF Title">
+<label>Description</label>
+<textarea name="description"
+placeholder="Video Description"></textarea>
 
-                    <label>Click URL</label>
-                    <input name="click_url"
-                           placeholder="https://...">
-                `,
+<label>Thumbnail URL</label>
+<input name="thumbnail_url"
+placeholder="https://...">
 
-                ad: `
-                    <label>Advertisement Image/Media URL</label>
-                    <input name="media_url"
-                           placeholder="https://...">
+<label>Button Text</label>
+<input name="button_text" placeholder="Watch">
+`,
 
-                    <label>Advertisement URL</label>
-                    <input name="ad_url"
-                           placeholder="https://...">
+message: `
+<label>Message</label>
+<textarea name="message"
+placeholder="Write your message"></textarea>
 
-                    <label>Ad Title</label>
-                    <input name="title" placeholder="Advertisement">
-                `,
+<label>Button Text</label>
+<input name="button_text" placeholder="Open">
 
-                music: `
-                    <label>Music URL</label>
-                    <input name="music_url"
-                           placeholder="https://...">
+<label>Button URL</label>
+<input name="button_url"
+placeholder="https://...">
+`,
 
-                    <label>Music Title</label>
-                    <input name="title" placeholder="Music Title">
+donation: `
+<label>Donation Message</label>
+<textarea name="donation_message"
+placeholder="Support MAYOTUBE"></textarea>
 
-                    <label>Artist</label>
-                    <input name="artist" placeholder="Artist Name">
-                `,
+<label>Donation URL</label>
+<input name="donation_url"
+placeholder="https://...">
 
-                gallery: `
-                    <label>Gallery Video URL</label>
-                    <input name="video_url"
-                           placeholder="https://...">
+<label>Button Text</label>
+<input name="button_text" placeholder="Donate">
+`,
 
-                    <label>Title</label>
-                    <input name="title" placeholder="Gallery Video">
+audio: `
+<label>Audio URL</label>
+<input name="audio_url"
+placeholder="https://...">
 
-                    <label>Thumbnail URL</label>
-                    <input name="thumbnail_url"
-                           placeholder="https://...">
-                `,
+<label>Audio Title</label>
+<input name="title" placeholder="Audio Title">
 
-                live: `
-                    <label>Live Channel URL</label>
-                    <input name="live_url"
-                           placeholder="https://...">
+<label>Cover Image URL</label>
+<input name="cover_url"
+placeholder="https://...">
+`,
 
-                    <label>Channel Name</label>
-                    <input name="channel_name"
-                           placeholder="Channel Name">
+notification: `
+<label>Notification Message</label>
+<textarea name="notification"
+placeholder="Notification text"></textarea>
 
-                    <label>Thumbnail URL</label>
-                    <input name="thumbnail_url"
-                           placeholder="https://...">
-                `
-            };
+<label>Button Text</label>
+<input name="button_text" placeholder="Open">
 
-            function showFields() {
-                const type = document.getElementById("contentType").value;
-                const box = document.getElementById("fields");
+<label>Button URL</label>
+<input name="button_url"
+placeholder="https://...">
+`,
 
-                if (!type) {
-                    box.innerHTML = "";
-                    return;
-                }
+image: `
+<label>Image URL</label>
+<input name="image_url"
+placeholder="https://...">
 
-                box.innerHTML =
-                    '<div class="type-info">Selected: ' +
-                    type.toUpperCase() +
-                    '</div>' +
-                    fields[type];
-            }
-        </script>
-    </body>
-    </html>
-    """
+<label>Title</label>
+<input name="title" placeholder="Image Title">
+
+<label>Click URL</label>
+<input name="click_url"
+placeholder="https://...">
+`,
+
+video: `
+<label>Video URL</label>
+<input name="video_url"
+placeholder="https://...">
+
+<label>Title</label>
+<input name="title" placeholder="Video Title">
+
+<label>Thumbnail URL</label>
+<input name="thumbnail_url"
+placeholder="https://...">
+
+<label>Description</label>
+<textarea name="description"
+placeholder="Video Description"></textarea>
+`,
+
+gif: `
+<label>GIF URL</label>
+<input name="gif_url"
+placeholder="https://...">
+
+<label>Title</label>
+<input name="title" placeholder="GIF Title">
+
+<label>Click URL</label>
+<input name="click_url"
+placeholder="https://...">
+`,
+
+ad: `
+<label>Advertisement Image/Media URL</label>
+<input name="media_url"
+placeholder="https://...">
+
+<label>Advertisement URL</label>
+<input name="ad_url"
+placeholder="https://...">
+
+<label>Ad Title</label>
+<input name="title" placeholder="Advertisement">
+`,
+
+music: `
+<label>Music URL</label>
+<input name="music_url"
+placeholder="https://...">
+
+<label>Music Title</label>
+<input name="title" placeholder="Music Title">
+
+<label>Artist</label>
+<input name="artist" placeholder="Artist Name">
+`,
+
+gallery: `
+<label>Gallery Video URL</label>
+<input name="video_url"
+placeholder="https://...">
+
+<label>Title</label>
+<input name="title" placeholder="Gallery Video">
+
+<label>Thumbnail URL</label>
+<input name="thumbnail_url"
+placeholder="https://...">
+`,
+
+live: `
+<label>Live Channel URL</label>
+<input name="live_url"
+placeholder="https://...">
+
+<label>Channel Name</label>
+<input name="channel_name"
+placeholder="Channel Name">
+
+<label>Thumbnail URL</label>
+<input name="thumbnail_url"
+placeholder="https://...">
+`
+
+};
+
+function showFields(){
+
+    const type =
+        document.getElementById("contentType").value;
+
+    const box =
+        document.getElementById("fields");
+
+    if(!type){
+        box.innerHTML="";
+        return;
+    }
+
+    box.innerHTML =
+        '<div class="type-info">Selected: ' +
+        type.toUpperCase() +
+        '</div>' +
+        fields[type];
+}
+
+</script>
+
+</body>
+</html>
+"""
 
 
 @app.get("/admin/logout")
