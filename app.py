@@ -2,7 +2,6 @@ import os
 import json
 import hmac
 import urllib.request
-import urllib.error
 from flask import Flask, jsonify, request, session, redirect, url_for
 
 app = Flask(__name__)
@@ -13,6 +12,10 @@ BLOB_PATH = "mayotube/home-content.json"
 BLOB_BASE = "https://blob.vercel-storage.com"
 
 app.secret_key = ADMIN_TOKEN or os.urandom(32)
+
+
+def admin_required():
+    return session.get("admin") is True
 
 
 def blob_request(method, data=None):
@@ -42,25 +45,34 @@ def blob_request(method, data=None):
         return response.read()
 
 
+def empty_content():
+    return {
+        "app": "MAYOTUBE",
+        "count": 0,
+        "enabled": True,
+        "items": []
+    }
+
+
 def load_content():
     if not BLOB_TOKEN:
-        return {
-            "app": "MAYOTUBE",
-            "count": 0,
-            "enabled": True,
-            "items": []
-        }
+        return empty_content()
 
     try:
         raw = blob_request("GET")
-        return json.loads(raw.decode("utf-8"))
+        data = json.loads(raw.decode("utf-8"))
+
+        if not isinstance(data, dict):
+            return empty_content()
+
+        if not isinstance(data.get("items"), list):
+            data["items"] = []
+
+        data["count"] = len(data["items"])
+        return data
+
     except Exception:
-        return {
-            "app": "MAYOTUBE",
-            "count": 0,
-            "enabled": True,
-            "items": []
-        }
+        return empty_content()
 
 
 def save_content(data):
@@ -71,10 +83,6 @@ def save_content(data):
     ).encode("utf-8")
 
     blob_request("PUT", raw)
-
-
-def admin_required():
-    return session.get("admin") is True
 
 
 @app.get("/")
@@ -143,7 +151,6 @@ def admin_content_save():
 
         data["items"].append(item)
         data["count"] = len(data["items"])
-        data["enabled"] = True
 
         save_content(data)
 
@@ -160,6 +167,195 @@ def admin_content_save():
         }), 500
 
 
+@app.post("/api/admin/content/update")
+def admin_content_update():
+
+    if not admin_required():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    if not BLOB_TOKEN:
+        return jsonify({
+            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+        }), 500
+
+    try:
+        item = request.get_json(silent=True)
+
+        if not isinstance(item, dict):
+            return jsonify({
+                "error": "Invalid content data"
+            }), 400
+
+        item_id = item.get("id")
+
+        if item_id is None:
+            return jsonify({
+                "error": "Content ID is required"
+            }), 400
+
+        data = load_content()
+        items = data.get("items", [])
+
+        found = False
+
+        for index, old_item in enumerate(items):
+
+            if str(old_item.get("id")) == str(item_id):
+
+                item["id"] = old_item.get("id")
+                item["enabled"] = old_item.get(
+                    "enabled",
+                    True
+                )
+
+                items[index] = item
+                found = True
+                break
+
+        if not found:
+            return jsonify({
+                "error": "Content not found"
+            }), 404
+
+        data["items"] = items
+        data["count"] = len(items)
+
+        save_content(data)
+
+        return jsonify({
+            "success": True,
+            "message": "Content updated successfully",
+            "data": data
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Content update failed",
+            "details": str(e)[:200]
+        }), 500
+
+
+@app.post("/api/admin/content/delete")
+def admin_content_delete():
+
+    if not admin_required():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    if not BLOB_TOKEN:
+        return jsonify({
+            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+        }), 500
+
+    try:
+        body = request.get_json(silent=True) or {}
+        item_id = body.get("id")
+
+        if item_id is None:
+            return jsonify({
+                "error": "Content ID is required"
+            }), 400
+
+        data = load_content()
+        items = data.get("items", [])
+
+        new_items = [
+            item for item in items
+            if str(item.get("id")) != str(item_id)
+        ]
+
+        if len(new_items) == len(items):
+            return jsonify({
+                "error": "Content not found"
+            }), 404
+
+        for index, item in enumerate(new_items, 1):
+            item["id"] = index
+
+        data["items"] = new_items
+        data["count"] = len(new_items)
+
+        save_content(data)
+
+        return jsonify({
+            "success": True,
+            "message": "Content deleted successfully",
+            "data": data
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Content delete failed",
+            "details": str(e)[:200]
+        }), 500
+
+
+@app.post("/api/admin/content/toggle")
+def admin_content_toggle():
+
+    if not admin_required():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    if not BLOB_TOKEN:
+        return jsonify({
+            "error": "BLOB_READ_WRITE_TOKEN is not configured"
+        }), 500
+
+    try:
+        body = request.get_json(silent=True) or {}
+        item_id = body.get("id")
+
+        if item_id is None:
+            return jsonify({
+                "error": "Content ID is required"
+            }), 400
+
+        data = load_content()
+        items = data.get("items", [])
+
+        found = False
+        new_status = False
+
+        for item in items:
+
+            if str(item.get("id")) == str(item_id):
+
+                item["enabled"] = not bool(
+                    item.get("enabled", True)
+                )
+
+                new_status = item["enabled"]
+                found = True
+                break
+
+        if not found:
+            return jsonify({
+                "error": "Content not found"
+            }), 404
+
+        data["items"] = items
+        data["count"] = len(items)
+
+        save_content(data)
+
+        return jsonify({
+            "success": True,
+            "enabled": new_status,
+            "data": data
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Content status update failed",
+            "details": str(e)[:200]
+        }), 500
+
+
 @app.get("/admin")
 def admin_login():
 
@@ -172,7 +368,6 @@ def admin_login():
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAYOTUBE Admin</title>
-
 <style>
 html,body{
     margin:0;
@@ -181,9 +376,7 @@ html,body{
     max-width:100%;
     overflow-x:hidden;
 }
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 body{
     font-family:Arial,sans-serif;
     background:#f2f2f2;
@@ -192,7 +385,6 @@ body{
 .box{
     width:100%;
     max-width:420px;
-    min-width:0;
     margin:50px auto;
     background:white;
     padding:25px;
@@ -200,22 +392,17 @@ body{
     box-shadow:0 4px 15px #bbb;
 }
 h2{
-    width:100%;
     margin:0 0 20px;
     text-align:center;
 }
 input,button{
     display:block;
     width:100%;
-    max-width:100%;
-    min-width:0;
     padding:13px;
     margin-top:12px;
     border-radius:8px;
 }
-input{
-    border:1px solid #ccc;
-}
+input{border:1px solid #ccc}
 button{
     border:0;
     background:#111;
@@ -224,29 +411,18 @@ button{
 }
 </style>
 </head>
-
 <body>
-
 <div class="box">
-
 <h2>MAYOTUBE ADMIN</h2>
-
 <form method="post" action="/admin/login">
-
 <input
 type="password"
 name="token"
 placeholder="Owner Admin Token"
 required>
-
-<button type="submit">
-Login
-</button>
-
+<button type="submit">Login</button>
 </form>
-
 </div>
-
 </body>
 </html>
 """
@@ -257,15 +433,19 @@ def admin_login_post():
 
     token = request.form.get("token", "")
 
-    if ADMIN_TOKEN and hmac.compare_digest(token, ADMIN_TOKEN):
+    if ADMIN_TOKEN and hmac.compare_digest(
+        token,
+        ADMIN_TOKEN
+    ):
         session["admin"] = True
-        return redirect(url_for("admin_dashboard"))
+        return redirect(
+            url_for("admin_dashboard")
+        )
 
     return """
 <h3 style="text-align:center;color:red">
 Invalid Admin Token
 </h3>
-
 <p style="text-align:center">
 <a href="/admin">Try Again</a>
 </p>
@@ -281,7 +461,6 @@ def admin_dashboard():
     return """
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <meta
@@ -292,8 +471,7 @@ content="width=device-width,initial-scale=1">
 
 <style>
 
-html,
-body{
+html,body{
     margin:0;
     padding:0;
     width:100%;
@@ -314,12 +492,10 @@ body{
 .box{
     width:100%;
     max-width:700px;
-    min-width:0;
     margin:0 auto;
 }
 
 .header{
-    width:100%;
     background:#111;
     color:white;
     padding:20px;
@@ -329,30 +505,26 @@ body{
 }
 
 .header h2{
-    width:100%;
     margin:0 0 10px;
-    text-align:center;
 }
 
 .card{
     width:100%;
-    min-width:0;
     background:white;
     padding:20px;
     margin-bottom:12px;
     border-radius:14px;
     box-shadow:0 2px 8px #ccc;
+    overflow:hidden;
 }
 
 .card h3{
-    width:100%;
     margin:0 0 18px;
     text-align:center !important;
 }
 
 .field{
     width:100%;
-    min-width:0;
     margin-top:18px;
 }
 
@@ -365,7 +537,6 @@ body{
     font-size:16px;
     line-height:1.4;
     overflow-wrap:anywhere;
-    word-break:break-word;
 }
 
 input,
@@ -404,47 +575,71 @@ button{
 
 .save{
     margin-top:20px;
-    background:#111;
 }
 
 .load{
-    margin-top:10px;
+    margin-top:12px;
     background:#555;
 }
 
 .status{
-    width:100%;
-    text-align:center !important;
+    text-align:center;
     font-weight:bold;
 }
 
-.success{
-    color:green;
-}
-
-.error{
-    color:red;
-}
+.success{color:green}
+.error{color:red}
 
 .type-info{
-    width:100%;
     margin-top:15px;
     padding:12px;
     background:#f5f5f5;
     border-radius:8px;
-    text-align:center !important;
+    text-align:center;
     overflow-wrap:anywhere;
-    word-break:break-word;
 }
 
 .saved-item{
     width:100%;
-    margin-top:10px;
-    padding:12px;
+    margin-top:12px;
+    padding:15px;
     background:#f7f7f7;
-    border-radius:8px;
+    border-radius:10px;
     overflow-wrap:anywhere;
     word-break:break-word;
+}
+
+.saved-title{
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.action-row{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.action-row button{
+    flex:1;
+    margin:0;
+}
+
+.edit{
+    background:#444;
+}
+
+.delete{
+    background:#b00020;
+}
+
+.toggle{
+    background:#087f23;
+}
+
+.disabled{
+    opacity:.6;
 }
 
 .logout{
@@ -625,11 +820,16 @@ Logout
 
 <script>
 
+let editingId = null;
+
+
 function field(title,html){
 
     return `
     <div class="field">
-        <div class="field-title">${title}</div>
+        <div class="field-title">
+            ${title}
+        </div>
         ${html}
     </div>
     `;
@@ -640,495 +840,325 @@ function field(title,html){
 const fields = {
 
 url:
-
 field(
 "URL",
-`
-<input
-name="url"
-placeholder="https://example.com">
-`
+`<input name="url"
+placeholder="https://example.com">`
 )
-
 +
-
 field(
 "Button Text",
-`
-<input
-name="button_text"
-placeholder="Open">
-`
+`<input name="button_text"
+placeholder="Open">`
 ),
 
 
 youtube:
-
 field(
 "YouTube URL",
-`
-<input
-name="youtube_url"
-placeholder="https://youtube.com/watch?v=...">
-`
+`<input name="youtube_url"
+placeholder="https://youtube.com/watch?v=...">`
 )
-
 +
-
 field(
 "Title",
-`
-<input
-name="title"
-placeholder="Video Title">
-`
+`<input name="title"
+placeholder="Video Title">`
 )
-
 +
-
 field(
 "Description",
-`
-<textarea
-name="description"
-placeholder="Video Description"></textarea>
-`
+`<textarea name="description"
+placeholder="Video Description"></textarea>`
 )
-
 +
-
 field(
 "Thumbnail URL",
-`
-<input
-name="thumbnail_url"
-placeholder="https://...">
-`
+`<input name="thumbnail_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Button Text",
-`
-<input
-name="button_text"
-placeholder="Watch">
-`
+`<input name="button_text"
+placeholder="Watch">`
 ),
 
 
 message:
-
 field(
 "Message",
-`
-<textarea
-name="message"
-placeholder="Write your message"></textarea>
-`
+`<textarea name="message"
+placeholder="Write your message"></textarea>`
 )
-
 +
-
 field(
 "Button Text",
-`
-<input
-name="button_text"
-placeholder="Open">
-`
+`<input name="button_text"
+placeholder="Open">`
 )
-
 +
-
 field(
 "Button URL",
-`
-<input
-name="button_url"
-placeholder="https://...">
-`
+`<input name="button_url"
+placeholder="https://...">`
 ),
 
 
 donation:
-
 field(
 "Donation Message",
-`
-<textarea
-name="donation_message"
-placeholder="Support MAYOTUBE"></textarea>
-`
+`<textarea name="donation_message"
+placeholder="Support MAYOTUBE"></textarea>`
 )
-
 +
-
 field(
 "Donation URL",
-`
-<input
-name="donation_url"
-placeholder="https://...">
-`
+`<input name="donation_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Button Text",
-`
-<input
-name="button_text"
-placeholder="Donate">
-`
+`<input name="button_text"
+placeholder="Donate">`
 ),
 
 
 audio:
-
 field(
 "Audio URL",
-`
-<input
-name="audio_url"
-placeholder="https://...">
-`
+`<input name="audio_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Audio Title",
-`
-<input
-name="title"
-placeholder="Audio Title">
-`
+`<input name="title"
+placeholder="Audio Title">`
 )
-
 +
-
 field(
 "Cover Image URL",
-`
-<input
-name="cover_url"
-placeholder="https://...">
-`
+`<input name="cover_url"
+placeholder="https://...">`
 ),
 
 
 notification:
-
 field(
 "Notification Message",
-`
-<textarea
-name="notification"
-placeholder="Notification text"></textarea>
-`
+`<textarea name="notification"
+placeholder="Notification text"></textarea>`
 )
-
 +
-
 field(
 "Button Text",
-`
-<input
-name="button_text"
-placeholder="Open">
-`
+`<input name="button_text"
+placeholder="Open">`
 )
-
 +
-
 field(
 "Button URL",
-`
-<input
-name="button_url"
-placeholder="https://...">
-`
+`<input name="button_url"
+placeholder="https://...">`
 ),
 
 
 image:
-
 field(
 "Image URL",
-`
-<input
-name="image_url"
-placeholder="https://...">
-`
+`<input name="image_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Title",
-`
-<input
-name="title"
-placeholder="Image Title">
-`
+`<input name="title"
+placeholder="Image Title">`
 )
-
 +
-
 field(
 "Click URL",
-`
-<input
-name="click_url"
-placeholder="https://...">
-`
+`<input name="click_url"
+placeholder="https://...">`
 ),
 
 
 video:
-
 field(
 "Video URL",
-`
-<input
-name="video_url"
-placeholder="https://...">
-`
+`<input name="video_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Title",
-`
-<input
-name="title"
-placeholder="Video Title">
-`
+`<input name="title"
+placeholder="Video Title">`
 )
-
 +
-
 field(
 "Thumbnail URL",
-`
-<input
-name="thumbnail_url"
-placeholder="https://...">
-`
+`<input name="thumbnail_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Description",
-`
-<textarea
-name="description"
-placeholder="Video Description"></textarea>
-`
+`<textarea name="description"
+placeholder="Video Description"></textarea>`
 ),
 
 
 gif:
-
 field(
 "GIF URL",
-`
-<input
-name="gif_url"
-placeholder="https://...">
-`
+`<input name="gif_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Title",
-`
-<input
-name="title"
-placeholder="GIF Title">
-`
+`<input name="title"
+placeholder="GIF Title">`
 )
-
 +
-
 field(
 "Click URL",
-`
-<input
-name="click_url"
-placeholder="https://...">
-`
+`<input name="click_url"
+placeholder="https://...">`
 ),
 
 
 ad:
-
 field(
 "Advertisement Image/Media URL",
-`
-<input
-name="media_url"
-placeholder="https://...">
-`
+`<input name="media_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Advertisement URL",
-`
-<input
-name="ad_url"
-placeholder="https://...">
-`
+`<input name="ad_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Ad Title",
-`
-<input
-name="title"
-placeholder="Advertisement">
-`
+`<input name="title"
+placeholder="Advertisement">`
 ),
 
 
 music:
-
 field(
 "Music URL",
-`
-<input
-name="music_url"
-placeholder="https://...">
-`
+`<input name="music_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Music Title",
-`
-<input
-name="title"
-placeholder="Music Title">
-`
+`<input name="title"
+placeholder="Music Title">`
 )
-
 +
-
 field(
 "Artist",
-`
-<input
-name="artist"
-placeholder="Artist Name">
-`
+`<input name="artist"
+placeholder="Artist Name">`
 ),
 
 
 gallery:
-
 field(
 "Gallery Video URL",
-`
-<input
-name="video_url"
-placeholder="https://...">
-`
+`<input name="video_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Title",
-`
-<input
-name="title"
-placeholder="Gallery Video">
-`
+`<input name="title"
+placeholder="Gallery Video">`
 )
-
 +
-
 field(
 "Thumbnail URL",
-`
-<input
-name="thumbnail_url"
-placeholder="https://...">
-`
+`<input name="thumbnail_url"
+placeholder="https://...">`
 ),
 
 
 live:
-
 field(
 "Live Channel URL",
-`
-<input
-name="live_url"
-placeholder="https://...">
-`
+`<input name="live_url"
+placeholder="https://...">`
 )
-
 +
-
 field(
 "Channel Name",
-`
-<input
-name="channel_name"
-placeholder="Channel Name">
-`
+`<input name="channel_name"
+placeholder="Channel Name">`
 )
-
 +
-
 field(
 "Thumbnail URL",
-`
-<input
-name="thumbnail_url"
-placeholder="https://...">
-`
+`<input name="thumbnail_url"
+placeholder="https://...">`
 )
 
 };
 
 
-function showFields(){
+function showFields(data={}){
 
     const type =
-        document.getElementById("contentType").value;
+        data.type ||
+        document.getElementById(
+            "contentType"
+        ).value;
 
     const box =
-        document.getElementById("fields");
+        document.getElementById(
+            "fields"
+        );
 
     if(!type){
 
         box.innerHTML="";
-
         return;
 
     }
 
-    box.innerHTML =
+    document.getElementById(
+        "contentType"
+    ).value=type;
+
+    box.innerHTML=
         `
         <div class="type-info">
         Selected: ${type.toUpperCase()}
         </div>
-        `
-        +
+        `+
         fields[type];
+
+    Object.keys(data).forEach(
+        function(key){
+
+            const el =
+                box.querySelector(
+                    `[name="${key}"]`
+                );
+
+            if(el){
+                el.value=data[key] ?? "";
+            }
+
+        }
+    );
 
 }
 
@@ -1136,23 +1166,34 @@ function showFields(){
 function collectFields(){
 
     const type =
-        document.getElementById("contentType").value;
+        document.getElementById(
+            "contentType"
+        ).value;
 
     if(!type){
         return null;
     }
 
-    const item = {
+    const item={
         type:type
     };
 
     document
-    .querySelectorAll("#fields input,#fields textarea")
-    .forEach(function(el){
+    .querySelectorAll(
+        "#fields input,#fields textarea"
+    )
+    .forEach(
+        function(el){
 
-        item[el.name] = el.value.trim();
+            item[el.name]=
+                el.value.trim();
 
-    });
+        }
+    );
+
+    if(editingId !== null){
+        item.id=editingId;
+    }
 
     return item;
 
@@ -1162,14 +1203,17 @@ function collectFields(){
 async function saveContent(){
 
     const message =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
 
     const item =
         collectFields();
 
     if(!item){
 
-        message.className="status error";
+        message.className=
+            "status error";
 
         message.textContent=
             "Please select a Content Type.";
@@ -1179,15 +1223,18 @@ async function saveContent(){
     }
 
     message.className="status";
+    message.textContent="Saving...";
 
-    message.textContent=
-        "Saving...";
+    const endpoint =
+        editingId === null
+        ? "/api/admin/content/save"
+        : "/api/admin/content/update";
 
     try{
 
         const response =
             await fetch(
-                "/api/admin/content/save",
+                endpoint,
                 {
                     method:"POST",
                     headers:{
@@ -1203,19 +1250,29 @@ async function saveContent(){
             await response.json();
 
         if(!response.ok){
-
             throw new Error(
                 data.error ||
                 "Save failed"
             );
-
         }
 
         message.className=
             "status success";
 
         message.textContent=
-            "Content saved successfully ✓";
+            editingId === null
+            ? "Content saved successfully ✓"
+            : "Content updated successfully ✓";
+
+        editingId=null;
+
+        document.getElementById(
+            "contentType"
+        ).value="";
+
+        document.getElementById(
+            "fields"
+        ).innerHTML="";
 
         loadContent();
 
@@ -1235,7 +1292,9 @@ async function saveContent(){
 async function loadContent(){
 
     const box =
-        document.getElementById("savedContent");
+        document.getElementById(
+            "savedContent"
+        );
 
     box.innerHTML="Loading...";
 
@@ -1250,48 +1309,209 @@ async function loadContent(){
             await response.json();
 
         if(!response.ok){
-
             throw new Error(
                 data.error ||
                 "Load failed"
             );
-
         }
 
         if(!data.items ||
            data.items.length===0){
 
             box.innerHTML=
-                '<div class="saved-item">' +
-                'No saved content yet.' +
-                '</div>';
+                `
+                <div class="saved-item">
+                No saved content yet.
+                </div>
+                `;
 
             return;
 
         }
 
         box.innerHTML=
-            data.items.map(function(item){
+            data.items.map(
+                function(item){
 
-                return `
-                <div class="saved-item">
-                    <b>
+                    const status =
+                        item.enabled !== false
+                        ? "Enabled"
+                        : "Disabled";
+
+                    const cls =
+                        item.enabled !== false
+                        ? ""
+                        : "disabled";
+
+                    return `
+                    <div
+                    class="saved-item ${cls}">
+
+                    <div class="saved-title">
                     ${item.type.toUpperCase()}
-                    </b>
-                    <br>
-                    ID: ${item.id}
-                </div>
-                `;
+                    </div>
 
-            }).join("");
+                    <div>
+                    ID: ${item.id}
+                    </div>
+
+                    <div>
+                    Status: ${status}
+                    </div>
+
+                    <div class="action-row">
+
+                    <button
+                    class="edit"
+                    onclick='editContent(${JSON.stringify(item)})'>
+                    Edit
+                    </button>
+
+                    <button
+                    class="toggle"
+                    onclick="toggleContent(${item.id})">
+                    ${item.enabled !== false
+                    ? "Disable"
+                    : "Enable"}
+                    </button>
+
+                    <button
+                    class="delete"
+                    onclick="deleteContent(${item.id})">
+                    Delete
+                    </button>
+
+                    </div>
+
+                    </div>
+                    `;
+
+                }
+            ).join("");
 
     }catch(error){
 
         box.innerHTML=
-            '<div class="saved-item">' +
-            'Load failed: ' +
-            error.message +
-            '</div>';
+            `
+            <div class="saved-item">
+            Load failed:
+            ${error.message}
+            </div>
+            `;
+
+    }
+
+}
+
+
+function editContent(item){
+
+    editingId=item.id;
+
+    showFields(item);
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    message.className=
+        "status";
+
+    message.textContent=
+        "Editing Content ID " +
+        item.id;
+
+}
+
+
+async function deleteContent(id){
+
+    if(!confirm(
+        "Delete this content?"
+    )){
+        return;
+    }
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/admin/content/delete",
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body:
+                    JSON.stringify({
+                        id:id
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+            throw new Error(
+                data.error ||
+                "Delete failed"
+            );
+        }
+
+        loadContent();
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function toggleContent(id){
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/admin/content/toggle",
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body:
+                    JSON.stringify({
+                        id:id
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+            throw new Error(
+                data.error ||
+                "Status update failed"
+            );
+        }
+
+        loadContent();
+
+    }catch(error){
+
+        alert(error.message);
 
     }
 
