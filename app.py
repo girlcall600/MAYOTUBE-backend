@@ -35,6 +35,7 @@ def admin_login():
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAYOTUBE Admin</title>
+
 <style>
 html,body{
     margin:0;
@@ -43,14 +44,17 @@ html,body{
     max-width:100%;
     overflow-x:hidden;
 }
+
 *{
     box-sizing:border-box;
 }
+
 body{
     font-family:Arial,sans-serif;
     background:#f2f2f2;
     padding:30px 15px;
 }
+
 .box{
     width:100%;
     max-width:420px;
@@ -62,10 +66,13 @@ body{
     box-shadow:0 4px 15px #bbb;
     overflow:hidden;
 }
+
 h2{
+    width:100%;
+    margin:0 0 20px;
     text-align:center;
-    margin-top:0;
 }
+
 input,button{
     display:block;
     width:100%;
@@ -75,9 +82,11 @@ input,button{
     margin-top:12px;
     border-radius:8px;
 }
+
 input{
     border:1px solid #ccc;
 }
+
 button{
     border:0;
     background:#111;
@@ -86,15 +95,27 @@ button{
 }
 </style>
 </head>
+
 <body>
+
 <div class="box">
-    <h2>MAYOTUBE ADMIN</h2>
-    <form method="post" action="/admin/login">
-        <input type="password" name="token"
-               placeholder="Owner Admin Token" required>
-        <button type="submit">Login</button>
-    </form>
+
+<h2>MAYOTUBE ADMIN</h2>
+
+<form method="post" action="/admin/login">
+
+<input
+type="password"
+name="token"
+placeholder="Owner Admin Token"
+required>
+
+<button type="submit">Login</button>
+
+</form>
+
 </div>
+
 </body>
 </html>
 """
@@ -109,7 +130,10 @@ def admin_login_post():
         return redirect(url_for("admin_dashboard"))
 
     return """
-<h3 style="text-align:center;color:red">Invalid Admin Token</h3>
+<h3 style="text-align:center;color:red">
+Invalid Admin Token
+</h3>
+
 <p style="text-align:center">
 <a href="/admin">Try Again</a>
 </p>
@@ -118,18 +142,26 @@ def admin_login_post():
 
 @app.get("/admin/dashboard")
 def admin_dashboard():
+
     if not session.get("admin"):
         return redirect(url_for("admin_login"))
 
     return """
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1">
+
 <title>MAYOTUBE Admin Dashboard</title>
 
 <style>
-html,body{
+
+html,
+body{
     margin:0;
     padding:0;
     width:100%;
@@ -139,7 +171,6 @@ html,body{
 
 *{
     box-sizing:border-box;
-    max-width:100%;
 }
 
 body{
@@ -152,8 +183,7 @@ body{
     width:100%;
     max-width:700px;
     min-width:0;
-    margin:auto;
-    overflow:hidden;
+    margin:0 auto;
 }
 
 .header{
@@ -164,14 +194,12 @@ body{
     border-radius:14px;
     margin-bottom:15px;
     text-align:center;
-    overflow:hidden;
 }
 
 .header h2{
-    margin:0;
+    width:100%;
+    margin:0 0 10px;
     text-align:center;
-    overflow-wrap:anywhere;
-    word-break:break-word;
 }
 
 .card{
@@ -182,45 +210,51 @@ body{
     margin-bottom:12px;
     border-radius:14px;
     box-shadow:0 2px 8px #ccc;
-    overflow:hidden;
 }
 
-h3{
-    margin-top:0;
-    text-align:center;
-    overflow-wrap:anywhere;
-    word-break:break-word;
+.card h3{
+    width:100%;
+    margin:0 0 18px;
+    text-align:center !important;
 }
 
-label{
+.field{
+    width:100%;
+    min-width:0;
+    margin-top:18px;
+}
+
+.field-title{
     display:block;
     width:100%;
-    margin-top:16px;
+    margin:0 0 8px;
+    text-align:center !important;
     font-weight:bold;
-    text-align:center;
+    font-size:16px;
+    line-height:1.4;
     overflow-wrap:anywhere;
     word-break:break-word;
 }
 
-input,textarea,select,button{
+input,
+textarea,
+select,
+button{
     display:block;
     width:100%;
     max-width:100%;
     min-width:0;
     padding:12px;
-    margin-top:7px;
+    margin:0;
     border-radius:8px;
     font-size:15px;
 }
 
-input,textarea,select{
+input,
+textarea,
+select{
     border:1px solid #ccc;
     background:white;
-}
-
-input,textarea{
-    overflow-wrap:anywhere;
-    word-break:break-word;
 }
 
 textarea{
@@ -235,44 +269,38 @@ button{
     font-size:16px;
 }
 
-.status{
-    text-align:center;
-    color:green;
-    font-weight:bold;
+.type-info{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    background:#f5f5f5;
+    border-radius:8px;
+    text-align:center !important;
     overflow-wrap:anywhere;
     word-break:break-word;
+}
+
+.status{
+    width:100%;
+    text-align:center !important;
+    color:green;
+    font-weight:bold;
 }
 
 .logout{
     display:block;
     width:100%;
-    max-width:100%;
-    text-align:center;
     margin-top:15px;
     padding:12px;
     background:#ddd;
     color:#111;
     text-decoration:none;
-    border-radius:8px;
-}
-
-.type-info{
-    width:100%;
-    max-width:100%;
-    background:#f5f5f5;
-    padding:12px;
-    border-radius:8px;
-    margin-top:12px;
-    color:#555;
     text-align:center;
-    overflow-wrap:anywhere;
-    word-break:break-word;
+    border-radius:8px;
 }
 
-.hidden{
-    display:none;
-}
 </style>
+
 </head>
 
 <body>
@@ -280,227 +308,606 @@ button{
 <div class="box">
 
 <div class="header">
-    <h2>MAYOTUBE ADMIN</h2>
-    <div class="status">Owner Admin ✓</div>
+
+<h2>MAYOTUBE ADMIN</h2>
+
+<div class="status">
+Owner Admin ✓
 </div>
+
+</div>
+
 
 <div class="card">
 
-<h3>Add Homepage Content</h3>
+<h3>
+Add Homepage Content
+</h3>
 
-<label>Content Type</label>
+
+<div class="field">
+
+<div class="field-title">
+Content Type
+</div>
 
 <select id="contentType" onchange="showFields()">
-    <option value="">Select Content Type</option>
-    <option value="url">URL / Web Link</option>
-    <option value="youtube">YouTube Video</option>
-    <option value="message">Message</option>
-    <option value="donation">Donation</option>
-    <option value="audio">Audio</option>
-    <option value="notification">Notification</option>
-    <option value="image">Image</option>
-    <option value="video">Video</option>
-    <option value="gif">GIF</option>
-    <option value="ad">Advertisement</option>
-    <option value="music">Music Link</option>
-    <option value="gallery">Gallery Video</option>
-    <option value="live">Live Channel</option>
+
+<option value="">
+Select Content Type
+</option>
+
+<option value="url">
+URL / Web Link
+</option>
+
+<option value="youtube">
+YouTube Video
+</option>
+
+<option value="message">
+Message
+</option>
+
+<option value="donation">
+Donation
+</option>
+
+<option value="audio">
+Audio
+</option>
+
+<option value="notification">
+Notification
+</option>
+
+<option value="image">
+Image
+</option>
+
+<option value="video">
+Video
+</option>
+
+<option value="gif">
+GIF
+</option>
+
+<option value="ad">
+Advertisement
+</option>
+
+<option value="music">
+Music Link
+</option>
+
+<option value="gallery">
+Gallery Video
+</option>
+
+<option value="live">
+Live Channel
+</option>
+
 </select>
+
+</div>
+
 
 <div id="fields"></div>
 
 </div>
 
+
 <div class="card">
-    <h3>System Status</h3>
-    <p class="status">Backend Online ✓</p>
-    <p class="status">Admin Authenticated ✓</p>
+
+<h3>
+System Status
+</h3>
+
+<p class="status">
+Backend Online ✓
+</p>
+
+<p class="status">
+Admin Authenticated ✓
+</p>
+
 </div>
 
-<a class="logout" href="/admin/logout">Logout</a>
+
+<a
+class="logout"
+href="/admin/logout">
+
+Logout
+
+</a>
 
 </div>
+
 
 <script>
 
+function field(title,html){
+
+    return `
+    <div class="field">
+        <div class="field-title">${title}</div>
+        ${html}
+    </div>
+    `;
+
+}
+
+
 const fields = {
 
-url: `
-<label>URL</label>
-<input name="url" placeholder="https://example.com">
+url:
 
-<label>Button Text</label>
-<input name="button_text" placeholder="Open">
-`,
+field(
+"URL",
+`
+<input
+name="url"
+placeholder="https://example.com">
+`
+)
 
-youtube: `
-<label>YouTube URL</label>
-<input name="youtube_url"
++
+
+field(
+"Button Text",
+`
+<input
+name="button_text"
+placeholder="Open">
+`
+),
+
+
+youtube:
+
+field(
+"YouTube URL",
+`
+<input
+name="youtube_url"
 placeholder="https://youtube.com/watch?v=...">
+`
+)
 
-<label>Title</label>
-<input name="title" placeholder="Video Title">
++
 
-<label>Description</label>
-<textarea name="description"
+field(
+"Title",
+`
+<input
+name="title"
+placeholder="Video Title">
+`
+)
+
++
+
+field(
+"Description",
+`
+<textarea
+name="description"
 placeholder="Video Description"></textarea>
+`
+)
 
-<label>Thumbnail URL</label>
-<input name="thumbnail_url"
-placeholder="https://...">
++
 
-<label>Button Text</label>
-<input name="button_text" placeholder="Watch">
-`,
-
-message: `
-<label>Message</label>
-<textarea name="message"
-placeholder="Write your message"></textarea>
-
-<label>Button Text</label>
-<input name="button_text" placeholder="Open">
-
-<label>Button URL</label>
-<input name="button_url"
-placeholder="https://...">
-`,
-
-donation: `
-<label>Donation Message</label>
-<textarea name="donation_message"
-placeholder="Support MAYOTUBE"></textarea>
-
-<label>Donation URL</label>
-<input name="donation_url"
-placeholder="https://...">
-
-<label>Button Text</label>
-<input name="button_text" placeholder="Donate">
-`,
-
-audio: `
-<label>Audio URL</label>
-<input name="audio_url"
-placeholder="https://...">
-
-<label>Audio Title</label>
-<input name="title" placeholder="Audio Title">
-
-<label>Cover Image URL</label>
-<input name="cover_url"
-placeholder="https://...">
-`,
-
-notification: `
-<label>Notification Message</label>
-<textarea name="notification"
-placeholder="Notification text"></textarea>
-
-<label>Button Text</label>
-<input name="button_text" placeholder="Open">
-
-<label>Button URL</label>
-<input name="button_url"
-placeholder="https://...">
-`,
-
-image: `
-<label>Image URL</label>
-<input name="image_url"
-placeholder="https://...">
-
-<label>Title</label>
-<input name="title" placeholder="Image Title">
-
-<label>Click URL</label>
-<input name="click_url"
-placeholder="https://...">
-`,
-
-video: `
-<label>Video URL</label>
-<input name="video_url"
-placeholder="https://...">
-
-<label>Title</label>
-<input name="title" placeholder="Video Title">
-
-<label>Thumbnail URL</label>
-<input name="thumbnail_url"
-placeholder="https://...">
-
-<label>Description</label>
-<textarea name="description"
-placeholder="Video Description"></textarea>
-`,
-
-gif: `
-<label>GIF URL</label>
-<input name="gif_url"
-placeholder="https://...">
-
-<label>Title</label>
-<input name="title" placeholder="GIF Title">
-
-<label>Click URL</label>
-<input name="click_url"
-placeholder="https://...">
-`,
-
-ad: `
-<label>Advertisement Image/Media URL</label>
-<input name="media_url"
-placeholder="https://...">
-
-<label>Advertisement URL</label>
-<input name="ad_url"
-placeholder="https://...">
-
-<label>Ad Title</label>
-<input name="title" placeholder="Advertisement">
-`,
-
-music: `
-<label>Music URL</label>
-<input name="music_url"
-placeholder="https://...">
-
-<label>Music Title</label>
-<input name="title" placeholder="Music Title">
-
-<label>Artist</label>
-<input name="artist" placeholder="Artist Name">
-`,
-
-gallery: `
-<label>Gallery Video URL</label>
-<input name="video_url"
-placeholder="https://...">
-
-<label>Title</label>
-<input name="title" placeholder="Gallery Video">
-
-<label>Thumbnail URL</label>
-<input name="thumbnail_url"
-placeholder="https://...">
-`,
-
-live: `
-<label>Live Channel URL</label>
-<input name="live_url"
-placeholder="https://...">
-
-<label>Channel Name</label>
-<input name="channel_name"
-placeholder="Channel Name">
-
-<label>Thumbnail URL</label>
-<input name="thumbnail_url"
+field(
+"Thumbnail URL",
+`
+<input
+name="thumbnail_url"
 placeholder="https://...">
 `
+)
+
++
+
+field(
+"Button Text",
+`
+<input
+name="button_text"
+placeholder="Watch">
+`
+),
+
+
+message:
+
+field(
+"Message",
+`
+<textarea
+name="message"
+placeholder="Write your message"></textarea>
+`
+)
+
++
+
+field(
+"Button Text",
+`
+<input
+name="button_text"
+placeholder="Open">
+`
+)
+
++
+
+field(
+"Button URL",
+`
+<input
+name="button_url"
+placeholder="https://...">
+`
+),
+
+
+donation:
+
+field(
+"Donation Message",
+`
+<textarea
+name="donation_message"
+placeholder="Support MAYOTUBE"></textarea>
+`
+)
+
++
+
+field(
+"Donation URL",
+`
+<input
+name="donation_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Button Text",
+`
+<input
+name="button_text"
+placeholder="Donate">
+`
+),
+
+
+audio:
+
+field(
+"Audio URL",
+`
+<input
+name="audio_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Audio Title",
+`
+<input
+name="title"
+placeholder="Audio Title">
+`
+)
+
++
+
+field(
+"Cover Image URL",
+`
+<input
+name="cover_url"
+placeholder="https://...">
+`
+),
+
+
+notification:
+
+field(
+"Notification Message",
+`
+<textarea
+name="notification"
+placeholder="Notification text"></textarea>
+`
+)
+
++
+
+field(
+"Button Text",
+`
+<input
+name="button_text"
+placeholder="Open">
+`
+)
+
++
+
+field(
+"Button URL",
+`
+<input
+name="button_url"
+placeholder="https://...">
+`
+),
+
+
+image:
+
+field(
+"Image URL",
+`
+<input
+name="image_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Title",
+`
+<input
+name="title"
+placeholder="Image Title">
+`
+)
+
++
+
+field(
+"Click URL",
+`
+<input
+name="click_url"
+placeholder="https://...">
+`
+),
+
+
+video:
+
+field(
+"Video URL",
+`
+<input
+name="video_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Title",
+`
+<input
+name="title"
+placeholder="Video Title">
+`
+)
+
++
+
+field(
+"Thumbnail URL",
+`
+<input
+name="thumbnail_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Description",
+`
+<textarea
+name="description"
+placeholder="Video Description"></textarea>
+`
+),
+
+
+gif:
+
+field(
+"GIF URL",
+`
+<input
+name="gif_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Title",
+`
+<input
+name="title"
+placeholder="GIF Title">
+`
+)
+
++
+
+field(
+"Click URL",
+`
+<input
+name="click_url"
+placeholder="https://...">
+`
+),
+
+
+ad:
+
+field(
+"Advertisement Image/Media URL",
+`
+<input
+name="media_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Advertisement URL",
+`
+<input
+name="ad_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Ad Title",
+`
+<input
+name="title"
+placeholder="Advertisement">
+`
+),
+
+
+music:
+
+field(
+"Music URL",
+`
+<input
+name="music_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Music Title",
+`
+<input
+name="title"
+placeholder="Music Title">
+`
+)
+
++
+
+field(
+"Artist",
+`
+<input
+name="artist"
+placeholder="Artist Name">
+`
+),
+
+
+gallery:
+
+field(
+"Gallery Video URL",
+`
+<input
+name="video_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Title",
+`
+<input
+name="title"
+placeholder="Gallery Video">
+`
+)
+
++
+
+field(
+"Thumbnail URL",
+`
+<input
+name="thumbnail_url"
+placeholder="https://...">
+`
+),
+
+
+live:
+
+field(
+"Live Channel URL",
+`
+<input
+name="live_url"
+placeholder="https://...">
+`
+)
+
++
+
+field(
+"Channel Name",
+`
+<input
+name="channel_name"
+placeholder="Channel Name">
+`
+)
+
++
+
+field(
+"Thumbnail URL",
+`
+<input
+name="thumbnail_url"
+placeholder="https://...">
+`
+)
 
 };
+
 
 function showFields(){
 
@@ -511,20 +918,28 @@ function showFields(){
         document.getElementById("fields");
 
     if(!type){
+
         box.innerHTML="";
+
         return;
+
     }
 
     box.innerHTML =
-        '<div class="type-info">Selected: ' +
-        type.toUpperCase() +
-        '</div>' +
+        `
+        <div class="type-info">
+        Selected: ${type.toUpperCase()}
+        </div>
+        `
+        +
         fields[type];
+
 }
 
 </script>
 
 </body>
+
 </html>
 """
 
