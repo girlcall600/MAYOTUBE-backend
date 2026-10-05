@@ -44,7 +44,6 @@ def admin_login():
                          box-sizing:border-box;border-radius:8px}
             input{border:1px solid #ccc}
             button{border:0;background:#111;color:white;font-size:16px}
-            .error{color:red;text-align:center}
         </style>
     </head>
     <body>
@@ -70,9 +69,7 @@ def admin_login_post():
         return redirect(url_for("admin_dashboard"))
 
     return """
-    <h3 style="text-align:center;color:red">
-        Invalid Admin Token
-    </h3>
+    <h3 style="text-align:center;color:red">Invalid Admin Token</h3>
     <p style="text-align:center">
         <a href="/admin">Try Again</a>
     </p>
@@ -93,16 +90,29 @@ def admin_dashboard():
         <style>
             body{font-family:Arial;background:#f2f2f2;margin:0;padding:15px}
             .box{max-width:700px;margin:auto}
-            .header{background:#111;color:white;padding:20px;border-radius:14px;
-                    margin-bottom:15px}
+            .header{background:#111;color:white;padding:20px;
+                    border-radius:14px;margin-bottom:15px}
             .card{background:white;padding:20px;margin-bottom:12px;
                   border-radius:14px;box-shadow:0 2px 8px #ccc}
             h2,h3{margin-top:0}
+            label{display:block;margin-top:14px;font-weight:bold}
+            input,textarea,select,button{
+                width:100%;box-sizing:border-box;padding:12px;
+                margin-top:7px;border-radius:8px
+            }
+            input,textarea,select{border:1px solid #ccc;background:white}
+            textarea{min-height:100px;resize:vertical}
+            button{border:0;background:#111;color:white;font-size:16px}
             .status{color:green;font-weight:bold}
-            .btn{display:block;text-decoration:none;background:#111;color:white;
-                 text-align:center;padding:12px;border-radius:8px;margin-top:10px}
+            .logout{display:block;text-align:center;margin-top:15px;
+                    padding:12px;background:#ddd;color:#111;
+                    text-decoration:none;border-radius:8px}
+            .type-info{background:#f5f5f5;padding:12px;border-radius:8px;
+                       margin-top:12px;color:#555}
+            .hidden{display:none}
         </style>
     </head>
+
     <body>
         <div class="box">
 
@@ -112,14 +122,28 @@ def admin_dashboard():
             </div>
 
             <div class="card">
-                <h3>Homepage Content</h3>
-                <p>یہاں سے MAYOTUBE Homepage کا Content manage کیا جائے گا۔</p>
-            </div>
+                <h3>Add Homepage Content</h3>
 
-            <div class="card">
-                <h3>Content Management</h3>
-                <p>Text, Image, Video, GIF, Notification, Ads, Music,
-                Gallery اور Live Channel کے tools اگلے مراحل میں شامل ہوں گے۔</p>
+                <label>Content Type</label>
+
+                <select id="contentType" onchange="showFields()">
+                    <option value="">Select Content Type</option>
+                    <option value="url">URL / Web Link</option>
+                    <option value="youtube">YouTube Video</option>
+                    <option value="message">Message</option>
+                    <option value="donation">Donation</option>
+                    <option value="audio">Audio</option>
+                    <option value="notification">Notification</option>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                    <option value="gif">GIF</option>
+                    <option value="ad">Advertisement</option>
+                    <option value="music">Music Link</option>
+                    <option value="gallery">Gallery Video</option>
+                    <option value="live">Live Channel</option>
+                </select>
+
+                <div id="fields"></div>
             </div>
 
             <div class="card">
@@ -128,9 +152,204 @@ def admin_dashboard():
                 <p class="status">Admin Authenticated ✓</p>
             </div>
 
-            <a class="btn" href="/admin/logout">Logout</a>
+            <a class="logout" href="/admin/logout">Logout</a>
 
         </div>
+
+        <script>
+            const fields = {
+                url: `
+                    <label>URL</label>
+                    <input name="url" placeholder="https://example.com">
+
+                    <label>Button Text</label>
+                    <input name="button_text" placeholder="Open">
+                `,
+
+                youtube: `
+                    <label>YouTube URL</label>
+                    <input name="youtube_url"
+                           placeholder="https://youtube.com/watch?v=...">
+
+                    <label>Title</label>
+                    <input name="title" placeholder="Video Title">
+
+                    <label>Description</label>
+                    <textarea name="description"
+                              placeholder="Video Description"></textarea>
+
+                    <label>Thumbnail URL</label>
+                    <input name="thumbnail_url"
+                           placeholder="https://...">
+
+                    <label>Button Text</label>
+                    <input name="button_text" placeholder="Watch">
+                `,
+
+                message: `
+                    <label>Message</label>
+                    <textarea name="message"
+                              placeholder="Write your message"></textarea>
+
+                    <label>Button Text</label>
+                    <input name="button_text" placeholder="Open">
+
+                    <label>Button URL</label>
+                    <input name="button_url"
+                           placeholder="https://...">
+                `,
+
+                donation: `
+                    <label>Donation Message</label>
+                    <textarea name="donation_message"
+                              placeholder="Support MAYOTUBE"></textarea>
+
+                    <label>Donation URL</label>
+                    <input name="donation_url"
+                           placeholder="https://...">
+
+                    <label>Button Text</label>
+                    <input name="button_text" placeholder="Donate">
+                `,
+
+                audio: `
+                    <label>Audio URL</label>
+                    <input name="audio_url"
+                           placeholder="https://...">
+
+                    <label>Audio Title</label>
+                    <input name="title" placeholder="Audio Title">
+
+                    <label>Cover Image URL</label>
+                    <input name="cover_url"
+                           placeholder="https://...">
+                `,
+
+                notification: `
+                    <label>Notification Message</label>
+                    <textarea name="notification"
+                              placeholder="Notification text"></textarea>
+
+                    <label>Button Text</label>
+                    <input name="button_text" placeholder="Open">
+
+                    <label>Button URL</label>
+                    <input name="button_url"
+                           placeholder="https://...">
+                `,
+
+                image: `
+                    <label>Image URL</label>
+                    <input name="image_url"
+                           placeholder="https://...">
+
+                    <label>Title</label>
+                    <input name="title" placeholder="Image Title">
+
+                    <label>Click URL</label>
+                    <input name="click_url"
+                           placeholder="https://...">
+                `,
+
+                video: `
+                    <label>Video URL</label>
+                    <input name="video_url"
+                           placeholder="https://...">
+
+                    <label>Title</label>
+                    <input name="title" placeholder="Video Title">
+
+                    <label>Thumbnail URL</label>
+                    <input name="thumbnail_url"
+                           placeholder="https://...">
+
+                    <label>Description</label>
+                    <textarea name="description"
+                              placeholder="Video Description"></textarea>
+                `,
+
+                gif: `
+                    <label>GIF URL</label>
+                    <input name="gif_url"
+                           placeholder="https://...">
+
+                    <label>Title</label>
+                    <input name="title" placeholder="GIF Title">
+
+                    <label>Click URL</label>
+                    <input name="click_url"
+                           placeholder="https://...">
+                `,
+
+                ad: `
+                    <label>Advertisement Image/Media URL</label>
+                    <input name="media_url"
+                           placeholder="https://...">
+
+                    <label>Advertisement URL</label>
+                    <input name="ad_url"
+                           placeholder="https://...">
+
+                    <label>Ad Title</label>
+                    <input name="title" placeholder="Advertisement">
+                `,
+
+                music: `
+                    <label>Music URL</label>
+                    <input name="music_url"
+                           placeholder="https://...">
+
+                    <label>Music Title</label>
+                    <input name="title" placeholder="Music Title">
+
+                    <label>Artist</label>
+                    <input name="artist" placeholder="Artist Name">
+                `,
+
+                gallery: `
+                    <label>Gallery Video URL</label>
+                    <input name="video_url"
+                           placeholder="https://...">
+
+                    <label>Title</label>
+                    <input name="title" placeholder="Gallery Video">
+
+                    <label>Thumbnail URL</label>
+                    <input name="thumbnail_url"
+                           placeholder="https://...">
+                `,
+
+                live: `
+                    <label>Live Channel URL</label>
+                    <input name="live_url"
+                           placeholder="https://...">
+
+                    <label>Channel Name</label>
+                    <input name="channel_name"
+                           placeholder="Channel Name">
+
+                    <label>Thumbnail URL</label>
+                    <input name="thumbnail_url"
+                           placeholder="https://...">
+                `
+            };
+
+            function showFields() {
+                const type = document.getElementById("contentType").value;
+                const box = document.getElementById("fields");
+
+                if (!type) {
+                    box.innerHTML = "";
+                    return;
+                }
+
+                box.innerHTML =
+                    '<div class="type-info">Selected: ' +
+                    type.toUpperCase() +
+                    '</div>' +
+                    fields[type];
+            }
+        </script>
     </body>
     </html>
     """
