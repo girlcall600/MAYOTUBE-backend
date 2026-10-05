@@ -12,7 +12,7 @@
       "dest": "app.py"
     },
     {
-      "src": "/",
+      "src": "/(.*)",
       "dest": "app.py"
     }
   ]
