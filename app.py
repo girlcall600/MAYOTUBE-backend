@@ -64,9 +64,8 @@ def load_content():
             use_cache=False
         )
 
-        data = json.loads(
-            result.content.decode("utf-8")
-        )
+        raw = b"".join(result.stream or [])
+data = json.loads(raw.decode("utf-8"))
 
         if not isinstance(data, dict):
             return empty_content()
@@ -102,7 +101,7 @@ def save_content(data):
         access="public",
         content_type="application/json",
         add_random_suffix=False,
-        overwrite=True,
+        allow_overwrite=True,
         token=BLOB_TOKEN
     )
 
