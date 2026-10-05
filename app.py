@@ -1,51 +1,44 @@
 import os
 import json
 import hmac
-import urllib.request
-from flask import Flask, jsonify, request, session, redirect, url_for
+
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    session,
+    redirect,
+    url_for
+)
+
+from vercel import blob
+
 
 app = Flask(__name__)
 
-ADMIN_TOKEN = os.getenv("MAYOTUBE_ADMIN_TOKEN", "")
-BLOB_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN", "")
+ADMIN_TOKEN = os.getenv(
+    "MAYOTUBE_ADMIN_TOKEN",
+    ""
+)
+
+BLOB_TOKEN = os.getenv(
+    "BLOB_READ_WRITE_TOKEN",
+    ""
+)
+
 BLOB_PATH = "mayotube/home-content.json"
-BLOB_BASE = "https://blob.vercel-storage.com"
 
-app.secret_key = ADMIN_TOKEN or os.urandom(32)
+app.secret_key = (
+    ADMIN_TOKEN or os.urandom(32)
+)
 
+
+# =========================================================
+# HELPERS
+# =========================================================
 
 def admin_required():
     return session.get("admin") is True
-
-
-def blob_request(method, data=None):
-    url = f"{BLOB_BASE}/{BLOB_PATH}"
-
-    headers = {
-        "Authorization": f"Bearer {BLOB_TOKEN}",
-        "x-api-version": "7"
-    }
-
-    if method == "PUT":
-        headers.update({
-            "Content-Type": "application/json",
-            "x-content-type": "application/json",
-            "x-add-random-suffix": "0",
-            "x-allow-overwrite": "1"
-        })
-
-    req = urllib.request.Request(
-        url,
-        method=method,
-        data=data,
-        headers=headers
-    )
-
-    with urllib.request.urlopen(
-        req,
-        timeout=20
-    ) as response:
-        return response.read()
 
 
 def empty_content():
@@ -64,16 +57,18 @@ def load_content():
 
     try:
 
-        raw = blob_request("GET")
-
-        data = json.loads(
-            raw.decode("utf-8")
+        result = blob.get(
+            BLOB_PATH,
+            access="public",
+            token=BLOB_TOKEN,
+            use_cache=False
         )
 
-        if not isinstance(
-            data,
-            dict
-        ):
+        data = json.loads(
+            result.content.decode("utf-8")
+        )
+
+        if not isinstance(data, dict):
             return empty_content()
 
         if not isinstance(
@@ -101,9 +96,14 @@ def save_content(data):
         separators=(",", ":")
     ).encode("utf-8")
 
-    blob_request(
-        "PUT",
-        raw
+    blob.put(
+        BLOB_PATH,
+        raw,
+        access="public",
+        content_type="application/json",
+        add_random_suffix=False,
+        overwrite=True,
+        token=BLOB_TOKEN
     )
 
 
@@ -150,7 +150,8 @@ def public_home_content():
             items = []
 
         enabled_items = [
-            item for item in items
+            item
+            for item in items
             if isinstance(item, dict)
             and item.get(
                 "enabled",
@@ -254,7 +255,16 @@ def admin_content_save():
             data["items"] = []
 
         item["id"] = (
-            len(data["items"]) + 1
+            max(
+                [
+                    int(x.get("id", 0))
+                    for x in data["items"]
+                    if isinstance(x, dict)
+                    and str(
+                        x.get("id", "")
+                    ).isdigit()
+                ] or [0]
+            ) + 1
         )
 
         item["enabled"] = True
@@ -281,7 +291,7 @@ def admin_content_save():
             "error":
                 "Content save failed",
             "details":
-                str(e)[:200]
+                str(e)[:300]
         }), 500
 
 
@@ -388,7 +398,7 @@ def admin_content_update():
             "error":
                 "Content update failed",
             "details":
-                str(e)[:200]
+                str(e)[:300]
         }), 500
 
 
@@ -432,7 +442,8 @@ def admin_content_delete():
         )
 
         new_items = [
-            item for item in items
+            item
+            for item in items
             if str(
                 item.get("id")
             ) != str(item_id)
@@ -473,7 +484,7 @@ def admin_content_delete():
             "error":
                 "Content delete failed",
             "details":
-                str(e)[:200]
+                str(e)[:300]
         }), 500
 
 
@@ -569,7 +580,7 @@ def admin_content_toggle():
             "error":
                 "Content status update failed",
             "details":
-                str(e)[:200]
+                str(e)[:300]
         }), 500
 
 
@@ -666,32 +677,18 @@ def admin_media_upload():
                     "File is larger than 4 MB. Large media will use direct client upload."
             }), 413
 
-        try:
-
-            from vercel.blob import BlobClient
-
-        except ImportError:
-
-            return jsonify({
-                "error":
-                    "Vercel Python SDK is not installed. requirements.txt must include vercel."
-            }), 500
-
         content_type = (
             file.mimetype or
             "application/octet-stream"
         )
 
-        client = BlobClient(
-            token=BLOB_TOKEN
-        )
-
-        blob = client.put(
+        result = blob.put(
             f"media/{filename}",
             file_data,
             access="public",
             content_type=content_type,
-            add_random_suffix=True
+            add_random_suffix=True,
+            token=BLOB_TOKEN
         )
 
         return jsonify({
@@ -699,11 +696,11 @@ def admin_media_upload():
             "message":
                 "Media uploaded successfully",
             "url":
-                blob.url,
+                result.url,
             "pathname":
-                blob.pathname,
+                result.pathname,
             "content_type":
-                content_type,
+                result.content_type,
             "filename":
                 filename
         })
@@ -741,7 +738,9 @@ def admin_login():
 name="viewport"
 content="width=device-width,initial-scale=1">
 <title>MAYOTUBE Admin</title>
+
 <style>
+
 html,body{
 margin:0;
 padding:0;
@@ -749,12 +748,17 @@ width:100%;
 max-width:100%;
 overflow-x:hidden;
 }
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box
+}
+
 body{
 font-family:Arial,sans-serif;
 background:#f2f2f2;
 padding:30px 15px;
 }
+
 .box{
 width:100%;
 max-width:420px;
@@ -764,10 +768,12 @@ padding:25px;
 border-radius:14px;
 box-shadow:0 4px 15px #bbb;
 }
+
 h2{
 margin:0 0 20px;
 text-align:center;
 }
+
 input,button{
 display:block;
 width:100%;
@@ -775,29 +781,47 @@ padding:13px;
 margin-top:12px;
 border-radius:8px;
 }
-input{border:1px solid #ccc}
+
+input{
+border:1px solid #ccc
+}
+
 button{
 border:0;
 background:#111;
 color:white;
 font-size:16px;
 }
+
 </style>
 </head>
+
 <body>
+
 <div class="box">
-<h2>MAYOTUBE ADMIN</h2>
-<form method="post" action="/admin/login">
+
+<h2>
+MAYOTUBE ADMIN
+</h2>
+
+<form
+method="post"
+action="/admin/login">
+
 <input
 type="password"
 name="token"
 placeholder="Owner Admin Token"
 required>
+
 <button type="submit">
 Login
 </button>
+
 </form>
+
 </div>
+
 </body>
 </html>
 """
@@ -825,13 +849,18 @@ def admin_login_post():
         )
 
     return """
-<h3 style="text-align:center;color:red">
+<h3
+style="text-align:center;color:red">
 Invalid Admin Token
 </h3>
-<p style="text-align:center">
+
+<p
+style="text-align:center">
+
 <a href="/admin">
 Try Again
 </a>
+
 </p>
 """, 401
 
@@ -854,13 +883,16 @@ def admin_dashboard():
     return """
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta
 name="viewport"
 content="width=device-width,initial-scale=1">
 
-<title>MAYOTUBE Admin Dashboard</title>
+<title>
+MAYOTUBE Admin Dashboard
+</title>
 
 <style>
 
@@ -930,6 +962,7 @@ font-weight:bold;
 font-size:16px;
 line-height:1.4;
 overflow-wrap:anywhere;
+word-break:break-word;
 }
 
 input,
@@ -980,8 +1013,13 @@ text-align:center;
 font-weight:bold;
 }
 
-.success{color:green}
-.error{color:red}
+.success{
+color:green
+}
+
+.error{
+color:red
+}
 
 .type-info{
 margin-top:15px;
@@ -1079,7 +1117,9 @@ border-radius:8px;
 
 <div class="header">
 
-<h2>MAYOTUBE ADMIN</h2>
+<h2>
+MAYOTUBE ADMIN
+</h2>
 
 <div class="status success">
 Owner Admin ✓
@@ -1168,6 +1208,7 @@ Live Channel
 
 <div id="fields"></div>
 
+
 <button
 class="save"
 onclick="saveContent()">
@@ -1175,6 +1216,7 @@ onclick="saveContent()">
 Save Content
 
 </button>
+
 
 <div
 id="message"
@@ -1278,10 +1320,13 @@ function field(title,html){
 
 return `
 <div class="field">
+
 <div class="field-title">
 ${title}
 </div>
+
 ${html}
+
 </div>
 `;
 
@@ -1291,13 +1336,16 @@ ${html}
 const fields = {
 
 url:
+
 field(
 "URL",
 `<input
 name="url"
 placeholder="https://example.com">`
 )
+
 +
+
 field(
 "Button Text",
 `<input
@@ -1307,34 +1355,43 @@ placeholder="Open">`
 
 
 youtube:
+
 field(
 "YouTube URL",
 `<input
 name="youtube_url"
 placeholder="https://youtube.com/watch?v=...">`
 )
+
 +
+
 field(
 "Title",
 `<input
 name="title"
 placeholder="Video Title">`
 )
+
 +
+
 field(
 "Description",
 `<textarea
 name="description"
 placeholder="Video Description"></textarea>`
 )
+
 +
+
 field(
 "Thumbnail URL",
 `<input
 name="thumbnail_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Button Text",
 `<input
@@ -1344,20 +1401,25 @@ placeholder="Watch">`
 
 
 message:
+
 field(
 "Message",
 `<textarea
 name="message"
 placeholder="Write your message"></textarea>`
 )
+
 +
+
 field(
 "Button Text",
 `<input
 name="button_text"
 placeholder="Open">`
 )
+
 +
+
 field(
 "Button URL",
 `<input
@@ -1367,20 +1429,25 @@ placeholder="https://...">`
 
 
 donation:
+
 field(
 "Donation Message",
 `<textarea
 name="donation_message"
 placeholder="Support MAYOTUBE"></textarea>`
 )
+
 +
+
 field(
 "Donation URL",
 `<input
 name="donation_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Button Text",
 `<input
@@ -1390,20 +1457,25 @@ placeholder="Donate">`
 
 
 audio:
+
 field(
 "Audio URL",
 `<input
 name="audio_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Audio Title",
 `<input
 name="title"
 placeholder="Audio Title">`
 )
+
 +
+
 field(
 "Cover Image URL",
 `<input
@@ -1413,20 +1485,25 @@ placeholder="https://...">`
 
 
 notification:
+
 field(
 "Notification Message",
 `<textarea
 name="notification"
 placeholder="Notification text"></textarea>`
 )
+
 +
+
 field(
 "Button Text",
 `<input
 name="button_text"
 placeholder="Open">`
 )
+
 +
+
 field(
 "Button URL",
 `<input
@@ -1436,20 +1513,25 @@ placeholder="https://...">`
 
 
 image:
+
 field(
 "Image URL",
 `<input
 name="image_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Title",
 `<input
 name="title"
 placeholder="Image Title">`
 )
+
 +
+
 field(
 "Click URL",
 `<input
@@ -1459,27 +1541,34 @@ placeholder="https://...">`
 
 
 video:
+
 field(
 "Video URL",
 `<input
 name="video_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Title",
 `<input
 name="title"
 placeholder="Video Title">`
 )
+
 +
+
 field(
 "Thumbnail URL",
 `<input
 name="thumbnail_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Description",
 `<textarea
@@ -1489,20 +1578,25 @@ placeholder="Video Description"></textarea>`
 
 
 gif:
+
 field(
 "GIF URL",
 `<input
 name="gif_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Title",
 `<input
 name="title"
 placeholder="GIF Title">`
 )
+
 +
+
 field(
 "Click URL",
 `<input
@@ -1512,20 +1606,25 @@ placeholder="https://...">`
 
 
 ad:
+
 field(
 "Advertisement Image/Media URL",
 `<input
 name="media_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Advertisement URL",
 `<input
 name="ad_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Ad Title",
 `<input
@@ -1535,20 +1634,25 @@ placeholder="Advertisement">`
 
 
 music:
+
 field(
 "Music URL",
 `<input
 name="music_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Music Title",
 `<input
 name="title"
 placeholder="Music Title">`
 )
+
 +
+
 field(
 "Artist",
 `<input
@@ -1558,20 +1662,25 @@ placeholder="Artist Name">`
 
 
 gallery:
+
 field(
 "Gallery Video URL",
 `<input
 name="video_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Title",
 `<input
 name="title"
 placeholder="Gallery Video">`
 )
+
 +
+
 field(
 "Thumbnail URL",
 `<input
@@ -1581,20 +1690,25 @@ placeholder="https://...">`
 
 
 live:
+
 field(
 "Live Channel URL",
 `<input
 name="live_url"
 placeholder="https://...">`
 )
+
 +
+
 field(
 "Channel Name",
 `<input
 name="channel_name"
 placeholder="Channel Name">`
 )
+
 +
+
 field(
 "Thumbnail URL",
 `<input
@@ -1648,8 +1762,10 @@ box.querySelector(
 );
 
 if(el){
+
 el.value =
 data[key] ?? "";
+
 }
 
 }
@@ -1687,7 +1803,9 @@ el.value.trim();
 );
 
 if(editingId !== null){
+
 item.id=editingId;
+
 }
 
 return item;
@@ -1718,6 +1836,7 @@ return;
 }
 
 message.className="status";
+
 message.textContent="Saving...";
 
 const endpoint =
