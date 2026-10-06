@@ -1,6 +1,7 @@
 import os
 import json
 import hmac
+import urllib.request
 
 from flask import (
     Flask,
@@ -45,32 +46,51 @@ def blob_client():
         raise RuntimeError(
             "BLOB_READ_WRITE_TOKEN is not configured"
         )
-    return BlobClient()
+    return BlobClient(token=BLOB_TOKEN)
+
+
+def get_blob_url():
+    client = blob_client()
+
+    listing = client.list_objects(
+        prefix=BLOB_PATH
+    )
+
+    for blob in listing.blobs:
+        pathname = getattr(
+            blob,
+            "pathname",
+            ""
+        )
+
+        if pathname == BLOB_PATH:
+            return getattr(
+                blob,
+                "url",
+                None
+            )
+
+    return None
 
 
 def load_content():
-    client = blob_client()
+    blob_url = get_blob_url()
 
-    result = client.get(
-        BLOB_PATH,
-        access="public",
-        token=BLOB_TOKEN
-    )
-
-    if result is None:
+    if not blob_url:
         return empty_content()
 
-    if result.status_code != 200:
-        raise RuntimeError(
-            f"Blob read returned status {result.status_code}"
-        )
+    try:
+        with urllib.request.urlopen(
+            blob_url,
+            timeout=15
+        ) as response:
 
-    if result.stream is None:
-        raise RuntimeError(
-            "Blob returned no content stream"
-        )
+            raw = response.read()
 
-    raw = b"".join(result.stream)
+    except Exception as e:
+        raise RuntimeError(
+            f"Blob download failed: {e}"
+        )
 
     if not raw:
         return empty_content()
@@ -117,8 +137,7 @@ def save_content(data):
         access="public",
         content_type="application/json",
         add_random_suffix=False,
-        overwrite=True,
-        token=BLOB_TOKEN
+        overwrite=True
     )
 
     if not result:
@@ -609,8 +628,7 @@ def admin_media_upload():
             file_data,
             access="public",
             content_type=content_type,
-            add_random_suffix=True,
-            token=BLOB_TOKEN
+            add_random_suffix=True
         )
 
         return jsonify({
