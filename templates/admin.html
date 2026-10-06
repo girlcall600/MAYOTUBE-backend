@@ -1,42 +1,145 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAYOTUBE ADMIN</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0c0b10;color:#fff;font-family:Arial,sans-serif}
-header{padding:18px;background:#15131b;border-bottom:1px solid #292532}
+body{
+margin:0;
+background:#0c0b10;
+color:#fff;
+font-family:Arial,sans-serif
+}
+header{
+padding:18px;
+background:#15131b;
+border-bottom:1px solid #292532
+}
 h1{margin:0;font-size:22px}
 h2{font-size:18px;margin:0 0 14px}
 main{max-width:900px;margin:auto;padding:16px}
-.card{background:#15131b;border:1px solid #292532;border-radius:12px;padding:16px;margin-bottom:16px}
-input,textarea,select{width:100%;padding:12px;margin:7px 0;background:#0d0c11;color:#fff;border:1px solid #393342;border-radius:8px}
+.card{
+background:#15131b;
+border:1px solid #292532;
+border-radius:12px;
+padding:16px;
+margin-bottom:16px
+}
+input,textarea,select{
+width:100%;
+padding:12px;
+margin:7px 0;
+background:#0d0c11;
+color:#fff;
+border:1px solid #393342;
+border-radius:8px
+}
 textarea{min-height:100px;resize:vertical}
-button{border:0;border-radius:8px;padding:10px 14px;margin:4px;background:#2b2735;color:#fff;cursor:pointer}
+button{
+border:0;
+border-radius:8px;
+padding:10px 14px;
+margin:4px;
+background:#2b2735;
+color:#fff;
+cursor:pointer
+}
 button.primary{background:#6c3cff}
 button.danger{background:#b52b3c}
 button.ok{background:#167c45}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.item{border:1px solid #332e3d;border-radius:10px;padding:12px;margin:10px 0;background:#100f14}
-.item img,.item video{max-width:100%;max-height:220px;border-radius:8px;margin-top:8px}
-.small{font-size:13px;color:#aaa}
-.status{padding:10px;border-radius:8px;background:#0e2619;color:#7dffae}
-.error{background:#32151a;color:#ff9aa5}
-.hidden{display:none}
-label{display:block;margin-top:8px;font-size:13px;color:#bbb}
+.item{
+border:1px solid #332e3d;
+border-radius:10px;
+padding:12px;
+margin:10px 0;
+background:#100f14
+}
+.item img,
+.item video{
+display:block;
+max-width:100%;
+max-height:260px;
+border-radius:8px;
+margin-top:10px
+}
+.item audio{
+width:100%;
+margin-top:10px
+}
+.small{
+font-size:13px;
+color:#aaa;
+word-break:break-word
+}
+.status{
+padding:10px;
+border-radius:8px;
+background:#0e2619;
+color:#7dffae
+}
+.error{
+background:#32151a;
+color:#ff9aa5
+}
+label{
+display:block;
+margin-top:8px;
+font-size:13px;
+color:#bbb
+}
+.preview{
+margin-top:10px;
+padding:10px;
+border:1px dashed #393342;
+border-radius:8px
+}
+.preview img,
+.preview video{
+display:block;
+max-width:100%;
+max-height:250px;
+border-radius:8px
+}
+.preview audio{width:100%}
+#uploadProgress{
+height:7px;
+background:#292532;
+border-radius:10px;
+overflow:hidden;
+margin-top:8px;
+display:none
+}
+#uploadBar{
+height:100%;
+width:0;
+background:#6c3cff
+}
 </style>
-</head><body>
+</head>
+
+<body>
+
 <header>
 <h1>MAYOTUBE ADMIN</h1>
 <div class="small">Owner Control Panel</div>
-</header><main><div class="card">
+</header>
+
+<main>
+
+<div class="card">
 <h2>System Status</h2>
 <div id="systemStatus">Checking...</div>
-</div><div class="card">
-<h2>Homepage Content</h2><label>Content Type</label>
-<select id="type">
+</div>
 
+<div class="card">
+
+<h2>Homepage Content</h2>
+
+<label>Content Type</label>
+<select id="type" onchange="typeChanged()">
 <option value="message">Message</option>
 <option value="url">URL</option>
 <option value="youtube">YouTube</option>
@@ -50,278 +153,856 @@ label{display:block;margin-top:8px;font-size:13px;color:#bbb}
 <option value="gallery">Gallery Video</option>
 <option value="live">Live Channel</option>
 <option value="ad">Advertisement</option>
-</select><label>Message / Title</label>
+</select>
 
-<textarea id="message" placeholder="Homepage message or title"></textarea><label>Button Text</label>
-<input id="buttonText" placeholder="مثلاً Watch Now">
+<label>Message / Title</label>
+<textarea id="message"
+placeholder="Homepage message or title"></textarea>
+
+<label>Button Text</label>
+<input id="buttonText"
+placeholder="مثلاً Watch Now">
 
 <label>Button URL</label>
-<input id="buttonUrl" placeholder="https://...">
+<input id="buttonUrl"
+placeholder="https://...">
 
 <label>Media URL</label>
-<input id="mediaUrl" placeholder="https://...">
+<input id="mediaUrl"
+placeholder="https://...">
 
 <label>Upload Media</label>
-<input id="file" type="file">
+<input id="file" type="file"
+accept="image/*,video/*,audio/*">
+
+<div id="preview" class="preview hidden"></div>
+
+<div id="uploadProgress">
+<div id="uploadBar"></div>
+</div>
 
 <div class="row">
-<button class="primary" onclick="saveContent()">Save Content</button>
-<button onclick="clearForm()">Clear</button>
-<button onclick="loadContent()">Refresh</button>
-</div><div id="saveStatus" class="small"></div>
-</div><div class="card">
+<button class="primary" onclick="saveContent()">
+Save Content
+</button>
+
+<button onclick="clearForm()">
+Clear
+</button>
+
+<button onclick="loadContent()">
+Refresh
+</button>
+</div>
+
+<div id="saveStatus" class="small"></div>
+
+</div>
+
+<div class="card">
+
 <h2>Saved Homepage Content</h2>
-<div id="contentList">Loading...</div>
-</div></main><script>
+
+<div id="contentList">
+Loading...
+</div>
+
+</div>
+
+</main>
+
+<script>
+
 let editId=null;
 let apiToken="";
 
 async function getSession(){
-    const r=await fetch("/api/admin/session",{credentials:"same-origin",cache:"no-store"});
-    if(!r.ok) throw new Error("Admin session not authenticated");
-    const d=await r.json();
-    if(!d.authenticated) throw new Error("Admin session expired");
-    apiToken=d.api_token||"";
-    return d;
+
+const r=await fetch(
+"/api/admin/session",
+{
+credentials:"same-origin",
+cache:"no-store"
+}
+);
+
+if(!r.ok)
+throw new Error("Admin session not authenticated");
+
+const d=await r.json();
+
+if(!d.authenticated)
+throw new Error("Admin session expired");
+
+apiToken=d.api_token||"";
+
+return d;
 }
 
 async function api(url,options={}){
-    options.credentials="same-origin";
-    options.cache="no-store";
-    options.headers=options.headers||{};
-    options.headers["X-MAYOTUBE-ADMIN"]=apiToken;
-    if(options.body && !(options.body instanceof FormData))
-        options.headers["Content-Type"]="application/json";
 
-    const r=await fetch(url,options);
-    const text=await r.text();
+options.credentials="same-origin";
+options.cache="no-store";
 
-    let data={};
-    try{data=JSON.parse(text)}catch(e){}
+options.headers=options.headers||{};
 
-    if(!r.ok){
-        throw new Error(data.error||text||("HTTP "+r.status));
-    }
-    return data;
+options.headers["X-MAYOTUBE-ADMIN"]=apiToken;
+
+if(
+options.body &&
+!(options.body instanceof FormData)
+){
+options.headers["Content-Type"]="application/json";
+}
+
+const r=await fetch(url,options);
+const text=await r.text();
+
+let data={};
+
+try{
+data=JSON.parse(text);
+}catch(e){}
+
+if(!r.ok){
+throw new Error(
+data.error||
+text||
+("HTTP "+r.status)
+);
+}
+
+return data;
 }
 
 async function checkStatus(){
-    const box=document.getElementById("systemStatus");
-    try{
-        const r=await fetch("/api/health",{credentials:"same-origin",cache:"no-store"});
-        const d=await r.json();
-        if(r.ok && d.status==="ok"){
-            box.className="status";
-            box.textContent="Online • Blob: "+(d.blob_configured?"Configured":"Not Configured");
-        }else{
-            throw new Error("Health check failed");
-        }
-    }catch(e){
-        box.className="status error";
-        box.textContent="System Error: "+e.message;
-    }
+
+const box=document.getElementById(
+"systemStatus"
+);
+
+try{
+
+const r=await fetch(
+"/api/health",
+{
+credentials:"same-origin",
+cache:"no-store"
+}
+);
+
+const d=await r.json();
+
+if(r.ok && d.status==="ok"){
+
+box.className="status";
+
+box.textContent=
+"Online • Blob: "+
+(
+d.blob_configured
+?"Configured"
+:"Not Configured"
+);
+
+}else{
+throw new Error(
+"Health check failed"
+);
+}
+
+}catch(e){
+
+box.className="status error";
+
+box.textContent=
+"System Error: "+e.message;
+}
 }
 
 async function loadContent(){
-    const box=document.getElementById("contentList");
-    box.textContent="Loading...";
 
-    try{
-        await getSession();
-        const d=await api("/api/admin/content");
-        const items=Array.isArray(d.items)?d.items:[];
+const box=document.getElementById(
+"contentList"
+);
 
-        if(!items.length){
-            box.innerHTML='<div class="small">No homepage content saved.</div>';
-            return;
-        }
+box.textContent="Loading...";
 
-        box.innerHTML=items.map(item=>{
-            const id=Number(item.id)||0;
-            const enabled=item.enabled!==false;
+try{
 
-            let preview="";
-            const type=item.type||"message";
+await getSession();
 
-            if((type==="image"||type==="gif") && item.media_url){
-                preview='<img src="'+esc(item.media_url)+'">';
-            }else if(type==="video" && item.media_url){
-                preview='<video src="'+esc(item.media_url)+'" controls></video>';
-            }else if((type==="audio"||type==="music") && item.media_url){
-                preview='<audio src="'+esc(item.media_url)+'" controls style="width:100%;margin-top:8px"></audio>';
-            }
+const d=await api(
+"/api/admin/content"
+);
 
-            return `
-            <div class="item">
-                <b>#${id} • ${esc(type)}</b>
-                <div class="small">Status: ${enabled?"Enabled":"Disabled"}</div>
-                ${item.message?'<div style="margin-top:8px">'+esc(item.message)+'</div>':''}
-                ${item.button_text?'<div class="small">Button: '+esc(item.button_text)+'</div>':''}
-                ${item.button_url?'<div class="small">URL: '+esc(item.button_url)+'</div>':''}
-                ${item.media_url?'<div class="small">Media: '+esc(item.media_url)+'</div>':''}
-                ${preview}
-                <div class="row" style="margin-top:8px">
-                    <button onclick="editItem(${id})">Edit</button>
-                    <button class="${enabled?'':'ok'}" onclick="toggleItem(${id})">${enabled?'Disable':'Enable'}</button>
-                    <button class="danger" onclick="deleteItem(${id})">Delete</button>
-                </div>
-            </div>`;
-        }).join("");
+const items=
+Array.isArray(d.items)
+?d.items
+:[];
 
-    }catch(e){
-        box.innerHTML='<div class="error" style="padding:10px;border-radius:8px">'+esc(e.message)+'</div>';
-    }
+if(!items.length){
+
+box.innerHTML=
+'<div class="small">'+
+'No homepage content saved.'+
+'</div>';
+
+return;
+}
+
+box.innerHTML=items.map(
+item=>renderItem(item)
+).join("");
+
+}catch(e){
+
+box.innerHTML=
+'<div class="error" '+
+'style="padding:10px;border-radius:8px">'+
+esc(e.message)+
+'</div>';
+}
+}
+
+function renderItem(item){
+
+const id=Number(item.id)||0;
+
+const enabled=
+item.enabled!==false;
+
+const type=
+item.type||"message";
+
+let preview="";
+
+const media=
+item.media_url||"";
+
+if(media){
+
+if(type==="image"||type==="gif"){
+
+preview=
+'<img src="'+
+esc(media)+
+'" loading="lazy" '+
+'onerror="this.style.display=\'none\'">';
+
+}else if(
+type==="video"||
+type==="gallery"||
+type==="live"
+){
+
+preview=
+'<video src="'+
+esc(media)+
+'" controls '+
+'preload="metadata"></video>';
+
+}else if(
+type==="audio"||
+type==="music"
+){
+
+preview=
+'<audio src="'+
+esc(media)+
+'" controls></audio>';
+
+}
+}
+
+return `
+<div class="item">
+
+<b>#${id} • ${esc(type)}</b>
+
+<div class="small">
+Status: ${enabled?"Enabled":"Disabled"}
+</div>
+
+${
+item.message
+?
+'<div style="margin-top:8px">'+
+esc(item.message)+
+'</div>'
+:""
+}
+
+${
+item.button_text
+?
+'<div class="small">'+
+'Button: '+
+esc(item.button_text)+
+'</div>'
+:""
+}
+
+${
+item.button_url
+?
+'<div class="small">'+
+'URL: '+
+esc(item.button_url)+
+'</div>'
+:""
+}
+
+${
+media
+?
+'<div class="small">'+
+'Media: '+
+esc(media)+
+'</div>'
+:""
+}
+
+${preview}
+
+<div class="row" style="margin-top:8px">
+
+<button onclick="editItem(${id})">
+Edit
+</button>
+
+<button
+class="${enabled?'':'ok'}"
+onclick="toggleItem(${id})">
+${enabled?'Disable':'Enable'}
+</button>
+
+<button
+class="danger"
+onclick="deleteItem(${id})">
+Delete
+</button>
+
+</div>
+
+</div>
+`;
 }
 
 async function saveContent(){
-    const status=document.getElementById("saveStatus");
-    status.textContent="Saving...";
 
-    try{
-        await getSession();
+const status=
+document.getElementById(
+"saveStatus"
+);
 
-        const type=document.getElementById("type").value;
-        const message=document.getElementById("message").value.trim();
-        const buttonText=document.getElementById("buttonText").value.trim();
-        const buttonUrl=document.getElementById("buttonUrl").value.trim();
-        let mediaUrl=document.getElementById("mediaUrl").value.trim();
+status.textContent="Saving...";
 
-        const file=document.getElementById("file").files[0];
+try{
 
-        if(file){
-            status.textContent="Uploading media...";
+await getSession();
 
-            const fd=new FormData();
-            fd.append("file",file);
+const type=
+document.getElementById(
+"type"
+).value;
 
-            const upload=await api("/api/admin/media/upload",{
-                method:"POST",
-                body:fd
-            });
+const message=
+document.getElementById(
+"message"
+).value.trim();
 
-            mediaUrl=upload.url||upload.media_url||"";
-            if(!mediaUrl) throw new Error("Upload succeeded but no media URL returned");
+const buttonText=
+document.getElementById(
+"buttonText"
+).value.trim();
 
-            document.getElementById("mediaUrl").value=mediaUrl;
-        }
+const buttonUrl=
+document.getElementById(
+"buttonUrl"
+).value.trim();
 
-        const item={
-            type:type,
-            message:message,
-            button_text:buttonText,
-            button_url:buttonUrl,
-            media_url:mediaUrl,
-            enabled:true
-        };
+let mediaUrl=
+document.getElementById(
+"mediaUrl"
+).value.trim();
 
-        if(editId!==null){
-            item.id=editId;
-            await api("/api/admin/content/update",{
-                method:"POST",
-                body:JSON.stringify(item)
-            });
-            status.textContent="Content updated successfully.";
-        }else{
-            await api("/api/admin/content/save",{
-                method:"POST",
-                body:JSON.stringify(item)
-            });
-            status.textContent="Content saved successfully.";
-        }
+const file=
+document.getElementById(
+"file"
+).files[0];
 
-        editId=null;
-        clearForm();
-        await loadContent();
+if(file){
 
-    }catch(e){
-        status.textContent="Save failed: "+e.message;
-    }
+status.textContent=
+"Uploading media...";
+
+const fd=new FormData();
+
+fd.append("file",file);
+
+showProgress(true,10);
+
+const upload=
+await api(
+"/api/admin/media/upload",
+{
+method:"POST",
+body:fd
+}
+);
+
+showProgress(true,100);
+
+mediaUrl=
+upload.url||
+upload.media_url||
+"";
+
+if(!mediaUrl)
+throw new Error(
+"Upload succeeded but no media URL returned"
+);
+
+document.getElementById(
+"mediaUrl"
+).value=mediaUrl;
+
+status.textContent=
+"Media uploaded. Saving content...";
+}
+
+const item={
+type:type,
+message:message,
+button_text:buttonText,
+button_url:buttonUrl,
+media_url:mediaUrl,
+enabled:true
+};
+
+if(editId!==null){
+
+item.id=editId;
+
+await api(
+"/api/admin/content/update",
+{
+method:"POST",
+body:JSON.stringify(item)
+}
+);
+
+status.textContent=
+"Content updated successfully.";
+
+}else{
+
+await api(
+"/api/admin/content/save",
+{
+method:"POST",
+body:JSON.stringify(item)
+}
+);
+
+status.textContent=
+"Content saved successfully.";
+}
+
+editId=null;
+
+clearForm();
+
+await loadContent();
+
+}catch(e){
+
+status.textContent=
+"Save failed: "+e.message;
+
+}finally{
+
+setTimeout(
+()=>showProgress(false),
+500
+);
+}
 }
 
 async function deleteItem(id){
-    if(!confirm("Delete this content?")) return;
 
-    try{
-        await getSession();
-        await api("/api/admin/content/delete",{
-            method:"POST",
-            body:JSON.stringify({id:id})
-        });
-        await loadContent();
-    }catch(e){
-        alert("Delete failed: "+e.message);
-    }
+if(!confirm(
+"Delete this content?"
+)) return;
+
+try{
+
+await getSession();
+
+await api(
+"/api/admin/content/delete",
+{
+method:"POST",
+body:JSON.stringify({
+id:id
+})
+}
+);
+
+await loadContent();
+
+}catch(e){
+
+alert(
+"Delete failed: "+
+e.message
+);
+}
 }
 
 async function toggleItem(id){
-    try{
-        await getSession();
-        await api("/api/admin/content/toggle",{
-            method:"POST",
-            body:JSON.stringify({id:id})
-        });
-        await loadContent();
-    }catch(e){
-        alert("Toggle failed: "+e.message);
-    }
+
+try{
+
+await getSession();
+
+await api(
+"/api/admin/content/toggle",
+{
+method:"POST",
+body:JSON.stringify({
+id:id
+})
+}
+);
+
+await loadContent();
+
+}catch(e){
+
+alert(
+"Toggle failed: "+
+e.message
+);
+}
 }
 
 async function editItem(id){
-    try{
-        await getSession();
-        const d=await api("/api/admin/content");
-        const item=(d.items||[]).find(x=>Number(x.id)===Number(id));
 
-        if(!item) throw new Error("Content item not found");
+try{
 
-        editId=Number(item.id);
+await getSession();
 
-        document.getElementById("type").value=item.type||"message";
-        document.getElementById("message").value=item.message||"";
-        document.getElementById("buttonText").value=item.button_text||"";
-        document.getElementById("buttonUrl").value=item.button_url||"";
-        document.getElementById("mediaUrl").value=item.media_url||"";
-        document.getElementById("file").value="";
+const d=
+await api(
+"/api/admin/content"
+);
 
-        document.getElementById("saveStatus").textContent="Editing item #"+editId;
+const item=
+(d.items||[]).find(
+x=>Number(x.id)===Number(id)
+);
 
-        window.scrollTo({top:0,behavior:"smooth"});
-    }catch(e){
-        alert("Edit failed: "+e.message);
-    }
+if(!item)
+throw new Error(
+"Content item not found"
+);
+
+editId=
+Number(item.id);
+
+document.getElementById(
+"type"
+).value=
+item.type||"message";
+
+document.getElementById(
+"message"
+).value=
+item.message||"";
+
+document.getElementById(
+"buttonText"
+).value=
+item.button_text||"";
+
+document.getElementById(
+"buttonUrl"
+).value=
+item.button_url||"";
+
+document.getElementById(
+"mediaUrl"
+).value=
+item.media_url||"";
+
+document.getElementById(
+"file"
+).value="";
+
+showPreview(
+item.type||"message",
+item.media_url||""
+);
+
+document.getElementById(
+"saveStatus"
+).textContent=
+"Editing item #"+editId;
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}catch(e){
+
+alert(
+"Edit failed: "+
+e.message
+);
+}
 }
 
 function clearForm(){
-    editId=null;
-    document.getElementById("message").value="";
-    document.getElementById("buttonText").value="";
-    document.getElementById("buttonUrl").value="";
-    document.getElementById("mediaUrl").value="";
-    document.getElementById("file").value="";
+
+editId=null;
+
+document.getElementById(
+"message"
+).value="";
+
+document.getElementById(
+"buttonText"
+).value="";
+
+document.getElementById(
+"buttonUrl"
+).value="";
+
+document.getElementById(
+"mediaUrl"
+).value="";
+
+document.getElementById(
+"file"
+).value="";
+
+document.getElementById(
+"saveStatus"
+).textContent="";
+
+showPreview(
+"",
+""
+);
+}
+
+function typeChanged(){
+
+const type=
+document.getElementById(
+"type"
+).value;
+
+const media=
+document.getElementById(
+"mediaUrl"
+).value.trim();
+
+showPreview(
+type,
+media
+);
+}
+
+function showPreview(type,url){
+
+const box=
+document.getElementById(
+"preview"
+);
+
+if(!url){
+
+box.classList.add(
+"hidden"
+);
+
+box.innerHTML="";
+
+return;
+}
+
+let html="";
+
+if(type==="image"||type==="gif"){
+
+html=
+'<img src="'+
+esc(url)+
+'" onerror="previewError()">';
+
+}else if(
+type==="video"||
+type==="gallery"||
+type==="live"
+){
+
+html=
+'<video src="'+
+esc(url)+
+'" controls></video>';
+
+}else if(
+type==="audio"||
+type==="music"
+){
+
+html=
+'<audio src="'+
+esc(url)+
+'" controls></audio>';
+
+}else{
+
+box.classList.add(
+"hidden"
+);
+
+box.innerHTML="";
+
+return;
+}
+
+box.innerHTML=html;
+
+box.classList.remove(
+"hidden"
+);
+}
+
+function previewError(){
+
+const box=
+document.getElementById(
+"preview"
+);
+
+box.innerHTML=
+'<div class="small">'+
+'Media preview could not be loaded.'+
+'</div>';
+}
+
+document.getElementById(
+"mediaUrl"
+).addEventListener(
+"input",
+typeChanged
+);
+
+document.getElementById(
+"file"
+).addEventListener(
+"change",
+function(){
+
+const file=this.files[0];
+
+if(!file)return;
+
+const type=
+document.getElementById(
+"type"
+).value;
+
+const localUrl=
+URL.createObjectURL(file);
+
+showPreview(
+type,
+localUrl
+);
+}
+);
+
+function showProgress(show,value){
+
+const box=
+document.getElementById(
+"uploadProgress"
+);
+
+const bar=
+document.getElementById(
+"uploadBar"
+);
+
+if(!show){
+
+box.style.display="none";
+
+bar.style.width="0%";
+
+return;
+}
+
+box.style.display="block";
+
+bar.style.width=
+Math.max(
+0,
+Math.min(100,value||0)
+)+"%";
 }
 
 function esc(v){
-    return String(v??"")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+
+return String(v??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
 async function init(){
-    try{
-        await getSession();
-        await checkStatus();
-        await loadContent();
-    }catch(e){
-        document.getElementById("systemStatus").className="status error";
-        document.getElementById("systemStatus").textContent=e.message;
-        document.getElementById("contentList").innerHTML=
-            '<div class="error" style="padding:10px;border-radius:8px">'+esc(e.message)+'</div>';
-    }
+
+try{
+
+await getSession();
+
+await checkStatus();
+
+await loadContent();
+
+}catch(e){
+
+document.getElementById(
+"systemStatus"
+).className=
+"status error";
+
+document.getElementById(
+"systemStatus"
+).textContent=
+e.message;
+
+document.getElementById(
+"contentList"
+).innerHTML=
+'<div class="error" '+
+'style="padding:10px;border-radius:8px">'+
+esc(e.message)+
+'</div>';
+}
 }
 
 init();
-</script></body>
+
+</script>
+
+</body>
 </html>
