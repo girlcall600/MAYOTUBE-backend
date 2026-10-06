@@ -70,11 +70,9 @@ max-width:620px;
 margin:5px auto 20px;
 text-align:center;
 padding:24px;
-background:
-linear-gradient(145deg,#211638,#111a2c);
+background:linear-gradient(145deg,#211638,#111a2c);
 border:1px solid #6040a0;
-box-shadow:
-0 12px 40px rgba(80,40,160,.25)
+box-shadow:0 12px 40px rgba(80,40,160,.25)
 }
 
 .type-title{
@@ -98,8 +96,7 @@ width:100%;
 padding:16px 45px 16px 16px;
 border-radius:13px;
 border:1px solid #7651c9;
-background:
-linear-gradient(135deg,#30204e,#171a2c);
+background:linear-gradient(135deg,#30204e,#171a2c);
 color:#fff;
 font-size:16px;
 font-weight:bold;
@@ -235,7 +232,18 @@ border:1px solid #332e3d;
 border-radius:13px;
 padding:14px;
 margin:11px 0;
-background:#100f15
+background:#100f15;
+transition:.18s
+}
+
+.item.dragging{
+opacity:.45;
+transform:scale(.99)
+}
+
+.item.drop-target{
+border-color:#8b5cf6;
+box-shadow:0 0 0 2px rgba(139,92,246,.18)
 }
 
 .item img,
@@ -250,6 +258,57 @@ margin-top:10px
 .item audio{
 width:100%;
 margin-top:10px
+}
+
+/* ORDER */
+
+.order-bar{
+display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:10px;
+padding-bottom:10px;
+border-bottom:1px solid #292533
+}
+
+.drag-handle{
+flex:1;
+padding:10px 12px;
+border-radius:9px;
+background:#191622;
+border:1px dashed #554b6b;
+color:#cbbdf0;
+font-size:13px;
+text-align:center;
+cursor:grab;
+touch-action:none;
+user-select:none
+}
+
+.drag-handle:active{
+cursor:grabbing
+}
+
+.order-buttons{
+display:flex;
+gap:5px
+}
+
+.order-buttons button{
+padding:8px 11px;
+font-size:16px
+}
+
+.order-save{
+margin-top:15px;
+padding:12px;
+border-radius:10px;
+background:#171322;
+border:1px solid #39304d
+}
+
+#orderStatus{
+margin-top:8px
 }
 
 #uploadProgress{
@@ -268,9 +327,28 @@ background:linear-gradient(90deg,#7042ef,#b44cff)
 }
 
 @media(max-width:600px){
+
 main{padding:12px}
+
 .card{padding:15px}
+
 .type-card{padding:20px 15px}
+
+.order-bar{
+align-items:stretch
+}
+
+.drag-handle{
+min-height:42px;
+display:flex;
+align-items:center;
+justify-content:center
+}
+
+.order-buttons button{
+min-width:42px
+}
+
 }
 </style>
 </head>
@@ -284,14 +362,10 @@ main{padding:12px}
 
 <main>
 
-<!-- STATUS -->
-
 <div class="card">
 <h2>System Status</h2>
 <div id="systemStatus">Checking...</div>
 </div>
-
-<!-- CONTENT TYPE -->
 
 <div class="card type-card">
 
@@ -326,11 +400,7 @@ onchange="typeChanged()">
 
 </div>
 
-<!-- DYNAMIC FORM -->
-
 <div class="card">
-
-<!-- MESSAGE -->
 
 <div id="fieldMessage" class="field show">
 
@@ -341,9 +411,6 @@ id="message"
 placeholder="اپنا پیغام یہاں لکھیں..."></textarea>
 
 </div>
-
-
-<!-- URL -->
 
 <div id="fieldUrl" class="field">
 
@@ -363,9 +430,6 @@ placeholder="Open Website">
 
 </div>
 
-
-<!-- YOUTUBE -->
-
 <div id="fieldYoutube" class="field">
 
 <label>YouTube Video URL</label>
@@ -384,9 +448,6 @@ placeholder="YouTube video title">
 
 </div>
 
-
-<!-- DONATION -->
-
 <div id="fieldDonation" class="field">
 
 <label>Donation URL</label>
@@ -396,7 +457,8 @@ id="buttonUrlDonation"
 placeholder="https://...">
 
 <label style="margin-top:12px">
-Donation Message</label>
+Donation Message
+</label>
 
 <textarea
 id="messageDonation"
@@ -410,9 +472,6 @@ placeholder="Donate Now">
 
 </div>
 
-
-<!-- NOTIFICATION -->
-
 <div id="fieldNotification" class="field">
 
 <label>Notification Message</label>
@@ -422,9 +481,6 @@ id="messageNotification"
 placeholder="Notification text..."></textarea>
 
 </div>
-
-
-<!-- MEDIA -->
 
 <div id="fieldMedia" class="field">
 
@@ -460,9 +516,6 @@ class="preview hidden">
 
 </div>
 
-
-<!-- COMMON BUTTON -->
-
 <div id="fieldButton" class="field">
 
 <label>Button Text</label>
@@ -480,7 +533,6 @@ id="commonButtonUrl"
 placeholder="https://...">
 
 </div>
-
 
 <div class="row">
 
@@ -508,26 +560,44 @@ style="margin-top:10px">
 
 </div>
 
-
-<!-- SAVED CONTENT -->
-
 <div class="card">
 
 <h2>Saved Homepage Content</h2>
 
+<div class="small" style="margin-bottom:12px">
+پریس کرکے Box کو Drag کر کے اوپر یا نیچے کریں۔
+موبائل پر ▲ ▼ بٹن بھی استعمال کر سکتے ہیں۔
+</div>
+
 <div id="contentList">
 Loading...
+</div>
+
+<div class="order-save">
+
+<button
+class="primary"
+style="width:100%"
+onclick="saveOrder()">
+💾 Save Homepage Order
+</button>
+
+<div
+id="orderStatus"
+class="small">
+</div>
+
 </div>
 
 </div>
 
 </main>
 
-
 <script>
 
 let editId=null;
 let apiToken="";
+let draggedItem=null;
 
 const fields=[
 "fieldMessage",
@@ -562,35 +632,20 @@ document.getElementById("type").value;
 
 hideAll();
 
-if(type==="message"){
-
+if(type==="message")
 show("fieldMessage");
 
-}
-
-else if(type==="url"){
-
+else if(type==="url")
 show("fieldUrl");
 
-}
-
-else if(type==="youtube"){
-
+else if(type==="youtube")
 show("fieldYoutube");
 
-}
-
-else if(type==="donation"){
-
+else if(type==="donation")
 show("fieldDonation");
 
-}
-
-else if(type==="notification"){
-
+else if(type==="notification")
 show("fieldNotification");
-
-}
 
 else if(
 type==="image"||
@@ -600,11 +655,8 @@ type==="audio"||
 type==="music"||
 type==="gallery"||
 type==="live"
-){
-
+)
 show("fieldMedia");
-
-}
 
 else if(type==="ad"){
 
@@ -669,6 +721,7 @@ options.body &&
 options.headers[
 "Content-Type"
 ]="application/json";
+
 }
 
 const r=await fetch(url,options);
@@ -692,6 +745,7 @@ text||
 }
 
 return data;
+
 }
 
 
@@ -787,6 +841,8 @@ return;
 box.innerHTML=
 items.map(renderItem).join("");
 
+enableDragDrop();
+
 }catch(e){
 
 box.innerHTML=
@@ -802,7 +858,7 @@ esc(e.message)+
 
 /* RENDER */
 
-function renderItem(item){
+function renderItem(item,index){
 
 const id=
 Number(item.id)||0;
@@ -859,11 +915,43 @@ esc(media)+
 
 return `
 
-<div class="item">
+<div
+class="item"
+data-id="${id}">
+
+<div class="order-bar">
+
+<div
+class="drag-handle"
+title="Press and drag">
+☰ &nbsp; Press & Drag to Move
+</div>
+
+<div class="order-buttons">
+
+<button
+title="Move Up"
+onclick="moveItem(${id},-1)">
+▲
+</button>
+
+<button
+title="Move Down"
+onclick="moveItem(${id},1)">
+▼
+</button>
+
+</div>
+
+</div>
 
 <b>
 #${id} • ${esc(type)}
 </b>
+
+<div class="small">
+Order Position: ${index+1}
+</div>
 
 <div class="small">
 Status:
@@ -939,6 +1027,276 @@ Delete
 }
 
 
+/* DRAG */
+
+function enableDragDrop(){
+
+const items=
+document.querySelectorAll(
+"#contentList .item"
+);
+
+items.forEach(item=>{
+
+const handle=
+item.querySelector(".drag-handle");
+
+if(!handle)return;
+
+handle.onpointerdown=
+function(){
+
+item.setPointerCapture?.(
+event.pointerId
+);
+
+};
+
+item.draggable=true;
+
+item.ondragstart=
+function(){
+
+draggedItem=item;
+
+item.classList.add(
+"dragging"
+);
+
+};
+
+item.ondragend=
+function(){
+
+item.classList.remove(
+"dragging"
+);
+
+document.querySelectorAll(
+".drop-target"
+).forEach(x=>
+x.classList.remove(
+"drop-target"
+)
+);
+
+draggedItem=null;
+
+};
+
+item.ondragover=
+function(e){
+
+e.preventDefault();
+
+if(
+draggedItem &&
+draggedItem!==item
+){
+
+item.classList.add(
+"drop-target"
+);
+
+}
+
+};
+
+item.ondragleave=
+function(){
+
+item.classList.remove(
+"drop-target"
+);
+
+};
+
+item.ondrop=
+function(e){
+
+e.preventDefault();
+
+item.classList.remove(
+"drop-target"
+);
+
+if(
+!draggedItem ||
+draggedItem===item
+)return;
+
+const parent=
+item.parentNode;
+
+const rect=
+item.getBoundingClientRect();
+
+if(
+e.clientY<
+rect.top+
+rect.height/2
+){
+
+parent.insertBefore(
+draggedItem,
+item
+);
+
+}else{
+
+parent.insertBefore(
+draggedItem,
+item.nextSibling
+);
+
+}
+
+updatePositions();
+
+};
+
+});
+
+}
+
+
+/* POSITION */
+
+function updatePositions(){
+
+document.querySelectorAll(
+"#contentList .item"
+).forEach(
+(item,index)=>{
+
+const smalls=
+item.querySelectorAll(
+".small"
+);
+
+if(smalls.length>1){
+
+smalls[0].textContent=
+"Order Position: "+(index+1);
+
+}
+
+}
+);
+
+}
+
+
+/* MOVE UP / DOWN */
+
+function moveItem(id,direction){
+
+const list=
+document.getElementById(
+"contentList"
+);
+
+const item=
+list.querySelector(
+'.item[data-id="'+id+'"]'
+);
+
+if(!item)return;
+
+if(direction<0){
+
+const previous=
+item.previousElementSibling;
+
+if(previous)
+list.insertBefore(
+item,
+previous
+);
+
+}else{
+
+const next=
+item.nextElementSibling;
+
+if(next)
+list.insertBefore(
+item,
+next.nextSibling
+);
+
+}
+
+updatePositions();
+
+}
+
+
+/* SAVE ORDER */
+
+async function saveOrder(){
+
+const status=
+document.getElementById(
+"orderStatus"
+);
+
+const items=
+Array.from(
+document.querySelectorAll(
+"#contentList .item"
+)
+);
+
+if(!items.length){
+
+status.textContent=
+"No content to reorder.";
+
+return;
+
+}
+
+const order=
+items.map(
+item=>Number(
+item.dataset.id
+)
+);
+
+status.textContent=
+"Saving homepage order...";
+
+try{
+
+await getSession();
+
+await api(
+"/api/admin/content/reorder",
+{
+method:"POST",
+body:JSON.stringify({
+order:order
+})
+}
+);
+
+status.textContent=
+"✓ Homepage order saved successfully.";
+
+await loadContent();
+
+}catch(e){
+
+status.textContent=
+"Order save failed: "+
+e.message;
+
+}
+
+}
+
+
 /* SAVE */
 
 async function saveContent(){
@@ -968,9 +1326,6 @@ media_url:"",
 enabled:true
 };
 
-
-/* MESSAGE */
-
 if(type==="message"){
 
 item.message=
@@ -979,9 +1334,6 @@ document.getElementById(
 ).value.trim();
 
 }
-
-
-/* URL */
 
 else if(type==="url"){
 
@@ -997,9 +1349,6 @@ document.getElementById(
 
 }
 
-
-/* YOUTUBE */
-
 else if(type==="youtube"){
 
 item.media_url=
@@ -1013,9 +1362,6 @@ document.getElementById(
 ).value.trim();
 
 }
-
-
-/* DONATION */
 
 else if(type==="donation"){
 
@@ -1036,9 +1382,6 @@ document.getElementById(
 
 }
 
-
-/* NOTIFICATION */
-
 else if(type==="notification"){
 
 item.message=
@@ -1047,9 +1390,6 @@ document.getElementById(
 ).value.trim();
 
 }
-
-
-/* MEDIA */
 
 else if(
 type==="image"||
@@ -1108,9 +1448,6 @@ throw new Error(
 
 }
 
-
-/* AD */
-
 else if(type==="ad"){
 
 item.message=
@@ -1165,9 +1502,6 @@ upload.media_url||
 }
 
 }
-
-
-/* UPDATE / SAVE */
 
 if(editId!==null){
 
