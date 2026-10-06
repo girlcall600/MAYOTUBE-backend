@@ -2,6 +2,7 @@ import os
 import json
 import hmac
 import urllib.request
+import time
 
 from flask import (
     Flask,
@@ -23,10 +24,6 @@ BLOB_PATH = "mayotube/home-content.json"
 
 app.secret_key = ADMIN_TOKEN or os.urandom(32)
 
-
-# =========================================================
-# HELPERS
-# =========================================================
 
 def admin_required():
     return session.get("admin") is True
@@ -73,18 +70,35 @@ def get_blob_url():
     return None
 
 
-def load_content():
-    blob_url = get_blob_url()
+def load_content(blob_url=None):
+    if not blob_url:
+        blob_url = get_blob_url()
 
     if not blob_url:
         return empty_content()
 
     try:
+        cache_buster = str(
+            int(time.time() * 1000)
+        )
+
+        separator = (
+            "&"
+            if "?" in blob_url
+            else "?"
+        )
+
+        fresh_url = (
+            blob_url +
+            separator +
+            "v=" +
+            cache_buster
+        )
+
         with urllib.request.urlopen(
-            blob_url,
+            fresh_url,
             timeout=15
         ) as response:
-
             raw = response.read()
 
     except Exception as e:
@@ -151,7 +165,9 @@ def save_content(data):
 def save_and_verify(data):
     result = save_content(data)
 
-    saved = load_content()
+    saved = load_content(
+        getattr(result, "url", None)
+    )
 
     if saved != data:
         raise RuntimeError(
@@ -167,10 +183,6 @@ def error_response(message, error):
         "details": str(error)[:1000]
     }), 500
 
-
-# =========================================================
-# PUBLIC HOME
-# =========================================================
 
 @app.get("/")
 def home():
@@ -228,10 +240,6 @@ def public_home_content():
             e
         )
 
-
-# =========================================================
-# ADMIN CONTENT
-# =========================================================
 
 @app.get("/api/admin/content")
 def admin_content():
@@ -542,10 +550,6 @@ def admin_content_toggle():
         )
 
 
-# =========================================================
-# MEDIA UPLOAD
-# =========================================================
-
 @app.post("/api/admin/media/upload")
 def admin_media_upload():
     if not admin_required():
@@ -650,10 +654,6 @@ def admin_media_upload():
             e
         )
 
-
-# =========================================================
-# ADMIN LOGIN
-# =========================================================
 
 @app.get("/admin")
 def admin_login():
@@ -760,10 +760,6 @@ Invalid Admin Token
 </p>
 """, 401
 
-
-# =========================================================
-# ADMIN DASHBOARD
-# =========================================================
 
 @app.get("/admin/dashboard")
 def admin_dashboard():
