@@ -59,9 +59,11 @@ def load_content():
         result = blob.get(
             BLOB_PATH,
             access="public",
-            token=BLOB_TOKEN,
-            use_cache=False
+            token=BLOB_TOKEN
         )
+
+        if not result:
+            return empty_content()
 
         raw = b"".join(
             result.stream or []
@@ -2275,3 +2277,4 @@ def admin_logout():
             "admin_login"
         )
     )
+    
