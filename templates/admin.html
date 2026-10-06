@@ -1,473 +1,618 @@
-<!DOCTYPE html>
-<html lang="ur" dir="rtl">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAYOTUBE ADMIN</title>
-
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;
- background:#0c0b10;
- color:#fff;
- font-family:Arial,sans-serif
+ margin:0;background:#0b0b10;color:#fff;font-family:Arial,sans-serif;
+ padding:18px
 }
-header{
- background:#171521;
- padding:18px;
- border-bottom:1px solid #292536;
- position:sticky;
- top:0;
- z-index:10
-}
-h1{margin:0;font-size:22px}
-small{color:#9ca3af}
-main{
- max-width:900px;
- margin:auto;
- padding:16px
-}
+.wrap{max-width:1000px;margin:auto}
+h1{margin:0 0 6px;font-size:28px}
+h2{margin:0 0 14px}
+.sub{color:#aaa;margin-bottom:22px}
 .card{
- background:#15131e;
- border:1px solid #292536;
- border-radius:14px;
- padding:16px;
- margin-bottom:16px
+ background:#15151d;border:1px solid #292936;border-radius:14px;
+ padding:18px;margin-bottom:18px
 }
-h2{
- margin:0 0 14px;
- font-size:18px
+label{display:block;color:#bbb;margin:12px 0 6px}
+input,textarea,select{
+ width:100%;padding:12px;border-radius:9px;
+ border:1px solid #383846;background:#0e0e14;color:#fff;
+ font-size:15px
 }
-label{
- display:block;
- color:#c4c7d0;
- font-size:13px;
- margin:12px 0 6px
-}
-input,select,textarea{
- width:100%;
- background:#0f0e15;
- color:#fff;
- border:1px solid #353043;
- border-radius:9px;
- padding:12px;
- outline:none
-}
-textarea{
- min-height:100px;
- resize:vertical
-}
+textarea{min-height:100px;resize:vertical}
 button{
- border:0;
- border-radius:9px;
- padding:12px 16px;
- background:#8b5cf6;
- color:#fff;
- font-weight:bold;
- cursor:pointer;
- margin-top:12px
+ border:0;border-radius:9px;padding:11px 16px;
+ background:#4f7cff;color:#fff;font-weight:bold;cursor:pointer;
+ margin:5px 4px 5px 0
 }
-button.secondary{background:#292536}
-button.danger{background:#b42318}
-button:disabled{
- opacity:.5;
- cursor:not-allowed
-}
-.row{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px
-}
-.status{
- padding:12px;
- border-radius:9px;
- background:#0f0e15;
- color:#c4c7d0;
- margin-top:12px;
- white-space:pre-wrap
-}
+button:hover{opacity:.9}
+button.red{background:#c9344d}
+button.gray{background:#444452}
+button.green{background:#24965c}
+button.orange{background:#bd7925}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .item{
- background:#0f0e15;
- border:1px solid #302b3c;
- border-radius:12px;
- padding:14px;
- margin-top:10px
+ border:1px solid #30303c;border-radius:12px;padding:14px;
+ margin-top:12px;background:#101017
 }
-.item-title{
- font-weight:bold;
- margin-bottom:7px
+.item.disabled{opacity:.5}
+.item-head{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;flex-wrap:wrap
 }
-.item-meta{
- color:#9ca3af;
- font-size:12px;
- line-height:1.7
+.badge{
+ display:inline-block;padding:4px 8px;border-radius:20px;
+ background:#303044;color:#ddd;font-size:12px
 }
-.actions{
- display:flex;
- gap:7px;
- flex-wrap:wrap
-}
-.actions button{
- margin-top:8px;
- padding:9px 12px;
- font-size:12px
-}
-.preview{
- width:100%;
- max-height:220px;
- object-fit:contain;
- border-radius:9px;
- margin-top:10px;
- background:#000
-}
+.status{margin:10px 0;padding:11px;border-radius:9px;display:none}
+.ok{display:block;background:#123b29;color:#7ff0ae}
+.err{display:block;background:#451820;color:#ff9da9}
+.preview{max-width:180px;max-height:110px;border-radius:8px;margin-top:8px}
+.small{font-size:12px;color:#999}
 .hidden{display:none}
-.ok{color:#4ade80}
-.err{color:#f87171}
+.actions{margin-top:12px}
+hr{border:0;border-top:1px solid #292936;margin:18px 0}
+@media(max-width:650px){
+ .row{grid-template-columns:1fr}
+ body{padding:10px}
+}
 </style>
-</head>
+</head><body>
+<div class="wrap"><h1>MAYOTUBE ADMIN</h1>
+<div class="sub">Owner Admin ✓ — Homepage Content Manager</div><div id="status" class="status"></div><div class="card">
+<h2>Add Homepage Content</h2><label>Content Type</label>
+<select id="type" onchange="showFields()">
 
-<body>
-
-<header>
-<h1>MAYOTUBE ADMIN</h1>
-<small>Owner Admin • Homepage Content Manager</small>
-</header>
-
-<main>
-
-<div class="card">
-<h2>➕ Add Homepage Content</h2>
-
-<label>Content Type</label>
-<select id="type">
+<option value="url">URL / Web Link</option>
+<option value="youtube">YouTube Video</option>
 <option value="message">Message</option>
+<option value="donation">Donation</option>
+<option value="audio">Audio</option>
+<option value="notification">Notification</option>
 <option value="image">Image</option>
 <option value="video">Video</option>
 <option value="gif">GIF</option>
-<option value="notification">Notification</option>
-<option value="advertisement">Advertisement</option>
-<option value="donation">Donation</option>
-<option value="audio">Audio</option>
+<option value="ad">Advertisement</option>
 <option value="music">Music Link</option>
-<option value="gallery_video">Gallery Video</option>
-<option value="live_channel">Live Channel</option>
-<option value="youtube">YouTube Video</option>
-<option value="link">URL / Web Link</option>
-</select>
-
-<label>Title</label>
-<input id="title" placeholder="Post title">
-
-<label>Message / Description</label>
-<textarea id="message" placeholder="اپنا پیغام یا description لکھیں"></textarea>
-
-<label>Media / Content URL</label>
-<input id="url" placeholder="https://...">
-
-<label>Button Text</label>
-<input id="buttonText" placeholder="مثلاً Watch Now">
-
-<label>Button URL</label>
-<input id="buttonUrl" placeholder="https://...">
-
-<div class="row">
+<option value="gallery">Gallery Video</option>
+<option value="live">Live Channel</option>
+</select><div id="fields"></div><div class="row">
 <div>
-<label>Order</label>
-<input id="sortOrder" type="number" value="0">
+<label>Display Order</label>
+<input id="order" type="number" value="0">
 </div>
-
 <div>
-<label>Status</label>
+<label>Enabled</label>
 <select id="enabled">
-<option value="true">Enabled</option>
-<option value="false">Disabled</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select>
 </div>
-</div>
+</div><div class="actions">
+<button class="green" onclick="saveContent()">Save Content</button>
+<button class="gray" onclick="clearForm()">Clear</button>
+</div><input id="editId" type="hidden">
+</div><div class="card">
+<h2>Media Upload</h2><label>Select Image / Video / GIF / Audio</label>
+<input id="mediaFile" type="file"
+accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov,.mp3,.wav,.m4a,.aac">
 
-<button id="saveBtn" onclick="saveContent()">Save Content</button>
+<div class="small">
+Maximum file size: 4 MB
+</div><button class="orange" onclick="uploadMedia()">Upload Media</button>
 
-<div id="saveStatus" class="status hidden"></div>
-</div>
+<div id="uploadResult" class="small"></div>
+</div><div class="card">
+<div class="item-head">
+<h2>Saved Homepage Content</h2>
+<button onclick="loadContent()">Refresh</button>
+</div><div id="saved">Loading...</div>
+</div><div class="card">
+<h2>System Status</h2>
+<div id="systemStatus">Checking...</div>
+</div></div><script>
+const fields={
+ url:[
+  ["url","URL","url"],
+  ["button_text","Button Text","text"]
+ ],
+ youtube:[
+  ["youtube_url","YouTube URL","url"],
+  ["title","Title","text"],
+  ["description","Description","textarea"],
+  ["thumbnail_url","Thumbnail URL","url"],
+  ["button_text","Button Text","text"]
+ ],
+ message:[
+  ["message","Message","textarea"],
+  ["button_text","Button Text","text"],
+  ["button_url","Button URL","url"]
+ ],
+ donation:[
+  ["donation_message","Donation Message","textarea"],
+  ["donation_url","Donation URL","url"],
+  ["button_text","Button Text","text"]
+ ],
+ audio:[
+  ["audio_url","Audio URL","url"],
+  ["title","Title","text"],
+  ["cover_url","Cover Image URL","url"]
+ ],
+ notification:[
+  ["notification","Notification","textarea"],
+  ["button_text","Button Text","text"],
+  ["button_url","Button URL","url"]
+ ],
+ image:[
+  ["image_url","Image URL","url"],
+  ["title","Title","text"],
+  ["click_url","Click URL","url"]
+ ],
+ video:[
+  ["video_url","Video URL","url"],
+  ["title","Title","text"],
+  ["thumbnail_url","Thumbnail URL","url"],
+  ["description","Description","textarea"]
+ ],
+ gif:[
+  ["gif_url","GIF URL","url"],
+  ["title","Title","text"],
+  ["click_url","Click URL","url"]
+ ],
+ ad:[
+  ["media_url","Media URL","url"],
+  ["title","Advertisement Title","text"],
+  ["click_url","Click URL","url"],
+  ["description","Description","textarea"]
+ ],
+ music:[
+  ["music_url","Music URL","url"],
+  ["title","Music Title","text"],
+  ["artist","Artist","text"]
+ ],
+ gallery:[
+  ["video_url","Video URL","url"],
+  ["title","Title","text"],
+  ["thumbnail_url","Thumbnail URL","url"]
+ ],
+ live:[
+  ["live_url","Live URL","url"],
+  ["channel_name","Channel Name","text"],
+  ["thumbnail_url","Thumbnail URL","url"]
+ ]
+};
 
 
-<div class="card">
-<h2>📤 Media Upload</h2>
+function showFields(data={}){
+ const type=document.getElementById("type").value;
+ const box=document.getElementById("fields");
 
-<label>Select Image / Video / GIF / Audio</label>
-<input id="mediaFile" type="file">
+ box.innerHTML="";
 
-<button onclick="uploadMedia()">Upload Media</button>
+ (fields[type]||[]).forEach(f=>{
+  const id=f[0],label=f[1],kind=f[2];
+  const value=data[id]??"";
 
-<div id="uploadStatus" class="status hidden"></div>
-</div>
-
-
-<div class="card">
-<h2>🏠 Saved Homepage Content</h2>
-
-<button class="secondary" onclick="loadContent()">↻ Refresh</button>
-
-<div id="contentList">
-<div class="status">Loading...</div>
-</div>
-</div>
-
-
-<div class="card">
-<h2>⚙️ System Status</h2>
-
-<div id="systemStatus" class="status">Checking...</div>
-</div>
-
-</main>
-
-<script>
-const API="";
-
-function token(){
- return localStorage.getItem("MAYOTUBE_ADMIN_TOKEN")||"";
+  if(kind==="textarea"){
+   box.innerHTML+=`
+   <label>${label}</label>
+   <textarea id="f_${id}">${esc(value)}</textarea>`;}else{
+box.innerHTML+=" <label>${label}</label> <input id="f_${id}" type="${kind}" value="${attr(value)}">";
+}
+});
 }
 
-function headers(json=false){
- const h={
-  "Authorization":"Bearer "+token()
- };
- if(json)h["Content-Type"]="application/json";
- return h;
+function collectFields(){
+const type=document.getElementById("type").value;
+const data={
+type:type,
+enabled:document.getElementById("enabled").value==="true",
+order:Number(document.getElementById("order").value||0)
+};
+
+(fields[type]||[]).forEach(f=>{
+const el=document.getElementById("f_"+f[0]);
+if(el)data[f[0]]=el.value.trim();
+});
+
+const id=document.getElementById("editId").value;
+if(id)data.id=Number(id);
+
+return data;
 }
 
-function show(id,text,ok=false){
- const e=document.getElementById(id);
- e.classList.remove("hidden");
- e.innerHTML='<span class="'+(ok?"ok":"err")+'">'+escapeHtml(text)+'</span>';
+async function api(url,options={}){
+const response=await fetch(url,{
+credentials:"same-origin",
+...options,
+headers:{
+"Content-Type":"application/json",
+...(options.headers||{})
+}
+});
+
+const text=await response.text();
+
+let data;
+try{
+data=JSON.parse(text);
+}catch(e){
+throw new Error(
+response.status+" "+response.statusText+"\n"+text
+);
 }
 
-function escapeHtml(v){
- return String(v??"")
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#039;");
+if(!response.ok){
+throw new Error(
+data.error||data.message||("HTTP "+response.status)
+);
+}
+
+return data;
 }
 
 async function saveContent(){
- const btn=document.getElementById("saveBtn");
- btn.disabled=true;
+try{
+const data=collectFields();
+const id=document.getElementById("editId").value;
 
- const data={
-  type:document.getElementById("type").value,
-  title:document.getElementById("title").value.trim(),
-  message:document.getElementById("message").value.trim(),
-  url:document.getElementById("url").value.trim(),
-  button_text:document.getElementById("buttonText").value.trim(),
-  button_url:document.getElementById("buttonUrl").value.trim(),
-  sort_order:Number(document.getElementById("sortOrder").value)||0,
-  enabled:document.getElementById("enabled").value==="true"
- };
-
- try{
-  const r=await fetch(API+"/api/admin/content",{
-   method:"POST",
-   headers:headers(true),
-   body:JSON.stringify(data)
-  });
-
-  const t=await r.text();
-
-  if(!r.ok){
-   throw new Error(t||("HTTP "+r.status));
-  }
-
-  show("saveStatus","Content saved successfully",true);
-  document.getElementById("message").value="";
-  document.getElementById("url").value="";
-  document.getElementById("title").value="";
-  document.getElementById("buttonText").value="";
-  document.getElementById("buttonUrl").value="";
-  loadContent();
-
- }catch(e){
-  show("saveStatus","Save failed: "+e.message);
- }finally{
-  btn.disabled=false;
- }
+if(!data.type){
+showStatus("Content type missing","error");
+return;
 }
 
+const endpoint=id
+?"/api/admin/content/update"
+:"/api/admin/content/save";
+
+const result=await api(endpoint,{
+method:"POST",
+body:JSON.stringify(data)
+});
+
+showStatus(
+result.message||"Content saved successfully",
+"ok"
+);
+
+clearForm();
+await loadContent();
+
+}catch(e){
+showStatus("Save failed: "+e.message,"error");
+}
+}
 
 async function loadContent(){
- const box=document.getElementById("contentList");
- box.innerHTML='<div class="status">Loading...</div>';
+const box=document.getElementById("saved");
+box.innerHTML="Loading...";
 
- try{
-  const r=await fetch(API+"/api/home/content?refresh="+Date.now(),{
-   headers:headers()
-  });
+try{
+const data=await api("/api/admin/content",{
+method:"GET",
+headers:{}
+});
 
-  const data=await r.json();
+const items=data.items||[];
 
-  if(!r.ok){
-   throw new Error(data.error||("HTTP "+r.status));
-  }
-
-  const items=Array.isArray(data.items)?data.items:[];
-
-  if(!items.length){
-   box.innerHTML='<div class="status">No homepage content found.</div>';
-   return;
-  }
-
-  box.innerHTML="";
-
-  items.forEach((item,index)=>{
-   const div=document.createElement("div");
-   div.className="item";
-
-   const type=escapeHtml(item.type||"");
-   const title=escapeHtml(item.title||"");
-   const message=escapeHtml(item.message||"");
-   const url=escapeHtml(item.url||item.media_url||"");
-   const enabled=item.enabled!==false;
-
-   div.innerHTML=
-    '<div class="item-title">'+
-    (title||("Content #"+(item.id||index+1)))+
-    '</div>'+
-    '<div class="item-meta">'+
-    'Type: '+type+
-    '<br>ID: '+escapeHtml(item.id||"")+
-    '<br>Status: '+(enabled?"Enabled":"Disabled")+
-    (message?'<br>'+message:"")+
-    (url?'<br>URL: '+url:"")+
-    '</div>'+
-    '<div class="actions">'+
-    '<button class="secondary" onclick="toggleContent('+Number(item.id)+','+(!enabled)+')">'+
-    (enabled?"Disable":"Enable")+
-    '</button>'+
-    '<button class="danger" onclick="deleteContent('+Number(item.id)+')">Delete</button>'+
-    '</div>';
-
-   box.appendChild(div);
-  });
-
- }catch(e){
-  box.innerHTML=
-   '<div class="status"><span class="err">Load failed: '+
-   escapeHtml(e.message)+
-   '</span></div>';
- }
+if(!items.length){
+box.innerHTML="<div class='small'>No homepage content saved.</div>";
+return;
 }
 
+box.innerHTML="";
 
-async function toggleContent(id,enabled){
- try{
-  const r=await fetch(API+"/api/admin/content/"+id,{
-   method:"PATCH",
-   headers:headers(true),
-   body:JSON.stringify({enabled:enabled})
-  });
+items.forEach(item=>{
+const div=document.createElement("div");
+div.className="item"+(item.enabled===false?" disabled":"");
 
-  const t=await r.text();
+div.innerHTML=`
+<div class="item-head">
+<div>
+<span class="badge">${esc(item.type||"content")}</span>
+<strong> #${esc(item.id)}</strong>
+</div>
+<span class="small">
+${item.enabled===false?"Disabled":"Enabled"}
+</span>
+</div>
 
-  if(!r.ok)throw new Error(t||("HTTP "+r.status));
+<div class="small" style="margin-top:8px">
+  Order: ${esc(item.order??0)}
+</div>
 
-  loadContent();
+<div style="margin-top:8px">
+  ${itemPreview(item)}
+</div>
 
- }catch(e){
-  alert("Update failed: "+e.message);
- }
+<div class="actions">
+  <button onclick='editItem(${JSON.stringify(item)})'>
+   Edit
+  </button>
+
+  <button class="${
+   item.enabled===false?"green":"orange"
+  }" onclick="toggleItem(${Number(item.id)})">
+   ${item.enabled===false?"Enable":"Disable"}
+  </button>
+
+  <button class="red"
+   onclick="deleteItem(${Number(item.id)})">
+   Delete
+  </button>
+</div>
+
+`;
+
+box.appendChild(div);
+});
+
+}catch(e){
+box.innerHTML=
+"<div class='status err' style='display:block'>"+
+"Load failed: "+esc(e.message)+
+"</div>";
+}
 }
 
+function itemPreview(item){
+const type=item.type||"";
 
-async function deleteContent(id){
- if(!confirm("Delete this content?"))return;
+if(type==="message")
+return "<div>"+esc(item.message||"")+"</div>";
 
- try{
-  const r=await fetch(API+"/api/admin/content/"+id,{
-   method:"DELETE",
-   headers:headers()
-  });
+if(type==="notification")
+return "<div>"+esc(item.notification||"")+"</div>";
 
-  const t=await r.text();
+if(type==="donation")
+return "<div>"+esc(item.donation_message||"")+"</div>";
 
-  if(!r.ok)throw new Error(t||("HTTP "+r.status));
+if(type==="youtube")
+return "<div><b>"+esc(item.title||"YouTube Video")+
+"</b><br>"+esc(item.youtube_url||"")+"</div>";
 
-  loadContent();
-
- }catch(e){
-  alert("Delete failed: "+e.message);
- }
+if(type==="image"){
+return "<b>${esc(item.title||"Image")}</b><br> ${item.image_url?"<img class="preview" src="${attr(item.image_url)}">":""} ";
 }
 
+if(type==="gif"){
+return "<b>${esc(item.title||"GIF")}</b><br> ${item.gif_url?"<img class="preview" src="${attr(item.gif_url)}">":""} ";
+}
+
+if(type==="video")
+return "<b>"+esc(item.title||"Video")+
+"</b><br>"+esc(item.video_url||"");
+
+if(type==="audio")
+return "<b>"+esc(item.title||"Audio")+
+"</b><br>"+esc(item.audio_url||"");
+
+if(type==="music")
+return "<b>"+esc(item.title||"Music")+
+"</b><br>"+esc(item.music_url||"");
+
+if(type==="gallery")
+return "<b>"+esc(item.title||"Gallery Video")+
+"</b><br>"+esc(item.video_url||"");
+
+if(type==="live")
+return "<b>"+esc(item.channel_name||"Live Channel")+
+"</b><br>"+esc(item.live_url||"");
+
+if(type==="ad")
+return "<b>"+esc(item.title||"Advertisement")+
+"</b><br>"+esc(item.media_url||"");
+
+if(type==="url")
+return "<b>"+esc(item.button_text||"Web Link")+
+"</b><br>"+esc(item.url||"");
+
+return "<pre>"+esc(JSON.stringify(item,null,2))+"</pre>";
+}
+
+function editItem(item){
+document.getElementById("editId").value=item.id||"";
+document.getElementById("type").value=item.type||"message";
+showFields(item);
+
+document.getElementById("enabled").value=
+item.enabled===false?"false":"true";
+
+document.getElementById("order").value=item.order??0;
+
+window.scrollTo({top:0,behavior:"smooth"});
+
+showStatus("Editing content #"+item.id,"ok");
+}
+
+async function deleteItem(id){
+if(!confirm("Delete this homepage content?"))return;
+
+try{
+const result=await api("/api/admin/content/delete",{
+method:"POST",
+body:JSON.stringify({id:Number(id)})
+});
+
+showStatus(
+result.message||"Content deleted successfully",
+"ok"
+);
+
+await loadContent();
+
+}catch(e){
+showStatus("Delete failed: "+e.message,"error");
+}
+}
+
+async function toggleItem(id){
+try{
+const result=await api("/api/admin/content/toggle",{
+method:"POST",
+body:JSON.stringify({id:Number(id)})
+});
+
+showStatus(
+result.message||"Content status updated",
+"ok"
+);
+
+await loadContent();
+
+}catch(e){
+showStatus("Toggle failed: "+e.message,"error");
+}
+}
 
 async function uploadMedia(){
- const file=document.getElementById("mediaFile").files[0];
+const file=document.getElementById("mediaFile").files[0];
+const resultBox=document.getElementById("uploadResult");
 
- if(!file){
-  show("uploadStatus","Please select a file.");
-  return;
- }
-
- const form=new FormData();
- form.append("file",file);
-
- try{
-  const r=await fetch(API+"/api/admin/upload",{
-   method:"POST",
-   headers:{
-    "Authorization":"Bearer "+token()
-   },
-   body:form
-  });
-
-  const data=await r.json();
-
-  if(!r.ok){
-   throw new Error(data.error||("HTTP "+r.status));
-  }
-
-  if(data.url){
-   document.getElementById("url").value=data.url;
-  }
-
-  show(
-   "uploadStatus",
-   "Upload successful"+(data.url?": "+data.url:""),
-   true
-  );
-
- }catch(e){
-  show("uploadStatus","Upload failed: "+e.message);
- }
+if(!file){
+resultBox.textContent="Please select a file.";
+return;
 }
 
+if(file.size>410241024){
+resultBox.textContent="File is larger than 4 MB.";
+return;
+}
+
+const form=new FormData();
+form.append("file",file);
+
+resultBox.textContent="Uploading...";
+
+try{
+const response=await fetch("/api/admin/media/upload",{
+method:"POST",
+credentials:"same-origin",
+body:form
+});
+
+const text=await response.text();
+
+let data;
+try{
+data=JSON.parse(text);
+}catch(e){
+throw new Error(
+response.status+" "+response.statusText+"\n"+text
+);
+}
+
+if(!response.ok){
+throw new Error(
+data.error||data.message||("HTTP "+response.status)
+);
+}
+
+const url=
+data.url||
+data.media_url||
+data.blob_url||
+data.download_url||
+"";
+
+resultBox.innerHTML=
+"Upload successful."+
+(url?
+"<br><input value="${attr(url)}" readonly onclick="this.select()">":"");
+
+if(url){
+const type=document.getElementById("type").value;
+
+const targetMap={
+image:"f_image_url",
+gif:"f_gif_url",
+video:"f_video_url",
+audio:"f_audio_url",
+ad:"f_media_url",
+music:"f_music_url",
+gallery:"f_video_url",
+live:"f_thumbnail_url"
+};
+
+const target=document.getElementById(
+targetMap[type]||""
+);
+
+if(target)target.value=url;
+}
+
+}catch(e){
+resultBox.textContent="Upload failed: "+e.message;
+}
+}
+
+function clearForm(){
+document.getElementById("editId").value="";
+document.getElementById("enabled").value="true";
+document.getElementById("order").value="0";
+document.getElementById("type").value="url";
+document.getElementById("mediaFile").value="";
+document.getElementById("uploadResult").textContent="";
+showFields();
+}
+
+function showStatus(message,type){
+const box=document.getElementById("status");
+box.className="status "+(type==="error"?"err":"ok");
+box.textContent=message;
+box.style.display="block";
+
+setTimeout(()=>{
+box.style.display="none";
+},5000);
+}
 
 async function checkSystem(){
- const box=document.getElementById("systemStatus");
+const box=document.getElementById("systemStatus");
 
- try{
-  const r=await fetch("/api/home/content?refresh="+Date.now());
-  const data=await r.json();
+try{
+const response=await fetch("/api/health",{
+credentials:"same-origin"
+});
 
-  if(!r.ok){
-   throw new Error(data.error||("HTTP "+r.status));
-  }
+if(!response.ok)
+throw new Error("HTTP "+response.status);
 
-  box.innerHTML=
-   '<span class="ok">✓ API Online</span>'+
-   '<br>Homepage Enabled: '+(data.enabled?"Yes":"No")+
-   '<br>Saved Items: '+(data.count??(data.items||[]).length);
+const data=await response.json();
 
- }catch(e){
-  box.innerHTML=
-   '<span class="err">✕ API Error: '+
-   escapeHtml(e.message)+'</span>';
- }
+box.innerHTML=
+"<span style='color:#7ff0ae'>● Backend Online</span>"+
+"<br><span class='small'>"+
+esc(JSON.stringify(data))+
+"</span>";
+
+}catch(e){
+box.innerHTML=
+"<span style='color:#ff8d99'>● Backend Error</span>"+
+"<br><span class='small'>"+
+esc(e.message)+
+"</span>";
+}
 }
 
+function esc(value){
+return String(value??"")
+.replace(/&/g,"&")
+.replace(/</g,"<")
+.replace(/>/g,">")
+.replace(/"/g,""")
+.replace(/'/g,"'");
+}
 
+function attr(value){
+return esc(value);
+}
+
+showFields();
 loadContent();
 checkSystem();
 </script>
