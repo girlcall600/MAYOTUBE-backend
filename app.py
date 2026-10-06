@@ -527,6 +527,103 @@ def admin_content_update():
         )
 
 
+@app.post("/api/admin/content/reorder")
+def admin_content_reorder():
+    if not admin_required():
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    try:
+        body = request.get_json(
+            silent=True
+        ) or {}
+
+        order = body.get("order")
+
+        if not isinstance(
+            order,
+            list
+        ):
+            return jsonify({
+                "error":
+                    "Order must be an array"
+            }), 400
+
+        data = load_content()
+
+        items = data.get(
+            "items",
+            []
+        )
+
+        if not isinstance(
+            items,
+            list
+        ):
+            items = []
+
+        if len(order) != len(items):
+            return jsonify({
+                "error":
+                    "Order does not match content count"
+            }), 400
+
+        item_map = {}
+
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+
+            item_id = str(
+                item.get("id", "")
+            )
+
+            if item_id:
+                item_map[item_id] = item
+
+        reordered = []
+
+        for item_id in order:
+
+            key = str(item_id)
+
+            if key not in item_map:
+                return jsonify({
+                    "error":
+                        "Invalid content ID in order: "
+                        + key
+                }), 400
+
+            reordered.append(
+                item_map[key]
+            )
+
+        if len(reordered) != len(items):
+            return jsonify({
+                "error":
+                    "Some content items are missing"
+            }), 400
+
+        data["items"] = reordered
+        data["count"] = len(reordered)
+
+        save_and_verify(data)
+
+        return jsonify({
+            "success": True,
+            "message":
+                "Homepage order saved successfully",
+            "data": data
+        })
+
+    except Exception as e:
+        return error_response(
+            "Content reorder failed",
+            e
+        )
+
+
 @app.post("/api/admin/content/delete")
 def admin_content_delete():
     if not admin_required():
