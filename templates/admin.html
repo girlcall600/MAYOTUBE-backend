@@ -5,617 +5,323 @@
 <title>MAYOTUBE ADMIN</title>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#0b0b10;color:#fff;font-family:Arial,sans-serif;
- padding:18px
-}
-.wrap{max-width:1000px;margin:auto}
-h1{margin:0 0 6px;font-size:28px}
-h2{margin:0 0 14px}
-.sub{color:#aaa;margin-bottom:22px}
-.card{
- background:#15151d;border:1px solid #292936;border-radius:14px;
- padding:18px;margin-bottom:18px
-}
-label{display:block;color:#bbb;margin:12px 0 6px}
-input,textarea,select{
- width:100%;padding:12px;border-radius:9px;
- border:1px solid #383846;background:#0e0e14;color:#fff;
- font-size:15px
-}
+body{margin:0;background:#0c0b10;color:#fff;font-family:Arial,sans-serif}
+header{padding:18px;background:#15131b;border-bottom:1px solid #292532}
+h1{margin:0;font-size:22px}
+h2{font-size:18px;margin:0 0 14px}
+main{max-width:900px;margin:auto;padding:16px}
+.card{background:#15131b;border:1px solid #292532;border-radius:12px;padding:16px;margin-bottom:16px}
+input,textarea,select{width:100%;padding:12px;margin:7px 0;background:#0d0c11;color:#fff;border:1px solid #393342;border-radius:8px}
 textarea{min-height:100px;resize:vertical}
-button{
- border:0;border-radius:9px;padding:11px 16px;
- background:#4f7cff;color:#fff;font-weight:bold;cursor:pointer;
- margin:5px 4px 5px 0
-}
-button:hover{opacity:.9}
-button.red{background:#c9344d}
-button.gray{background:#444452}
-button.green{background:#24965c}
-button.orange{background:#bd7925}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.item{
- border:1px solid #30303c;border-radius:12px;padding:14px;
- margin-top:12px;background:#101017
-}
-.item.disabled{opacity:.5}
-.item-head{
- display:flex;justify-content:space-between;
- align-items:center;gap:10px;flex-wrap:wrap
-}
-.badge{
- display:inline-block;padding:4px 8px;border-radius:20px;
- background:#303044;color:#ddd;font-size:12px
-}
-.status{margin:10px 0;padding:11px;border-radius:9px;display:none}
-.ok{display:block;background:#123b29;color:#7ff0ae}
-.err{display:block;background:#451820;color:#ff9da9}
-.preview{max-width:180px;max-height:110px;border-radius:8px;margin-top:8px}
-.small{font-size:12px;color:#999}
+button{border:0;border-radius:8px;padding:10px 14px;margin:4px;background:#2b2735;color:#fff;cursor:pointer}
+button.primary{background:#6c3cff}
+button.danger{background:#b52b3c}
+button.ok{background:#167c45}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.item{border:1px solid #332e3d;border-radius:10px;padding:12px;margin:10px 0;background:#100f14}
+.item img,.item video{max-width:100%;max-height:220px;border-radius:8px;margin-top:8px}
+.small{font-size:13px;color:#aaa}
+.status{padding:10px;border-radius:8px;background:#0e2619;color:#7dffae}
+.error{background:#32151a;color:#ff9aa5}
 .hidden{display:none}
-.actions{margin-top:12px}
-hr{border:0;border-top:1px solid #292936;margin:18px 0}
-@media(max-width:650px){
- .row{grid-template-columns:1fr}
- body{padding:10px}
-}
+label{display:block;margin-top:8px;font-size:13px;color:#bbb}
 </style>
 </head><body>
-<div class="wrap"><h1>MAYOTUBE ADMIN</h1>
-<div class="sub">Owner Admin ✓ — Homepage Content Manager</div><div id="status" class="status"></div><div class="card">
-<h2>Add Homepage Content</h2><label>Content Type</label>
-<select id="type" onchange="showFields()">
+<header>
+<h1>MAYOTUBE ADMIN</h1>
+<div class="small">Owner Control Panel</div>
+</header><main><div class="card">
+<h2>System Status</h2>
+<div id="systemStatus">Checking...</div>
+</div><div class="card">
+<h2>Homepage Content</h2><label>Content Type</label>
+<select id="type">
 
-<option value="url">URL / Web Link</option>
-<option value="youtube">YouTube Video</option>
 <option value="message">Message</option>
+<option value="url">URL</option>
+<option value="youtube">YouTube</option>
 <option value="donation">Donation</option>
-<option value="audio">Audio</option>
 <option value="notification">Notification</option>
 <option value="image">Image</option>
 <option value="video">Video</option>
 <option value="gif">GIF</option>
-<option value="ad">Advertisement</option>
-<option value="music">Music Link</option>
+<option value="audio">Audio</option>
+<option value="music">Music</option>
 <option value="gallery">Gallery Video</option>
 <option value="live">Live Channel</option>
-</select><div id="fields"></div><div class="row">
-<div>
-<label>Display Order</label>
-<input id="order" type="number" value="0">
-</div>
-<div>
-<label>Enabled</label>
-<select id="enabled">
-<option value="true">Yes</option>
-<option value="false">No</option>
-</select>
-</div>
-</div><div class="actions">
-<button class="green" onclick="saveContent()">Save Content</button>
-<button class="gray" onclick="clearForm()">Clear</button>
-</div><input id="editId" type="hidden">
-</div><div class="card">
-<h2>Media Upload</h2><label>Select Image / Video / GIF / Audio</label>
-<input id="mediaFile" type="file"
-accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov,.mp3,.wav,.m4a,.aac">
+<option value="ad">Advertisement</option>
+</select><label>Message / Title</label>
 
-<div class="small">
-Maximum file size: 4 MB
-</div><button class="orange" onclick="uploadMedia()">Upload Media</button>
+<textarea id="message" placeholder="Homepage message or title"></textarea><label>Button Text</label>
+<input id="buttonText" placeholder="مثلاً Watch Now">
 
-<div id="uploadResult" class="small"></div>
-</div><div class="card">
-<div class="item-head">
-<h2>Saved Homepage Content</h2>
+<label>Button URL</label>
+<input id="buttonUrl" placeholder="https://...">
+
+<label>Media URL</label>
+<input id="mediaUrl" placeholder="https://...">
+
+<label>Upload Media</label>
+<input id="file" type="file">
+
+<div class="row">
+<button class="primary" onclick="saveContent()">Save Content</button>
+<button onclick="clearForm()">Clear</button>
 <button onclick="loadContent()">Refresh</button>
-</div><div id="saved">Loading...</div>
+</div><div id="saveStatus" class="small"></div>
 </div><div class="card">
-<h2>System Status</h2>
-<div id="systemStatus">Checking...</div>
-</div></div><script>
-const fields={
- url:[
-  ["url","URL","url"],
-  ["button_text","Button Text","text"]
- ],
- youtube:[
-  ["youtube_url","YouTube URL","url"],
-  ["title","Title","text"],
-  ["description","Description","textarea"],
-  ["thumbnail_url","Thumbnail URL","url"],
-  ["button_text","Button Text","text"]
- ],
- message:[
-  ["message","Message","textarea"],
-  ["button_text","Button Text","text"],
-  ["button_url","Button URL","url"]
- ],
- donation:[
-  ["donation_message","Donation Message","textarea"],
-  ["donation_url","Donation URL","url"],
-  ["button_text","Button Text","text"]
- ],
- audio:[
-  ["audio_url","Audio URL","url"],
-  ["title","Title","text"],
-  ["cover_url","Cover Image URL","url"]
- ],
- notification:[
-  ["notification","Notification","textarea"],
-  ["button_text","Button Text","text"],
-  ["button_url","Button URL","url"]
- ],
- image:[
-  ["image_url","Image URL","url"],
-  ["title","Title","text"],
-  ["click_url","Click URL","url"]
- ],
- video:[
-  ["video_url","Video URL","url"],
-  ["title","Title","text"],
-  ["thumbnail_url","Thumbnail URL","url"],
-  ["description","Description","textarea"]
- ],
- gif:[
-  ["gif_url","GIF URL","url"],
-  ["title","Title","text"],
-  ["click_url","Click URL","url"]
- ],
- ad:[
-  ["media_url","Media URL","url"],
-  ["title","Advertisement Title","text"],
-  ["click_url","Click URL","url"],
-  ["description","Description","textarea"]
- ],
- music:[
-  ["music_url","Music URL","url"],
-  ["title","Music Title","text"],
-  ["artist","Artist","text"]
- ],
- gallery:[
-  ["video_url","Video URL","url"],
-  ["title","Title","text"],
-  ["thumbnail_url","Thumbnail URL","url"]
- ],
- live:[
-  ["live_url","Live URL","url"],
-  ["channel_name","Channel Name","text"],
-  ["thumbnail_url","Thumbnail URL","url"]
- ]
-};
+<h2>Saved Homepage Content</h2>
+<div id="contentList">Loading...</div>
+</div></main><script>
+let editId=null;
+let apiToken="";
 
-
-function showFields(data={}){
- const type=document.getElementById("type").value;
- const box=document.getElementById("fields");
-
- box.innerHTML="";
-
- (fields[type]||[]).forEach(f=>{
-  const id=f[0],label=f[1],kind=f[2];
-  const value=data[id]??"";
-
-  if(kind==="textarea"){
-   box.innerHTML+=`
-   <label>${label}</label>
-   <textarea id="f_${id}">${esc(value)}</textarea>`;}else{
-box.innerHTML+=" <label>${label}</label> <input id="f_${id}" type="${kind}" value="${attr(value)}">";
-}
-});
-}
-
-function collectFields(){
-const type=document.getElementById("type").value;
-const data={
-type:type,
-enabled:document.getElementById("enabled").value==="true",
-order:Number(document.getElementById("order").value||0)
-};
-
-(fields[type]||[]).forEach(f=>{
-const el=document.getElementById("f_"+f[0]);
-if(el)data[f[0]]=el.value.trim();
-});
-
-const id=document.getElementById("editId").value;
-if(id)data.id=Number(id);
-
-return data;
+async function getSession(){
+    const r=await fetch("/api/admin/session",{credentials:"same-origin",cache:"no-store"});
+    if(!r.ok) throw new Error("Admin session not authenticated");
+    const d=await r.json();
+    if(!d.authenticated) throw new Error("Admin session expired");
+    apiToken=d.api_token||"";
+    return d;
 }
 
 async function api(url,options={}){
-const response=await fetch(url,{
-credentials:"same-origin",
-...options,
-headers:{
-"Content-Type":"application/json",
-...(options.headers||{})
-}
-});
+    options.credentials="same-origin";
+    options.cache="no-store";
+    options.headers=options.headers||{};
+    options.headers["X-MAYOTUBE-ADMIN"]=apiToken;
+    if(options.body && !(options.body instanceof FormData))
+        options.headers["Content-Type"]="application/json";
 
-const text=await response.text();
+    const r=await fetch(url,options);
+    const text=await r.text();
 
-let data;
-try{
-data=JSON.parse(text);
-}catch(e){
-throw new Error(
-response.status+" "+response.statusText+"\n"+text
-);
-}
+    let data={};
+    try{data=JSON.parse(text)}catch(e){}
 
-if(!response.ok){
-throw new Error(
-data.error||data.message||("HTTP "+response.status)
-);
+    if(!r.ok){
+        throw new Error(data.error||text||("HTTP "+r.status));
+    }
+    return data;
 }
 
-return data;
-}
-
-async function saveContent(){
-try{
-const data=collectFields();
-const id=document.getElementById("editId").value;
-
-if(!data.type){
-showStatus("Content type missing","error");
-return;
-}
-
-const endpoint=id
-?"/api/admin/content/update"
-:"/api/admin/content/save";
-
-const result=await api(endpoint,{
-method:"POST",
-body:JSON.stringify(data)
-});
-
-showStatus(
-result.message||"Content saved successfully",
-"ok"
-);
-
-clearForm();
-await loadContent();
-
-}catch(e){
-showStatus("Save failed: "+e.message,"error");
-}
+async function checkStatus(){
+    const box=document.getElementById("systemStatus");
+    try{
+        const r=await fetch("/api/health",{credentials:"same-origin",cache:"no-store"});
+        const d=await r.json();
+        if(r.ok && d.status==="ok"){
+            box.className="status";
+            box.textContent="Online • Blob: "+(d.blob_configured?"Configured":"Not Configured");
+        }else{
+            throw new Error("Health check failed");
+        }
+    }catch(e){
+        box.className="status error";
+        box.textContent="System Error: "+e.message;
+    }
 }
 
 async function loadContent(){
-const box=document.getElementById("saved");
-box.innerHTML="Loading...";
+    const box=document.getElementById("contentList");
+    box.textContent="Loading...";
 
-try{
-const data=await api("/api/admin/content",{
-method:"GET",
-headers:{}
-});
+    try{
+        await getSession();
+        const d=await api("/api/admin/content");
+        const items=Array.isArray(d.items)?d.items:[];
 
-const items=data.items||[];
+        if(!items.length){
+            box.innerHTML='<div class="small">No homepage content saved.</div>';
+            return;
+        }
 
-if(!items.length){
-box.innerHTML="<div class='small'>No homepage content saved.</div>";
-return;
+        box.innerHTML=items.map(item=>{
+            const id=Number(item.id)||0;
+            const enabled=item.enabled!==false;
+
+            let preview="";
+            const type=item.type||"message";
+
+            if((type==="image"||type==="gif") && item.media_url){
+                preview='<img src="'+esc(item.media_url)+'">';
+            }else if(type==="video" && item.media_url){
+                preview='<video src="'+esc(item.media_url)+'" controls></video>';
+            }else if((type==="audio"||type==="music") && item.media_url){
+                preview='<audio src="'+esc(item.media_url)+'" controls style="width:100%;margin-top:8px"></audio>';
+            }
+
+            return `
+            <div class="item">
+                <b>#${id} • ${esc(type)}</b>
+                <div class="small">Status: ${enabled?"Enabled":"Disabled"}</div>
+                ${item.message?'<div style="margin-top:8px">'+esc(item.message)+'</div>':''}
+                ${item.button_text?'<div class="small">Button: '+esc(item.button_text)+'</div>':''}
+                ${item.button_url?'<div class="small">URL: '+esc(item.button_url)+'</div>':''}
+                ${item.media_url?'<div class="small">Media: '+esc(item.media_url)+'</div>':''}
+                ${preview}
+                <div class="row" style="margin-top:8px">
+                    <button onclick="editItem(${id})">Edit</button>
+                    <button class="${enabled?'':'ok'}" onclick="toggleItem(${id})">${enabled?'Disable':'Enable'}</button>
+                    <button class="danger" onclick="deleteItem(${id})">Delete</button>
+                </div>
+            </div>`;
+        }).join("");
+
+    }catch(e){
+        box.innerHTML='<div class="error" style="padding:10px;border-radius:8px">'+esc(e.message)+'</div>';
+    }
 }
 
-box.innerHTML="";
+async function saveContent(){
+    const status=document.getElementById("saveStatus");
+    status.textContent="Saving...";
 
-items.forEach(item=>{
-const div=document.createElement("div");
-div.className="item"+(item.enabled===false?" disabled":"");
+    try{
+        await getSession();
 
-div.innerHTML=`
-<div class="item-head">
-<div>
-<span class="badge">${esc(item.type||"content")}</span>
-<strong> #${esc(item.id)}</strong>
-</div>
-<span class="small">
-${item.enabled===false?"Disabled":"Enabled"}
-</span>
-</div>
+        const type=document.getElementById("type").value;
+        const message=document.getElementById("message").value.trim();
+        const buttonText=document.getElementById("buttonText").value.trim();
+        const buttonUrl=document.getElementById("buttonUrl").value.trim();
+        let mediaUrl=document.getElementById("mediaUrl").value.trim();
 
-<div class="small" style="margin-top:8px">
-  Order: ${esc(item.order??0)}
-</div>
+        const file=document.getElementById("file").files[0];
 
-<div style="margin-top:8px">
-  ${itemPreview(item)}
-</div>
+        if(file){
+            status.textContent="Uploading media...";
 
-<div class="actions">
-  <button onclick='editItem(${JSON.stringify(item)})'>
-   Edit
-  </button>
+            const fd=new FormData();
+            fd.append("file",file);
 
-  <button class="${
-   item.enabled===false?"green":"orange"
-  }" onclick="toggleItem(${Number(item.id)})">
-   ${item.enabled===false?"Enable":"Disable"}
-  </button>
+            const upload=await api("/api/admin/media/upload",{
+                method:"POST",
+                body:fd
+            });
 
-  <button class="red"
-   onclick="deleteItem(${Number(item.id)})">
-   Delete
-  </button>
-</div>
+            mediaUrl=upload.url||upload.media_url||"";
+            if(!mediaUrl) throw new Error("Upload succeeded but no media URL returned");
 
-`;
+            document.getElementById("mediaUrl").value=mediaUrl;
+        }
 
-box.appendChild(div);
-});
+        const item={
+            type:type,
+            message:message,
+            button_text:buttonText,
+            button_url:buttonUrl,
+            media_url:mediaUrl,
+            enabled:true
+        };
 
-}catch(e){
-box.innerHTML=
-"<div class='status err' style='display:block'>"+
-"Load failed: "+esc(e.message)+
-"</div>";
-}
-}
+        if(editId!==null){
+            item.id=editId;
+            await api("/api/admin/content/update",{
+                method:"POST",
+                body:JSON.stringify(item)
+            });
+            status.textContent="Content updated successfully.";
+        }else{
+            await api("/api/admin/content/save",{
+                method:"POST",
+                body:JSON.stringify(item)
+            });
+            status.textContent="Content saved successfully.";
+        }
 
-function itemPreview(item){
-const type=item.type||"";
+        editId=null;
+        clearForm();
+        await loadContent();
 
-if(type==="message")
-return "<div>"+esc(item.message||"")+"</div>";
-
-if(type==="notification")
-return "<div>"+esc(item.notification||"")+"</div>";
-
-if(type==="donation")
-return "<div>"+esc(item.donation_message||"")+"</div>";
-
-if(type==="youtube")
-return "<div><b>"+esc(item.title||"YouTube Video")+
-"</b><br>"+esc(item.youtube_url||"")+"</div>";
-
-if(type==="image"){
-return "<b>${esc(item.title||"Image")}</b><br> ${item.image_url?"<img class="preview" src="${attr(item.image_url)}">":""} ";
-}
-
-if(type==="gif"){
-return "<b>${esc(item.title||"GIF")}</b><br> ${item.gif_url?"<img class="preview" src="${attr(item.gif_url)}">":""} ";
-}
-
-if(type==="video")
-return "<b>"+esc(item.title||"Video")+
-"</b><br>"+esc(item.video_url||"");
-
-if(type==="audio")
-return "<b>"+esc(item.title||"Audio")+
-"</b><br>"+esc(item.audio_url||"");
-
-if(type==="music")
-return "<b>"+esc(item.title||"Music")+
-"</b><br>"+esc(item.music_url||"");
-
-if(type==="gallery")
-return "<b>"+esc(item.title||"Gallery Video")+
-"</b><br>"+esc(item.video_url||"");
-
-if(type==="live")
-return "<b>"+esc(item.channel_name||"Live Channel")+
-"</b><br>"+esc(item.live_url||"");
-
-if(type==="ad")
-return "<b>"+esc(item.title||"Advertisement")+
-"</b><br>"+esc(item.media_url||"");
-
-if(type==="url")
-return "<b>"+esc(item.button_text||"Web Link")+
-"</b><br>"+esc(item.url||"");
-
-return "<pre>"+esc(JSON.stringify(item,null,2))+"</pre>";
-}
-
-function editItem(item){
-document.getElementById("editId").value=item.id||"";
-document.getElementById("type").value=item.type||"message";
-showFields(item);
-
-document.getElementById("enabled").value=
-item.enabled===false?"false":"true";
-
-document.getElementById("order").value=item.order??0;
-
-window.scrollTo({top:0,behavior:"smooth"});
-
-showStatus("Editing content #"+item.id,"ok");
+    }catch(e){
+        status.textContent="Save failed: "+e.message;
+    }
 }
 
 async function deleteItem(id){
-if(!confirm("Delete this homepage content?"))return;
+    if(!confirm("Delete this content?")) return;
 
-try{
-const result=await api("/api/admin/content/delete",{
-method:"POST",
-body:JSON.stringify({id:Number(id)})
-});
-
-showStatus(
-result.message||"Content deleted successfully",
-"ok"
-);
-
-await loadContent();
-
-}catch(e){
-showStatus("Delete failed: "+e.message,"error");
-}
+    try{
+        await getSession();
+        await api("/api/admin/content/delete",{
+            method:"POST",
+            body:JSON.stringify({id:id})
+        });
+        await loadContent();
+    }catch(e){
+        alert("Delete failed: "+e.message);
+    }
 }
 
 async function toggleItem(id){
-try{
-const result=await api("/api/admin/content/toggle",{
-method:"POST",
-body:JSON.stringify({id:Number(id)})
-});
-
-showStatus(
-result.message||"Content status updated",
-"ok"
-);
-
-await loadContent();
-
-}catch(e){
-showStatus("Toggle failed: "+e.message,"error");
-}
+    try{
+        await getSession();
+        await api("/api/admin/content/toggle",{
+            method:"POST",
+            body:JSON.stringify({id:id})
+        });
+        await loadContent();
+    }catch(e){
+        alert("Toggle failed: "+e.message);
+    }
 }
 
-async function uploadMedia(){
-const file=document.getElementById("mediaFile").files[0];
-const resultBox=document.getElementById("uploadResult");
+async function editItem(id){
+    try{
+        await getSession();
+        const d=await api("/api/admin/content");
+        const item=(d.items||[]).find(x=>Number(x.id)===Number(id));
 
-if(!file){
-resultBox.textContent="Please select a file.";
-return;
-}
+        if(!item) throw new Error("Content item not found");
 
-if(file.size>410241024){
-resultBox.textContent="File is larger than 4 MB.";
-return;
-}
+        editId=Number(item.id);
 
-const form=new FormData();
-form.append("file",file);
+        document.getElementById("type").value=item.type||"message";
+        document.getElementById("message").value=item.message||"";
+        document.getElementById("buttonText").value=item.button_text||"";
+        document.getElementById("buttonUrl").value=item.button_url||"";
+        document.getElementById("mediaUrl").value=item.media_url||"";
+        document.getElementById("file").value="";
 
-resultBox.textContent="Uploading...";
+        document.getElementById("saveStatus").textContent="Editing item #"+editId;
 
-try{
-const response=await fetch("/api/admin/media/upload",{
-method:"POST",
-credentials:"same-origin",
-body:form
-});
-
-const text=await response.text();
-
-let data;
-try{
-data=JSON.parse(text);
-}catch(e){
-throw new Error(
-response.status+" "+response.statusText+"\n"+text
-);
-}
-
-if(!response.ok){
-throw new Error(
-data.error||data.message||("HTTP "+response.status)
-);
-}
-
-const url=
-data.url||
-data.media_url||
-data.blob_url||
-data.download_url||
-"";
-
-resultBox.innerHTML=
-"Upload successful."+
-(url?
-"<br><input value="${attr(url)}" readonly onclick="this.select()">":"");
-
-if(url){
-const type=document.getElementById("type").value;
-
-const targetMap={
-image:"f_image_url",
-gif:"f_gif_url",
-video:"f_video_url",
-audio:"f_audio_url",
-ad:"f_media_url",
-music:"f_music_url",
-gallery:"f_video_url",
-live:"f_thumbnail_url"
-};
-
-const target=document.getElementById(
-targetMap[type]||""
-);
-
-if(target)target.value=url;
-}
-
-}catch(e){
-resultBox.textContent="Upload failed: "+e.message;
-}
+        window.scrollTo({top:0,behavior:"smooth"});
+    }catch(e){
+        alert("Edit failed: "+e.message);
+    }
 }
 
 function clearForm(){
-document.getElementById("editId").value="";
-document.getElementById("enabled").value="true";
-document.getElementById("order").value="0";
-document.getElementById("type").value="url";
-document.getElementById("mediaFile").value="";
-document.getElementById("uploadResult").textContent="";
-showFields();
+    editId=null;
+    document.getElementById("message").value="";
+    document.getElementById("buttonText").value="";
+    document.getElementById("buttonUrl").value="";
+    document.getElementById("mediaUrl").value="";
+    document.getElementById("file").value="";
 }
 
-function showStatus(message,type){
-const box=document.getElementById("status");
-box.className="status "+(type==="error"?"err":"ok");
-box.textContent=message;
-box.style.display="block";
-
-setTimeout(()=>{
-box.style.display="none";
-},5000);
+function esc(v){
+    return String(v??"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
-async function checkSystem(){
-const box=document.getElementById("systemStatus");
-
-try{
-const response=await fetch("/api/health",{
-credentials:"same-origin"
-});
-
-if(!response.ok)
-throw new Error("HTTP "+response.status);
-
-const data=await response.json();
-
-box.innerHTML=
-"<span style='color:#7ff0ae'>● Backend Online</span>"+
-"<br><span class='small'>"+
-esc(JSON.stringify(data))+
-"</span>";
-
-}catch(e){
-box.innerHTML=
-"<span style='color:#ff8d99'>● Backend Error</span>"+
-"<br><span class='small'>"+
-esc(e.message)+
-"</span>";
-}
+async function init(){
+    try{
+        await getSession();
+        await checkStatus();
+        await loadContent();
+    }catch(e){
+        document.getElementById("systemStatus").className="status error";
+        document.getElementById("systemStatus").textContent=e.message;
+        document.getElementById("contentList").innerHTML=
+            '<div class="error" style="padding:10px;border-radius:8px">'+esc(e.message)+'</div>';
+    }
 }
 
-function esc(value){
-return String(value??"")
-.replace(/&/g,"&")
-.replace(/</g,"<")
-.replace(/>/g,">")
-.replace(/"/g,""")
-.replace(/'/g,"'");
-}
-
-function attr(value){
-return esc(value);
-}
-
-showFields();
-loadContent();
-checkSystem();
-</script>
-
-</body>
+init();
+</script></body>
 </html>
