@@ -43,6 +43,7 @@ def blob_client():
         raise RuntimeError(
             "BLOB_READ_WRITE_TOKEN is not configured"
         )
+
     return BlobClient(token=BLOB_TOKEN)
 
 
@@ -54,6 +55,7 @@ def get_blob_url():
     )
 
     for blob in listing.blobs:
+
         pathname = getattr(
             blob,
             "pathname",
@@ -61,6 +63,7 @@ def get_blob_url():
         )
 
         if pathname == BLOB_PATH:
+
             return getattr(
                 blob,
                 "url",
@@ -71,6 +74,7 @@ def get_blob_url():
 
 
 def load_content(blob_url=None):
+
     if not blob_url:
         blob_url = get_blob_url()
 
@@ -78,6 +82,7 @@ def load_content(blob_url=None):
         return empty_content()
 
     try:
+
         cache_buster = str(
             int(time.time() * 1000)
         )
@@ -99,9 +104,11 @@ def load_content(blob_url=None):
             fresh_url,
             timeout=15
         ) as response:
+
             raw = response.read()
 
     except Exception as e:
+
         raise RuntimeError(
             f"Blob download failed: {e}"
         )
@@ -110,15 +117,19 @@ def load_content(blob_url=None):
         return empty_content()
 
     try:
+
         data = json.loads(
             raw.decode("utf-8")
         )
+
     except Exception as e:
+
         raise RuntimeError(
             f"Saved Blob contains invalid JSON: {e}"
         )
 
     if not isinstance(data, dict):
+
         raise RuntimeError(
             "Saved Blob content is not a JSON object"
         )
@@ -127,6 +138,7 @@ def load_content(blob_url=None):
         data.get("items"),
         list
     ):
+
         data["items"] = []
 
     data["count"] = len(
@@ -137,6 +149,7 @@ def load_content(blob_url=None):
 
 
 def save_content(data):
+
     client = blob_client()
 
     raw = json.dumps(
@@ -151,19 +164,30 @@ def save_content(data):
         access="public",
         content_type="application/json",
         add_random_suffix=False,
-        overwrite=True
+        overwrite=True,
+        cache_control_max_age=60
     )
 
     if not result:
+
         raise RuntimeError(
             "Vercel Blob returned no upload result"
         )
 
-    return result
+    return result, len(raw)
 
 
 def save_and_verify(data):
-    result = save_content(data)
+
+    result, expected_size = save_content(
+        data
+    )
+
+    pathname = getattr(
+        result,
+        "pathname",
+        ""
+    )
 
     blob_url = getattr(
         result,
@@ -171,48 +195,73 @@ def save_and_verify(data):
         None
     )
 
+    if pathname != BLOB_PATH:
+
+        raise RuntimeError(
+            "Blob upload returned an unexpected pathname"
+        )
+
+    if not blob_url:
+
+        raise RuntimeError(
+            "Blob upload completed but returned no URL"
+        )
+
+    client = blob_client()
+
     last_error = None
 
     for attempt in range(5):
+
         try:
-            saved = load_content(
-                blob_url
+
+            head = client.head(
+                BLOB_PATH
+            )
+
+            saved_size = getattr(
+                head,
+                "size",
+                None
+            )
+
+            saved_pathname = getattr(
+                head,
+                "pathname",
+                ""
             )
 
             if (
-                saved.get("app") ==
-                data.get("app")
+                saved_pathname == BLOB_PATH
                 and
-                saved.get("enabled", True) ==
-                data.get("enabled", True)
-                and
-                saved.get("items", []) ==
-                data.get("items", [])
-                and
-                saved.get("count") ==
-                len(data.get("items", []))
+                saved_size == expected_size
             ):
+
                 return result
 
         except Exception as e:
+
             last_error = e
 
         if attempt < 4:
-            time.sleep(1)
+            time.sleep(0.5)
 
     if last_error:
+
         raise RuntimeError(
-            "Blob write completed, but verification read failed: "
+            "Blob write completed, but "
+            "stored Blob verification failed: "
             + str(last_error)
         )
 
     raise RuntimeError(
-        "Blob write completed, but the saved Blob "
-        "still returned different content"
+        "Blob write completed, but "
+        "stored Blob metadata could not be verified"
     )
 
 
 def error_response(message, error):
+
     return jsonify({
         "error": message,
         "details": str(error)[:1000]
@@ -221,6 +270,7 @@ def error_response(message, error):
 
 @app.get("/")
 def home():
+
     return jsonify({
         "app": "MAYOTUBE",
         "status": "online"
@@ -229,6 +279,7 @@ def home():
 
 @app.get("/api/health")
 def health():
+
     return jsonify({
         "status": "ok",
         "service": "MAYOTUBE backend",
@@ -238,7 +289,9 @@ def health():
 
 @app.get("/api/home/content")
 def public_home_content():
+
     try:
+
         data = load_content()
 
         items = data.get(
@@ -270,6 +323,7 @@ def public_home_content():
         })
 
     except Exception as e:
+
         return error_response(
             "Home content unavailable",
             e
@@ -278,16 +332,21 @@ def public_home_content():
 
 @app.get("/api/admin/content")
 def admin_content():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         return jsonify(
             load_content()
         )
+
     except Exception as e:
+
         return error_response(
             "Content load failed",
             e
@@ -296,12 +355,15 @@ def admin_content():
 
 @app.post("/api/admin/content/save")
 def admin_content_save():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         item = request.get_json(
             silent=True
         )
@@ -310,6 +372,7 @@ def admin_content_save():
             item,
             dict
         ):
+
             return jsonify({
                 "error": "Invalid content data"
             }), 400
@@ -322,6 +385,7 @@ def admin_content_save():
         ).strip()
 
         if not content_type:
+
             return jsonify({
                 "error": "Content type is required"
             }), 400
@@ -332,6 +396,7 @@ def admin_content_save():
             data.get("items"),
             list
         ):
+
             data["items"] = []
 
         numeric_ids = [
@@ -350,6 +415,7 @@ def admin_content_save():
         item["enabled"] = True
 
         data["items"].append(item)
+
         data["count"] = len(
             data["items"]
         )
@@ -364,6 +430,7 @@ def admin_content_save():
         })
 
     except Exception as e:
+
         return error_response(
             "Content save failed",
             e
@@ -372,12 +439,15 @@ def admin_content_save():
 
 @app.post("/api/admin/content/update")
 def admin_content_update():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         item = request.get_json(
             silent=True
         )
@@ -386,6 +456,7 @@ def admin_content_update():
             item,
             dict
         ):
+
             return jsonify({
                 "error": "Invalid content data"
             }), 400
@@ -393,6 +464,7 @@ def admin_content_update():
         item_id = item.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error": "Content ID is required"
             }), 400
@@ -409,6 +481,7 @@ def admin_content_update():
         for index, old_item in enumerate(
             items
         ):
+
             if str(
                 old_item.get("id")
             ) == str(item_id):
@@ -427,6 +500,7 @@ def admin_content_update():
                 break
 
         if not found:
+
             return jsonify({
                 "error": "Content not found"
             }), 404
@@ -444,6 +518,7 @@ def admin_content_update():
         })
 
     except Exception as e:
+
         return error_response(
             "Content update failed",
             e
@@ -452,12 +527,15 @@ def admin_content_update():
 
 @app.post("/api/admin/content/delete")
 def admin_content_delete():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         body = request.get_json(
             silent=True
         ) or {}
@@ -465,6 +543,7 @@ def admin_content_delete():
         item_id = body.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error": "Content ID is required"
             }), 400
@@ -485,6 +564,7 @@ def admin_content_delete():
         ]
 
         if len(new_items) == len(items):
+
             return jsonify({
                 "error": "Content not found"
             }), 404
@@ -493,10 +573,14 @@ def admin_content_delete():
             new_items,
             1
         ):
+
             item["id"] = index
 
         data["items"] = new_items
-        data["count"] = len(new_items)
+
+        data["count"] = len(
+            new_items
+        )
 
         save_and_verify(data)
 
@@ -508,6 +592,7 @@ def admin_content_delete():
         })
 
     except Exception as e:
+
         return error_response(
             "Content delete failed",
             e
@@ -516,12 +601,15 @@ def admin_content_delete():
 
 @app.post("/api/admin/content/toggle")
 def admin_content_toggle():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         body = request.get_json(
             silent=True
         ) or {}
@@ -529,6 +617,7 @@ def admin_content_toggle():
         item_id = body.get("id")
 
         if item_id is None:
+
             return jsonify({
                 "error": "Content ID is required"
             }), 400
@@ -544,6 +633,7 @@ def admin_content_toggle():
         new_status = False
 
         for item in items:
+
             if str(
                 item.get("id")
             ) == str(item_id):
@@ -563,6 +653,7 @@ def admin_content_toggle():
                 break
 
         if not found:
+
             return jsonify({
                 "error": "Content not found"
             }), 404
@@ -579,6 +670,7 @@ def admin_content_toggle():
         })
 
     except Exception as e:
+
         return error_response(
             "Content status update failed",
             e
@@ -587,17 +679,21 @@ def admin_content_toggle():
 
 @app.post("/api/admin/media/upload")
 def admin_media_upload():
+
     if not admin_required():
+
         return jsonify({
             "error": "Unauthorized"
         }), 401
 
     try:
+
         file = request.files.get(
             "file"
         )
 
         if not file:
+
             return jsonify({
                 "error": "No file uploaded"
             }), 400
@@ -607,6 +703,7 @@ def admin_media_upload():
         ).strip()
 
         if not filename:
+
             return jsonify({
                 "error": "Filename is required"
             }), 400
@@ -635,6 +732,7 @@ def admin_media_upload():
         }
 
         if extension not in allowed:
+
             return jsonify({
                 "error":
                     "File type is not allowed"
@@ -643,6 +741,7 @@ def admin_media_upload():
         file_data = file.read()
 
         if not file_data:
+
             return jsonify({
                 "error": "Empty file"
             }), 400
@@ -650,6 +749,7 @@ def admin_media_upload():
         max_size = 4 * 1024 * 1024
 
         if len(file_data) > max_size:
+
             return jsonify({
                 "error":
                     "File is larger than 4 MB."
@@ -684,6 +784,7 @@ def admin_media_upload():
         })
 
     except Exception as e:
+
         return error_response(
             "Media upload failed",
             e
@@ -694,6 +795,7 @@ def admin_media_upload():
 def admin_login():
 
     if admin_required():
+
         return redirect(
             url_for(
                 "admin_dashboard"
@@ -778,6 +880,7 @@ def admin_login_post():
         token,
         ADMIN_TOKEN
     ):
+
         session["admin"] = True
 
         return redirect(
@@ -800,6 +903,7 @@ Invalid Admin Token
 def admin_dashboard():
 
     if not admin_required():
+
         return redirect(
             url_for(
                 "admin_login"
@@ -1396,6 +1500,7 @@ placeholder="https://...">`
 
 
 function showFields(data={}){
+
 const type =
 data.type ||
 document.getElementById(
@@ -1408,7 +1513,9 @@ document.getElementById(
 );
 
 if(!type){
+
 box.innerHTML="";
+
 return;
 }
 
@@ -1435,12 +1542,15 @@ box.querySelector(
 );
 
 if(el){
+
 el.value =
 data[key] ?? "";
+
 }
 
 }
 );
+
 }
 
 
@@ -1473,7 +1583,9 @@ el.value.trim();
 );
 
 if(editingId !== null){
+
 item.id=editingId;
+
 }
 
 return item;
@@ -1502,7 +1614,9 @@ return;
 }
 
 message.className="status";
-message.textContent="Saving and verifying...";
+
+message.textContent=
+"Saving and verifying...";
 
 const endpoint =
 editingId === null
@@ -1538,6 +1652,7 @@ data.details
 : data.error ||
 "Save failed"
 );
+
 }
 
 message.className=
@@ -1567,7 +1682,9 @@ message.className=
 
 message.textContent=
 error.message;
+
 }
+
 }
 
 
@@ -1632,6 +1749,7 @@ data.details
 : data.error ||
 "Upload failed"
 );
+
 }
 
 result.className=
@@ -1649,7 +1767,9 @@ result.className=
 
 result.textContent=
 error.message;
+
 }
+
 }
 
 
@@ -1682,6 +1802,7 @@ data.details
 : data.error ||
 "Load failed"
 );
+
 }
 
 if(
@@ -1697,6 +1818,7 @@ No saved content yet.
 `;
 
 return;
+
 }
 
 box.innerHTML =
@@ -1757,6 +1879,7 @@ Delete
 
 </div>
 `;
+
 }
 ).join("");
 
@@ -1769,7 +1892,9 @@ Load failed:
 ${error.message}
 </div>
 `;
+
 }
+
 }
 
 
@@ -1794,6 +1919,7 @@ message.className="status";
 message.textContent =
 "Editing Content ID " +
 item.id;
+
 }
 
 
@@ -1836,6 +1962,7 @@ data.details
 : data.error ||
 "Delete failed"
 );
+
 }
 
 loadContent();
@@ -1843,7 +1970,9 @@ loadContent();
 }catch(error){
 
 alert(error.message);
+
 }
+
 }
 
 
@@ -1880,6 +2009,7 @@ data.details
 : data.error ||
 "Status update failed"
 );
+
 }
 
 loadContent();
@@ -1887,7 +2017,9 @@ loadContent();
 }catch(error){
 
 alert(error.message);
+
 }
+
 }
 
 
