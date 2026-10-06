@@ -165,16 +165,51 @@ def save_content(data):
 def save_and_verify(data):
     result = save_content(data)
 
-    saved = load_content(
-        getattr(result, "url", None)
+    blob_url = getattr(
+        result,
+        "url",
+        None
     )
 
-    if saved != data:
+    last_error = None
+
+    for attempt in range(5):
+        try:
+            saved = load_content(
+                blob_url
+            )
+
+            if (
+                saved.get("app") ==
+                data.get("app")
+                and
+                saved.get("enabled", True) ==
+                data.get("enabled", True)
+                and
+                saved.get("items", []) ==
+                data.get("items", [])
+                and
+                saved.get("count") ==
+                len(data.get("items", []))
+            ):
+                return result
+
+        except Exception as e:
+            last_error = e
+
+        if attempt < 4:
+            time.sleep(1)
+
+    if last_error:
         raise RuntimeError(
-            "Blob write completed but verification failed"
+            "Blob write completed, but verification read failed: "
+            + str(last_error)
         )
 
-    return result
+    raise RuntimeError(
+        "Blob write completed, but the saved Blob "
+        "still returned different content"
+    )
 
 
 def error_response(message, error):
@@ -1071,6 +1106,7 @@ Backend Online ✓
 <p class="status success">
 Admin Authenticated ✓
 </p>
+
 </div>
 
 <a class="logout"
