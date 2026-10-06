@@ -17,7 +17,7 @@ render_template
 
 from vercel.blob import BlobClient
 
-app = Flask(name)
+app = Flask(__name__)
 
 ADMIN_TOKEN = os.getenv("MAYOTUBE_ADMIN_TOKEN", "")
 BLOB_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN", "")
