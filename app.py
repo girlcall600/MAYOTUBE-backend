@@ -112,7 +112,7 @@ def save_content(data):
         access="public",
         content_type="application/json",
         add_random_suffix=False,
-        allow_overwrite=True,
+        overwrite=True,
         token=BLOB_TOKEN
     )
 
@@ -1852,7 +1852,6 @@ return;
 }
 
 message.className="status";
-
 message.textContent="Saving...";
 
 const endpoint =
@@ -2276,4 +2275,3 @@ def admin_logout():
             "admin_login"
         )
     )
-    
