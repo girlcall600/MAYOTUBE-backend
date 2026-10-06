@@ -56,7 +56,6 @@ def load_content():
         return empty_content()
 
     try:
-
         result = blob.get(
             BLOB_PATH,
             access="public",
@@ -67,6 +66,9 @@ def load_content():
         raw = b"".join(
             result.stream or []
         )
+
+        if not raw:
+            return empty_content()
 
         data = json.loads(
             raw.decode("utf-8")
@@ -88,11 +90,15 @@ def load_content():
         return data
 
     except Exception:
-
         return empty_content()
 
 
 def save_content(data):
+
+    if not BLOB_TOKEN:
+        raise RuntimeError(
+            "BLOB_READ_WRITE_TOKEN is not configured"
+        )
 
     raw = json.dumps(
         data,
@@ -100,7 +106,7 @@ def save_content(data):
         separators=(",", ":")
     ).encode("utf-8")
 
-    blob.put(
+    result = blob.put(
         BLOB_PATH,
         raw,
         access="public",
@@ -109,6 +115,20 @@ def save_content(data):
         allow_overwrite=True,
         token=BLOB_TOKEN
     )
+
+    if not result:
+        raise RuntimeError(
+            "Vercel Blob returned no upload result"
+        )
+
+    return result
+
+
+def error_response(message, error):
+    return jsonify({
+        "error": message,
+        "details": str(error)[:500]
+    }), 500
 
 
 # =========================================================
@@ -172,7 +192,7 @@ def public_home_content():
                 enabled_items
         })
 
-    except Exception:
+    except Exception as e:
 
         return jsonify({
             "app": "MAYOTUBE",
@@ -180,7 +200,9 @@ def public_home_content():
             "enabled": True,
             "items": [],
             "error":
-                "Home content unavailable"
+                "Home content unavailable",
+            "details":
+                str(e)[:300]
         }), 500
 
 
@@ -258,17 +280,17 @@ def admin_content_save():
         ):
             data["items"] = []
 
+        numeric_ids = [
+            int(x.get("id", 0))
+            for x in data["items"]
+            if isinstance(x, dict)
+            and str(
+                x.get("id", "")
+            ).isdigit()
+        ]
+
         item["id"] = (
-            max(
-                [
-                    int(x.get("id", 0))
-                    for x in data["items"]
-                    if isinstance(x, dict)
-                    and str(
-                        x.get("id", "")
-                    ).isdigit()
-                ] or [0]
-            ) + 1
+            max(numeric_ids or [0]) + 1
         )
 
         item["enabled"] = True
@@ -291,12 +313,10 @@ def admin_content_save():
 
     except Exception as e:
 
-        return jsonify({
-            "error":
-                "Content save failed",
-            "details":
-                str(e)[:300]
-        }), 500
+        return error_response(
+            "Content save failed",
+            e
+        )
 
 
 @app.post("/api/admin/content/update")
@@ -398,12 +418,10 @@ def admin_content_update():
 
     except Exception as e:
 
-        return jsonify({
-            "error":
-                "Content update failed",
-            "details":
-                str(e)[:300]
-        }), 500
+        return error_response(
+            "Content update failed",
+            e
+        )
 
 
 @app.post("/api/admin/content/delete")
@@ -484,12 +502,10 @@ def admin_content_delete():
 
     except Exception as e:
 
-        return jsonify({
-            "error":
-                "Content delete failed",
-            "details":
-                str(e)[:300]
-        }), 500
+        return error_response(
+            "Content delete failed",
+            e
+        )
 
 
 @app.post("/api/admin/content/toggle")
@@ -580,12 +596,10 @@ def admin_content_toggle():
 
     except Exception as e:
 
-        return jsonify({
-            "error":
-                "Content status update failed",
-            "details":
-                str(e)[:300]
-        }), 500
+        return error_response(
+            "Content status update failed",
+            e
+        )
 
 
 # =========================================================
@@ -711,12 +725,10 @@ def admin_media_upload():
 
     except Exception as e:
 
-        return jsonify({
-            "error":
-                "Media upload failed",
-            "details":
-                str(e)[:300]
-        }), 500
+        return error_response(
+            "Media upload failed",
+            e
+        )
 
 
 # =========================================================
@@ -1870,7 +1882,11 @@ await response.json();
 if(!response.ok){
 
 throw new Error(
-data.error ||
+data.details
+? data.error +
+" — " +
+data.details
+: data.error ||
 "Save failed"
 );
 
@@ -1964,7 +1980,11 @@ await response.json();
 if(!response.ok){
 
 throw new Error(
-data.error ||
+data.details
+? data.error +
+" — " +
+data.details
+: data.error ||
 "Upload failed"
 );
 
@@ -2169,7 +2189,11 @@ await response.json();
 if(!response.ok){
 
 throw new Error(
-data.error ||
+data.details
+? data.error +
+" — " +
+data.details
+: data.error ||
 "Delete failed"
 );
 
@@ -2212,7 +2236,11 @@ await response.json();
 if(!response.ok){
 
 throw new Error(
-data.error ||
+data.details
+? data.error +
+" — " +
+data.details
+: data.error ||
 "Status update failed"
 );
 
@@ -2248,3 +2276,4 @@ def admin_logout():
             "admin_login"
         )
     )
+    
