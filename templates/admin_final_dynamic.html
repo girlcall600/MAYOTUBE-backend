@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAYOTUBE Admin</title>
+<style>
+body{margin:0;background:#121212;color:#fff;font-family:Arial,sans-serif}
+main{max-width:900px;margin:auto;padding:10px}
+label{display:block;margin:7px 0 3px}
+input,select,textarea,button{box-sizing:border-box;width:100%;padding:8px;background:#181818;color:#fff;border:1px solid #444;border-radius:6px}
+button{cursor:pointer;background:#FFD600;color:#000;border:0;margin-top:8px}
+.editor-row,.control-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+details{margin:8px 0;padding:8px;background:#1c1c1c;border-radius:8px}
+summary{cursor:pointer;font-weight:bold}
+section{margin-bottom:10px}
+.check{display:flex;align-items:center;gap:6px}
+.check input{width:auto}
+@media(max-width:600px){.editor-row,.control-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<main>
+{% include "admin_parts/editor.html" %}
+{% include "admin_parts/controls.html" %}
+{% include "admin_parts/preview.html" %}
+</main>
+
+<script src="{{ url_for('static', filename='admin_parts/script.js') }}"></script>
+</body>
+</html>
