@@ -945,13 +945,13 @@
      <div class="editor-grid">
       <!-- TYPE -->
       <div class="input-group">
-       <label for="itemType"> Content Type </label> <select id="itemType" class="compact-type-select" onchange="updateEditorFields()"> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
+       <label for="itemType"> Content Type </label> <select id="itemType" class="compact-type-select" onchange="updateEditorFields()"> <option value="" selected> Content Type </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
       </div>
       <!-- SELECTED FEATURE FIELDS -->
-      <div class="selected-feature-panel full">
+      <div id="selectedFeaturePanel" class="selected-feature-panel full" style="display:none">
        <div class="selected-feature-title">✨ Selected Feature Fields</div>
        <!-- TITLE -->
-       <div class="input-group">
+       <div id="fieldTitle" class="input-group">
         <label for="itemTitle"> Title </label> <input id="itemTitle" type="text" placeholder="Content title">
        </div>
        <!-- MESSAGE -->
@@ -1642,6 +1642,11 @@ function updateEditorFields() {
     const type =
         $("itemType").value;
 
+    const panel = $("selectedFeaturePanel");
+    if (panel) {
+        panel.style.display = type ? "" : "none";
+    }
+
     /* صرف متعلقہ fields دکھائیں؛ API/CRUD کے تمام field names برقرار ہیں۔ */
     const messageTypes = [
         "message",
@@ -1693,6 +1698,11 @@ function updateEditorFields() {
         "advertisement"
     ];
 
+    $("fieldTitle").style.display =
+        type
+            ? ""
+            : "none";
+
     $("fieldMessage").style.display =
         messageTypes.includes(type)
             ? ""
@@ -1730,7 +1740,7 @@ function updateEditorFields() {
 
     /* منتخب feature کے fields ہی visible رہیں؛ باقی مکمل hide رہیں۔ */
     const featureFields = document.querySelectorAll(
-        "#fieldMessage, #fieldDescription, #fieldImageUrl, #fieldVideoUrl, #fieldAudioUrl, #fieldLinkUrl, #fieldButtonText"
+        "#fieldTitle, #fieldMessage, #fieldDescription, #fieldImageUrl, #fieldVideoUrl, #fieldAudioUrl, #fieldLinkUrl, #fieldButtonText"
     );
 
     featureFields.forEach(field => {
@@ -2109,7 +2119,7 @@ function clearForm() {
     $("itemId").value = "";  
   
     $("itemType").value =  
-        "message";  
+        "";  
   
     $("itemTitle").value =  
         "";  
@@ -2297,6 +2307,13 @@ function editItem(id) {
    ========================================================= */  
   
 async function saveItem() {  
+  
+    const selectedType = $("itemType").value;
+    if (!selectedType) {
+        showToast("پہلے Content Type منتخب کریں۔");
+        $("itemType").focus();
+        return;
+    }
   
     const id =  
         $("itemId").value.trim();  
