@@ -766,11 +766,11 @@
        RECYCLE BIN  
        ===================================================== */  
 
-    .trash-row { display:flex; align-items:center; gap:7px; overflow-x:auto; padding:2px 0 9px; margin-bottom:7px; scrollbar-width:thin; }
-    .trash-content-btn { flex:0 0 92px; height:38px; padding:5px 7px; border-radius:8px; border:1px solid #452020; background:#130b0b; color:#ddd; font-size:10px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+    .trash-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; overflow-x:auto; padding:2px 0 9px; margin:0; scrollbar-width:thin; direction:ltr; }
+    .trash-content-btn, .trash-empty-btn { flex:0 0 92px; width:92px; height:38px; box-sizing:border-box; padding:5px 7px; border-radius:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; font-size:10px; font-weight:700; }
+    .trash-content-btn { border:1px solid #452020; background:#130b0b; color:#ddd; direction:rtl; }
     .trash-content-btn:hover { border-color:#ef4444; }
-    .trash-empty-btn { flex:0 0 auto; height:38px; padding:5px 9px; white-space:nowrap; }
-    .trash-empty-note { color:#777; font-size:10px; margin:0 0 7px; }
+    .trash-empty-btn { border:1px solid #7f1d1d; }
     #trashActionModal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.72); }
     #trashActionModal.show { display:flex; }
     .trash-modal-box { width:min(360px,100%); background:#171717; border:1px solid #383838; border-radius:14px; padding:16px; box-shadow:0 18px 50px rgba(0,0,0,.55); }
@@ -1184,23 +1184,11 @@
     <!-- =================================================  
          CONTENT LIST  
          ================================================= -->
-    <div class="admin-card">
-     <div class="card-title">📦 Home Content</div>
-     <div class="card-subtitle">Drag &amp; Drop کر کے Content کی ترتیب تبدیل کریں۔</div>
-     <!-- SEARCH -->
-     <div class="toolbar">
-      <input id="searchItems" type="search" placeholder="🔍 Search content..." oninput="renderItems()"> <select id="filterType" onchange="renderItems()"> <option value="all"> All Types </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select> <select id="filterStatus" onchange="renderItems()"> <option value="all"> All Status </option> <option value="enabled"> Enabled </option> <option value="disabled"> Disabled </option> <option value="scheduled"> Scheduled </option> </select>
-     </div>
-     <div id="itemsList" class="items-list"></div>
-    </div>
+    <div id="itemsList" class="items-list"></div>
     <!-- =================================================  
          RECYCLE BIN  
          ================================================= -->
-    <div class="admin-card">
-     <div class="card-title">🗑️ Recycle Bin</div>
-     <div class="card-subtitle">Deleted content یہاں سے Restore کیا جا سکتا ہے۔</div>
-     <div id="trashList"></div>
-    </div>
+    <div id="trashList"></div>
     <!-- =================================================  
          MEDIA MANAGER  
          ================================================= -->
@@ -2829,7 +2817,6 @@ function renderTrash() {
     if (!trash.length) {
         container.innerHTML =
             '<div class="trash-row">' +
-                '<div class="trash-empty-note">Recycle Bin خالی ہے۔</div>' +
                 '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
             '</div>';
         return;
@@ -2837,13 +2824,14 @@ function renderTrash() {
 
     container.innerHTML =
         '<div class="trash-row">' +
+            '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
             trash.map((record, index) => {
                 const item = record.item || {};
                 return '<button class="trash-content-btn" title="' + escapeHtml(item.title || "Untitled") + '" onclick="openTrashAction(' + index + ')">' + escapeHtml(item.title || "Untitled") + '</button>';
             }).join("") +
-            '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
         '</div>';
 }
+
 
 let selectedTrashIndex = -1;
 
@@ -2877,91 +2865,8 @@ async function confirmPermanentDeleteTrash() {
 
 function getFilteredItems() {  
   
-    let items =  
+    const items =  
         [...(cmsContent.items || [])];  
-  
-    const search =  
-        (  
-            $("searchItems").value ||  
-            ""  
-        )  
-        .trim()  
-        .toLowerCase();  
-  
-    const type =  
-        $("filterType").value;  
-  
-    const status =  
-        $("filterStatus").value;  
-  
-  
-    if (search) {  
-  
-        items =  
-            items.filter(item => {  
-  
-                const text = [  
-  
-                    item.title,  
-                    item.message,  
-                    item.description,  
-                    item.type,  
-                    item.link_url  
-  
-                ]  
-                .join(" ")  
-                .toLowerCase();  
-  
-                return text.includes(search);  
-  
-            });  
-  
-    }  
-  
-  
-    if (type !== "all") {  
-  
-        items =  
-            items.filter(  
-                item =>  
-                    item.type === type  
-            );  
-  
-    }  
-  
-  
-    if (status === "enabled") {  
-  
-        items =  
-            items.filter(  
-                item =>  
-                    item.enabled !== false  
-            );  
-  
-    }  
-  
-  
-    if (status === "disabled") {  
-  
-        items =  
-            items.filter(  
-                item =>  
-                    item.enabled === false  
-            );  
-  
-    }  
-  
-  
-    if (status === "scheduled") {  
-  
-        items =  
-            items.filter(  
-                item =>  
-                    hasSchedule(item)  
-            );  
-  
-    }  
-  
   
     items.sort(  
         (a, b) =>  
