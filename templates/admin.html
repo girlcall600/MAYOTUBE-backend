@@ -578,17 +578,22 @@
     }  
 
     .item-title {  
-        font-size: 14px;  
-        font-weight: 900;  
+        font-size: 12px;  
+        font-weight: 800;  
+        word-break: break-word;  
+        line-height: 1.35;  
+    }  
+
+    .item-message {  
+        margin-top: 3px;  
+        color: #999;  
+        font-size: 11px;  
+        line-height: 1.4;  
+        white-space: pre-wrap;  
         word-break: break-word;  
     }  
 
-    .item-meta {  
-        display: flex;  
-        flex-wrap: wrap;  
-        gap: 5px;  
-        margin-top: 6px;  
-    }  
+    .item-meta { display: none; }  
 
     .badge {  
         display: inline-flex;  
@@ -623,12 +628,8 @@
         word-break: break-word;  
     }  
 
-    .item-actions {  
-        display: flex;  
-        flex-wrap: wrap;  
-        gap: 6px;  
-        margin-top: 10px;  
-    }  
+    .item-actions { display: flex; gap: 6px; margin-top: 10px; }  
+    .item-actions .item-action-btn { flex: 1 1 0; min-width: 0; height: 34px; padding: 5px 6px; font-size: 11px; white-space: nowrap; }  
 
     /* =====================================================  
        LIVE PREVIEW  
@@ -765,13 +766,17 @@
        RECYCLE BIN  
        ===================================================== */  
 
-    .trash-card {  
-        background: #130b0b;  
-        border: 1px solid #452020;  
-        border-radius: 12px;  
-        padding: 11px;  
-        margin-bottom: 8px;  
-    }  
+    .trash-row { display:flex; align-items:center; gap:7px; overflow-x:auto; padding:2px 0 9px; margin-bottom:7px; scrollbar-width:thin; }
+    .trash-content-btn { flex:0 0 92px; height:38px; padding:5px 7px; border-radius:8px; border:1px solid #452020; background:#130b0b; color:#ddd; font-size:10px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+    .trash-content-btn:hover { border-color:#ef4444; }
+    .trash-empty-btn { flex:0 0 auto; height:38px; padding:5px 9px; white-space:nowrap; }
+    .trash-empty-note { color:#777; font-size:10px; margin:0 0 7px; }
+    #trashActionModal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.72); }
+    #trashActionModal.show { display:flex; }
+    .trash-modal-box { width:min(360px,100%); background:#171717; border:1px solid #383838; border-radius:14px; padding:16px; box-shadow:0 18px 50px rgba(0,0,0,.55); }
+    .trash-modal-title { font-size:14px; font-weight:800; margin-bottom:12px; word-break:break-word; }
+    .trash-modal-actions { display:flex; gap:8px; }
+    .trash-modal-actions .btn { flex:1 1 0; }  
 
     /* =====================================================  
        TOAST  
@@ -1195,7 +1200,6 @@
      <div class="card-title">🗑️ Recycle Bin</div>
      <div class="card-subtitle">Deleted content یہاں سے Restore کیا جا سکتا ہے۔</div>
      <div id="trashList"></div>
-     <button class="btn btn-danger btn-small" onclick="emptyTrash()">Empty Recycle Bin</button>
     </div>
     <!-- =================================================  
          MEDIA MANAGER  
@@ -1221,18 +1225,19 @@
          SYSTEM STATUS  
          ================================================= -->
     <div class="admin-card">
-     <div class="card-title">⚙️ System Status</div>
-     <pre id="systemStatus" style="  
-                background:#080808;  
-                border:1px solid #292929;  
-                border-radius:10px;  
-                padding:12px;  
-                overflow:auto;  
-                white-space:pre-wrap;  
-                word-break:break-word;  
-                color:#aaa;  
-                font-size:11px;  
-            ">Loading...</pre>
+     <div class="card-title" onclick="showSystemStatus()" style="cursor:pointer">
+      ⚙️ System Status <span style="font-size:10px;color:#777">(Click to view for 5 seconds)</span>
+     </div>
+     <pre id="systemStatus" style="display:none;background:#080808;border:1px solid #292929;border-radius:10px;padding:12px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#aaa;font-size:11px;margin-top:10px"></pre>
+    </div>
+    <div id="trashActionModal" onclick="closeTrashAction(event)">
+     <div class="trash-modal-box" onclick="event.stopPropagation()">
+      <div id="trashModalTitle" class="trash-modal-title"></div>
+      <div class="trash-modal-actions">
+       <button class="btn btn-danger btn-small" onclick="confirmPermanentDeleteTrash()">🗑️ Permanent Delete</button>
+       <button class="btn btn-success btn-small" onclick="confirmRestoreTrash()">↩️ Restore</button>
+      </div>
+     </div>
     </div>
    </div>
   </div>
@@ -2711,7 +2716,7 @@ async function restoreTrash(index) {
 }
 
   
-async function permanentDeleteTrash(index) {
+async function permanentDeleteTrash(index, skipConfirm = false) {
 
     const trash = getTrash();
     const record = trash[index];
@@ -2728,7 +2733,7 @@ async function permanentDeleteTrash(index) {
 
     const title = item.title || "Untitled";
 
-    if (!confirm(
+    if (!skipConfirm && !confirm(
         "یہ Content مستقل طور پر Delete ہو جائے گا اور دوبارہ Restore نہیں ہو سکے گا.\n\n" +
         "کیا آپ واقعی اسے Permanent Delete کرنا چاہتے ہیں؟\n\n" +
         title
@@ -2819,45 +2824,57 @@ function renderTrash() {
 
     const container = $("trashList");
     const trash = getTrash();
-
     updateStats();
 
     if (!trash.length) {
         container.innerHTML =
-            '<div class="loading">Recycle Bin خالی ہے۔</div>';
+            '<div class="trash-row">' +
+                '<div class="trash-empty-note">Recycle Bin خالی ہے۔</div>' +
+                '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
+            '</div>';
         return;
     }
 
-    container.innerHTML = trash.map(
-        (record, index) => {
-            const item = record.item || {};
-
-            return (
-                '<div class="trash-card">' +
-                    '<div style="font-weight:800">' +
-                        escapeHtml(item.title || "Untitled") +
-                    '</div>' +
-                    '<div style="color:#888;font-size:11px;margin-top:5px">' +
-                        escapeHtml(item.type || "unknown") +
-                        " • " +
-                        escapeHtml(record.deletedAt || "") +
-                    '</div>' +
-                    '<div class="item-actions">' +
-                        '<button class="btn btn-success btn-small" onclick="restoreTrash(' +
-                            index +
-                        ')">↩️ Restore</button>' +
-                        '<button class="btn btn-danger btn-small" onclick="permanentDeleteTrash(' +
-                            index +
-                        ')">🗑️ Permanent Delete</button>' +
-                    '</div>' +
-                '</div>'
-            );
-        }
-    ).join("");
-
+    container.innerHTML =
+        '<div class="trash-row">' +
+            trash.map((record, index) => {
+                const item = record.item || {};
+                return '<button class="trash-content-btn" title="' + escapeHtml(item.title || "Untitled") + '" onclick="openTrashAction(' + index + ')">' + escapeHtml(item.title || "Untitled") + '</button>';
+            }).join("") +
+            '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
+        '</div>';
 }
 
-  
+let selectedTrashIndex = -1;
+
+function openTrashAction(index) {
+    const trash = getTrash();
+    const record = trash[index];
+    if (!record || !record.item) return;
+    selectedTrashIndex = index;
+    $("trashModalTitle").textContent = "Deleted Content: " + (record.item.title || "Untitled");
+    $("trashActionModal").classList.add("show");
+}
+
+function closeTrashAction(event) {
+    if (event && event.target !== $("trashActionModal")) return;
+    $("trashActionModal").classList.remove("show");
+    selectedTrashIndex = -1;
+}
+
+function confirmRestoreTrash() {
+    const index = selectedTrashIndex;
+    closeTrashAction({target: $("trashActionModal")});
+    if (index >= 0) restoreTrash(index);
+}
+
+async function confirmPermanentDeleteTrash() {
+    const index = selectedTrashIndex;
+    closeTrashAction({target: $("trashActionModal")});
+    if (index >= 0) await permanentDeleteTrash(index, true);
+}
+
+
 function getFilteredItems() {  
   
     let items =  
@@ -2995,142 +3012,30 @@ function renderItems() {
    BUILD ITEM CARD  
    ========================================================= */  
   
-function buildItemCard(item) {  
-  
-    const enabled =  
-        item.enabled !== false;  
-  
-    const scheduled =  
-        hasSchedule(item);  
-  
-    let statusBadge =  
-        enabled  
-            ? '<span class="badge badge-green">🟢 Enabled</span>'  
-            : '<span class="badge badge-red">🔴 Disabled</span>';  
-  
-    if (scheduled) {  
-  
-        statusBadge +=  
-            '<span class="badge badge-purple">📅 Scheduled</span>';  
-  
-    }  
-  
-    const preview =  
-        item.message ||  
-        item.description ||  
-        item.link_url ||  
-        item.audio_url ||  
-        item.video_url ||  
-        item.image_url ||  
-        "";  
-  
-    return (  
-  
-        '<div' +  
-  
-            ' class="item-card"' +  
-  
-            ' draggable="true"' +  
-  
-            ' data-id="' +  
-                escapeHtml(item.id) +  
-            '"' +  
-  
-        '>' +  
-  
-            '<div class="item-head">' +  
-  
-                '<div class="drag-handle" title="Drag">' +  
-                    "☷" +  
-                '</div>' +  
-  
-                '<div class="item-main">' +  
-  
-                    '<div class="item-title">' +  
-  
-                        escapeHtml(  
-                            item.title ||  
-                            "Untitled"  
-                        ) +  
-  
-                    '</div>' +  
-  
-                    '<div class="item-meta">' +  
-  
-                        '<span class="badge">' +  
-  
-                            escapeHtml(  
-                                item.type ||  
-                                "unknown"  
-                            ) +  
-  
-                        '</span>' +  
-  
-                        '<span class="badge">' +  
-  
-                            "Order " +  
-  
-                            escapeHtml(  
-                                item.order ||  
-                                0  
-                            ) +  
-  
-                        '</span>' +  
-  
-                        statusBadge +  
-  
-                    '</div>' +  
-  
-                '</div>' +  
-  
-            '</div>' +  
-  
-            (  
-                preview  
-                    ? (  
-                        '<div class="item-preview">' +  
-                            escapeHtml(  
-                                String(preview)  
-                                    .substring(0, 300)  
-                            ) +  
-                        '</div>'  
-                    )  
-                    : ""  
-            ) +  
-  
-            '<div class="item-actions">' +  
-  
-                '<button class="btn btn-primary btn-small" onclick="editItem(\'' +  
-                    escapeHtml(item.id) +  
-                '\')">✏️ Edit</button>' +  
-  
-                '<button class="btn btn-success btn-small" onclick="toggleItem(\'' +  
-                    escapeHtml(item.id) +  
-                '\')">' +  
-                    (  
-                        enabled  
-                            ? "🔴 Disable"  
-                            : "🟢 Enable"  
-                    ) +  
-                '</button>' +  
-  
-                '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' +  
-                    escapeHtml(item.id) +  
-                '\')">📋 Duplicate</button>' +  
-  
-                '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' +  
-                    escapeHtml(item.id) +  
-                '\')">🗑️ Delete</button>' +  
-  
-            '</div>' +  
-  
-        '</div>'  
-  
-    );  
-  
-}  
-  
-  
+function buildItemCard(item) {
+
+    const enabled = item.enabled !== false;
+    const preview = item.message || item.description || "";
+
+    return (
+        '<div class="item-card" draggable="true" data-id="' + escapeHtml(item.id) + '">' +
+            '<div class="item-head">' +
+                '<div class="drag-handle" title="Drag">☷</div>' +
+                '<div class="item-main">' +
+                    '<div class="item-title">' + escapeHtml(item.title || "Untitled") + '</div>' +
+                    (preview ? '<div class="item-message">' + escapeHtml(String(preview).substring(0,300)) + '</div>' : '') +
+                '</div>' +
+            '</div>' +
+            '<div class="item-actions">' +
+                '<button class="btn btn-danger btn-small item-action-btn" onclick="moveToTrash(\'' + escapeHtml(item.id) + '\')">🗑️ Delete</button>' +
+                '<button class="btn btn-success btn-small item-action-btn" onclick="toggleItem(\'' + escapeHtml(item.id) + '\')">' + (enabled ? '🔴 Disable' : '🟢 Enable') + '</button>' +
+                '<button class="btn btn-primary btn-small item-action-btn" onclick="editItem(\'' + escapeHtml(item.id) + '\')">✏️ Edit</button>' +
+            '</div>' +
+        '</div>'
+    );
+}
+
+
 /* =========================================================  
    DRAG & DROP  
    ========================================================= */  
@@ -4366,43 +4271,31 @@ async function deleteMedia(id) {
    SYSTEM STATUS  
    ========================================================= */  
   
-async function loadStatus() {  
-  
-    const output =  
-        $("systemStatus");  
-  
-    try {  
-  
-        const data =  
-            await api(  
-                "/api/admin/status"  
-            );  
-  
-        output.textContent =  
-            JSON.stringify(  
-                data,  
-                null,  
-                2  
-            );  
-  
-    } catch (error) {  
-  
-        output.textContent =  
-            JSON.stringify(  
-                {  
-                    success: false,  
-                    error:  
-                        error.message  
-                },  
-                null,  
-                2  
-            );  
-  
-    }  
-  
-}  
-  
-  
+let systemStatusTimer = null;
+
+async function showSystemStatus() {
+    const output = $("systemStatus");
+    output.style.display = "block";
+    output.textContent = "Loading...";
+    try {
+        const data = await api("/api/admin/status");
+        output.textContent = JSON.stringify(data, null, 2);
+    } catch (error) {
+        output.textContent = "System Status Error: " + error.message;
+    }
+    clearTimeout(systemStatusTimer);
+    systemStatusTimer = setTimeout(() => {
+        output.style.display = "none";
+        output.textContent = "";
+    }, 5000);
+}
+
+async function loadStatus() {
+    const output = $("systemStatus");
+    if (output && output.style.display !== "none") await showSystemStatus();
+}
+
+
 /* =========================================================  
    AUTO REFRESH PREVIEW  
    ========================================================= */  
