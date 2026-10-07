@@ -1,1 +1,125 @@
 
+<section id="dynamicEditor" class="admin-editor">
+  <div class="editor-head">
+    <h3>Content Editor</h3>
+    <button type="button" onclick="newItem()">＋ New</button>
+  </div>
+
+  <input id="itemId" type="hidden">
+
+  <label>Content Type</label>
+  <select id="itemType" onchange="updateEditorFields()">
+    <option value="message">Message</option>
+    <option value="format">Format</option>
+    <option value="url">URL</option>
+    <option value="video">Video</option>
+    <option value="youtube">YouTube</option>
+    <option value="audio">Audio</option>
+    <option value="image">Image</option>
+    <option value="gif">GIF</option>
+    <option value="gallery">Gallery</option>
+    <option value="donation">Donation</option>
+    <option value="button">Button</option>
+    <option value="link">Link</option>
+    <option value="live">Live</option>
+    <option value="advertisement">Advertisement</option>
+  </select>
+
+  <div id="fieldTitle">
+    <label>Title</label>
+    <input id="itemTitle" type="text">
+  </div>
+
+  <div id="fieldMessage">
+    <label>Message</label>
+    <textarea id="itemMessage" rows="3"></textarea>
+  </div>
+
+  <div id="fieldDescription">
+    <label>Description</label>
+    <textarea id="itemDescription" rows="2"></textarea>
+  </div>
+
+  <div id="fieldImageUrl">
+    <label>Image URL</label>
+    <input id="imageUrl" type="url">
+  </div>
+
+  <div id="fieldVideoUrl">
+    <label>Video URL</label>
+    <input id="videoUrl" type="url">
+  </div>
+
+  <div id="fieldAudioUrl">
+    <label>Audio URL</label>
+    <input id="audioUrl" type="url">
+  </div>
+
+  <div id="fieldLinkUrl">
+    <label>URL / Link</label>
+    <input id="linkUrl" type="url">
+  </div>
+
+  <div id="fieldButtonText">
+    <label>Button Text</label>
+    <input id="buttonText" type="text">
+  </div>
+
+  <div id="fieldFormat">
+    <label>Format</label>
+    <select id="contentFormat">
+      <option value="plain">Plain Text</option>
+      <option value="bold">Bold</option>
+      <option value="center">Center</option>
+      <option value="html">HTML</option>
+    </select>
+  </div>
+
+  <div id="fieldDonation">
+    <label>Donation Link</label>
+    <input id="donationUrl" type="url">
+  </div>
+
+  <div id="fieldLive">
+    <label>Live Stream URL</label>
+    <input id="liveUrl" type="url">
+  </div>
+
+  <div class="editor-row">
+    <div>
+      <label>Order</label>
+      <input id="itemOrder" type="number" value="0">
+    </div>
+    <label class="check">
+      <input id="itemEnabled" type="checkbox" checked>
+      Enabled
+    </label>
+  </div>
+
+  <button type="button" onclick="saveItem()">Save Content</button>
+</section>
+
+<script>
+function updateEditorFields(){
+  const t=document.getElementById("itemType").value;
+  const show={
+    fieldMessage:["message","format"].includes(t),
+    fieldDescription:["message","format","donation","advertisement"].includes(t),
+    fieldImageUrl:["image","gif","gallery","donation","advertisement"].includes(t),
+    fieldVideoUrl:["video","youtube","live"].includes(t),
+    fieldAudioUrl:["audio"].includes(t),
+    fieldLinkUrl:["url","youtube","button","link","advertisement"].includes(t),
+    fieldButtonText:["button","donation","advertisement"].includes(t),
+    fieldFormat:t==="format",
+    fieldDonation:t==="donation",
+    fieldLive:t==="live"
+  };
+
+  Object.keys(show).forEach(id=>{
+    const e=document.getElementById(id);
+    if(e)e.style.display=show[id]?"":"none";
+  });
+}
+
+document.addEventListener("DOMContentLoaded",updateEditorFields);
+</script>
