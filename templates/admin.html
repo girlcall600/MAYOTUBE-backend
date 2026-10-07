@@ -1,12 +1,1303 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MAYOTUBE ADMIN</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#121212;
+    color:#fff;
+    font-family:Arial,sans-serif;
+}
+
+button,
+input,
+textarea,
+select{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.container{
+    width:min(1100px,94%);
+    margin:20px auto 50px;
+}
+
+.header{
+    background:#181818;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:18px;
+    border:1px solid #292929;
+}
+
+.header h1{
+    margin:0 0 6px;
+    color:#FFD600;
+    font-size:25px;
+}
+
+.header p{
+    margin:0;
+    color:#aaa;
+}
+
+.card{
+    background:#181818;
+    border:1px solid #292929;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:18px;
+}
+
+.card h2{
+    margin:0 0 15px;
+    color:#FFD600;
+    font-size:20px;
+}
+
+.status{
+    padding:12px;
+    background:#101010;
+    border-radius:10px;
+    color:#aaa;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.form-group{
+    margin-bottom:14px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:7px;
+    color:#ddd;
+    font-size:14px;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    background:#101010;
+    color:#fff;
+    border:1px solid #3a3a3a;
+    border-radius:9px;
+    padding:11px;
+    outline:none;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+    border-color:#FFD600;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.type-buttons{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+    margin-bottom:18px;
+}
+
+.type-button{
+    background:#252525;
+    color:#fff;
+    border:1px solid #3a3a3a;
+    border-radius:9px;
+    padding:10px 5px;
+}
+
+.type-button.active{
+    background:#FFD600;
+    color:#000;
+    border-color:#FFD600;
+}
+
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.btn{
+    border:0;
+    border-radius:8px;
+    padding:10px 14px;
+    color:#fff;
+}
+
+.btn-primary{
+    background:#1976d2;
+}
+
+.btn-success{
+    background:#2e7d32;
+}
+
+.btn-danger{
+    background:#c62828;
+}
+
+.btn-warning{
+    background:#ef6c00;
+}
+
+.btn-blue{
+    background:#3949ab;
+}
+
+.btn-gray{
+    background:#424242;
+}
+
+.btn-small{
+    padding:7px 10px;
+    font-size:12px;
+}
+
+.checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:10px 0;
+}
+
+.checkbox-row input{
+    width:auto;
+}
+
+#app{
+    display:none;
+}
+
+#loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-box{
+    width:min(430px,100%);
+    background:#181818;
+    border:1px solid #292929;
+    border-radius:16px;
+    padding:25px;
+}
+
+.login-box h1{
+    color:#FFD600;
+    margin-top:0;
+}
+
+.error{
+    display:none;
+    background:#c62828;
+    color:#fff;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:12px;
+}
+
+.connection{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+#connectionText{
+    color:#76ff03;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.stat{
+    background:#101010;
+    border-radius:10px;
+    padding:15px;
+    text-align:center;
+}
+
+.stat strong{
+    display:block;
+    font-size:24px;
+    color:#FFD600;
+}
+
+.stat span{
+    color:#aaa;
+    font-size:12px;
+}
+
+.item-card,
+.trash-item,
+.media-card{
+    background:#101010;
+    border:1px solid #303030;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+}
+
+.item-card{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+}
+
+.item-card.dragging{
+    opacity:.4;
+}
+
+.item-card.drag-over{
+    border-color:#FFD600;
+}
+
+.item-title,
+.trash-title{
+    font-weight:bold;
+    color:#fff;
+    margin-bottom:5px;
+}
+
+.item-meta,
+.item-status,
+.trash-meta{
+    color:#999;
+    font-size:12px;
+}
+
+.item-actions,
+.trash-actions,
+.media-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+}
+
+.empty-state{
+    padding:25px;
+    text-align:center;
+    color:#888;
+    background:#101010;
+    border-radius:10px;
+}
+
+.preview{
+    background:#101010;
+    border-radius:10px;
+    padding:15px;
+    min-height:80px;
+}
+
+.media-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+}
+
+.media-card img,
+.media-card video{
+    width:100%;
+    max-height:180px;
+    object-fit:cover;
+    border-radius:7px;
+}
+
+.media-name{
+    margin:8px 0;
+    color:#ddd;
+    word-break:break-all;
+}
+
+.color-row{
+    display:grid;
+    grid-template-columns:70px 1fr;
+    gap:8px;
+}
+
+.color-row input[type=color]{
+    padding:3px;
+    height:42px;
+}
+
+.hidden{
+    display:none!important;
+}
+
+@media(max-width:700px){
+    .grid,
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .type-buttons{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .item-card{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .media-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN
+     ===================================================== -->
+
+<div id="loginScreen">
+
+    <div class="login-box">
+
+        <h1>MAYOTUBE ADMIN</h1>
+
+        <p style="color:#aaa">
+            Owner Control Panel
+        </p>
+
+        <div id="loginError" class="error"></div>
+
+        <div class="form-group">
+            <label>Admin Token</label>
+            <input
+                id="tokenInput"
+                type="password"
+                autocomplete="off"
+                placeholder="Admin token درج کریں">
+        </div>
+
+        <div class="checkbox-row">
+            <input
+                id="rememberToken"
+                type="checkbox">
+            <label for="rememberToken">
+                Token یاد رکھیں
+            </label>
+        </div>
+
+        <button
+            class="btn btn-primary"
+            style="width:100%"
+            onclick="login()">
+            Login
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+     ===================================================== -->
+
+<div id="app">
+
+<div class="container">
+
+<div class="header">
+
+    <h1>MAYOTUBE ADMIN</h1>
+
+    <p>Owner Control Panel</p>
+
+    <div
+        class="connection"
+        style="margin-top:12px">
+
+        <span>
+            System Status:
+            <b id="connectionText">
+                Checking...
+            </b>
+        </span>
+
+        <button
+            class="btn btn-danger btn-small"
+            onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SYSTEM STATUS
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>System Status</h2>
+
+    <div
+        id="systemStatus"
+        class="status">
+        Checking...
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     HOME CONTROL
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>Homepage Control</h2>
+
+    <div class="checkbox-row">
+
+        <input
+            id="homeEnabled"
+            type="checkbox"
+            checked
+            onchange="toggleHome()">
+
+        <label for="homeEnabled">
+            <b id="homeStatusText">
+                HOME ON
+            </b>
+        </label>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STATS
+     ===================================================== -->
+
+<div class="stats">
+
+    <div class="stat">
+        <strong id="statTotal">0</strong>
+        <span>Total</span>
+    </div>
+
+    <div class="stat">
+        <strong id="statEnabled">0</strong>
+        <span>Enabled</span>
+    </div>
+
+    <div class="stat">
+        <strong id="statDisabled">0</strong>
+        <span>Disabled</span>
+    </div>
+
+    <div class="stat">
+        <strong id="statTrash">0</strong>
+        <span>Recycle Bin</span>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CONTENT EDITOR
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>Homepage Content</h2>
+
+    <p style="color:#aaa">
+        Select what you want to add to MAYOTUBE
+    </p>
+
+    <div class="type-buttons">
+
+        <button
+            class="type-button"
+            onclick="selectType('message',this)">
+            💬 Message
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('link',this)">
+            🔗 URL
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('youtube',this)">
+            ▶️ YouTube
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('donation',this)">
+            💰 Donation
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('notification',this)">
+            🔔 Notification
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('image',this)">
+            🖼️ Image
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('video',this)">
+            🎬 Video
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('gif',this)">
+            🎞️ GIF
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('audio',this)">
+            🎵 Audio
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('music',this)">
+            🎧 Music
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('gallery_video',this)">
+            🎥 Gallery Video
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('live_channel',this)">
+            🔴 Live Channel
+        </button>
+
+        <button
+            class="type-button"
+            onclick="selectType('advertisement',this)">
+            📢 Advertisement
+        </button>
+
+    </div>
+
+
+    <input
+        id="itemId"
+        type="hidden">
+
+
+    <div class="grid">
+
+        <div class="form-group">
+
+            <label>Content Type</label>
+
+            <select id="itemType">
+                <option value="message">Message</option>
+                <option value="link">URL</option>
+                <option value="youtube">YouTube</option>
+                <option value="donation">Donation</option>
+                <option value="notification">Notification</option>
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+                <option value="gif">GIF</option>
+                <option value="audio">Audio</option>
+                <option value="music">Music</option>
+                <option value="gallery_video">Gallery Video</option>
+                <option value="live_channel">Live Channel</option>
+                <option value="advertisement">Advertisement</option>
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Title</label>
+
+            <input
+                id="itemTitle"
+                type="text"
+                placeholder="Title">
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Message</label>
+
+        <textarea
+            id="itemMessage"
+            placeholder="Message"></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Description</label>
+
+        <textarea
+            id="itemDescription"
+            placeholder="Description"></textarea>
+
+    </div>
+
+
+    <div
+        id="imageGroup"
+        class="form-group">
+
+        <label>Media URL</label>
+
+        <input
+            id="imageUrl"
+            type="url"
+            placeholder="https://...">
+
+    </div>
+
+
+    <div
+        id="videoGroup"
+        class="form-group">
+
+        <label>YouTube / Video URL</label>
+
+        <input
+            id="videoUrl"
+            type="url"
+            placeholder="https://...">
+
+    </div>
+
+
+    <div
+        id="linkGroup"
+        class="form-group">
+
+        <label>Website URL</label>
+
+        <input
+            id="linkUrl"
+            type="url"
+            placeholder="https://...">
+
+    </div>
+
+
+    <div
+        id="buttonGroup"
+        class="form-group">
+
+        <label>Button Text</label>
+
+        <input
+            id="buttonText"
+            type="text"
+            placeholder="Button Text">
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>OR Upload Media</label>
+
+        <input
+            id="mediaFile"
+            type="file">
+
+    </div>
+
+
+    <div class="grid">
+
+        <div class="form-group">
+
+            <label>Order</label>
+
+            <input
+                id="itemOrder"
+                type="number"
+                min="1"
+                value="1">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Status</label>
+
+            <div class="checkbox-row">
+
+                <input
+                    id="itemEnabled"
+                    type="checkbox"
+                    checked>
+
+                <label for="itemEnabled">
+                    Enabled
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STYLE -->
+
+    <details>
+
+        <summary
+            style="cursor:pointer;color:#FFD600;margin-bottom:15px">
+            Box Design
+        </summary>
+
+        <div class="grid">
+
+            <div class="form-group">
+                <label>Box Style</label>
+
+                <select id="boxStyle">
+                    <option value="default">
+                        Default
+                    </option>
+                    <option value="card">
+                        Card
+                    </option>
+                    <option value="flat">
+                        Flat
+                    </option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label>Text Align</label>
+
+                <select id="boxTextAlign">
+                    <option value="center">
+                        Center
+                    </option>
+                    <option value="left">
+                        Left
+                    </option>
+                    <option value="right">
+                        Right
+                    </option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Background Color</label>
+
+                <div class="color-row">
+
+                    <input
+                        id="boxBackgroundColor"
+                        type="color"
+                        value="#181818">
+
+                    <input
+                        id="boxBackgroundColorValue"
+                        value="#181818">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Text Color</label>
+
+                <div class="color-row">
+
+                    <input
+                        id="boxTextColor"
+                        type="color"
+                        value="#ffffff">
+
+                    <input
+                        id="boxTextColorValue"
+                        value="#ffffff">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+                <label>Width</label>
+                <input id="boxWidth">
+            </div>
+
+            <div class="form-group">
+                <label>Height</label>
+                <input id="boxHeight">
+            </div>
+
+            <div class="form-group">
+                <label>Padding</label>
+                <input id="boxPadding">
+            </div>
+
+            <div class="form-group">
+                <label>Radius</label>
+                <input id="boxRadius">
+            </div>
+
+            <div class="form-group">
+                <label>Shadow</label>
+                <input id="boxShadow">
+            </div>
+
+            <div class="form-group">
+                <label>Border</label>
+                <input id="boxBorder">
+            </div>
+
+            <div class="form-group">
+                <label>Image Height</label>
+                <input id="imageHeight">
+            </div>
+
+            <div class="form-group">
+                <label>Image Fit</label>
+                <select id="boxImageFit">
+                    <option value="cover">Cover</option>
+                    <option value="contain">Contain</option>
+                    <option value="fill">Fill</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Video Height</label>
+                <input id="videoHeight">
+            </div>
+
+            <div class="form-group">
+                <label>Video Fit</label>
+                <select id="videoFit">
+                    <option value="contain">Contain</option>
+                    <option value="cover">Cover</option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <div class="checkbox-row">
+
+            <input
+                id="videoAutoplay"
+                type="checkbox">
+
+            <label for="videoAutoplay">
+                Video Autoplay
+            </label>
+
+        </div>
+
+
+        <div class="checkbox-row">
+
+            <input
+                id="videoLoop"
+                type="checkbox">
+
+            <label for="videoLoop">
+                Video Loop
+            </label>
+
+        </div>
+
+
+        <div class="grid">
+
+            <div class="form-group">
+
+                <label>Button Color</label>
+
+                <div class="color-row">
+
+                    <input
+                        id="buttonColor"
+                        type="color"
+                        value="#673ab7">
+
+                    <input
+                        id="buttonColorValue"
+                        value="#673ab7">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Button Text Color</label>
+
+                <div class="color-row">
+
+                    <input
+                        id="buttonTextColor"
+                        type="color"
+                        value="#ffffff">
+
+                    <input
+                        id="buttonTextColorValue"
+                        value="#ffffff">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </details>
+
+
+    <!-- SCHEDULE -->
+
+    <details>
+
+        <summary
+            style="cursor:pointer;color:#FFD600;margin-bottom:15px">
+            Schedule
+        </summary>
+
+        <div class="grid">
+
+            <div class="form-group">
+
+                <label>Start</label>
+
+                <input
+                    id="scheduleStart"
+                    type="datetime-local">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>End</label>
+
+                <input
+                    id="scheduleEnd"
+                    type="datetime-local">
+
+            </div>
+
+        </div>
+
+        <div
+            id="scheduleStatus"
+            style="color:#aaa">
+            No schedule
+        </div>
+
+    </details>
+
+
+    <div
+        id="homePreview"
+        class="preview"
+        style="margin:15px 0">
+        Live Preview
+    </div>
+
+
+    <div class="actions">
+
+        <button
+            class="btn btn-success"
+            onclick="saveItem()">
+            Save Content
+        </button>
+
+        <button
+            class="btn btn-gray"
+            onclick="clearForm()">
+            Clear
+        </button>
+
+        <button
+            class="btn btn-primary"
+            onclick="loadAll()">
+            Refresh
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SAVED CONTENT
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>Saved Homepage Content</h2>
+
+    <p style="color:#aaa">
+        پریس کرکے Box کو Drag کر کے اوپر یا نیچے کریں۔
+        موبائل پر ▲ ▼ بٹن بھی استعمال کر سکتے ہیں۔
+    </p>
+
+
+    <div class="grid">
+
+        <div class="form-group">
+
+            <label>Search</label>
+
+            <input
+                id="searchItems"
+                placeholder="Search content">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Type</label>
+
+            <select id="filterType">
+
+                <option value="all">
+                    All
+                </option>
+
+                <option value="message">
+                    Message
+                </option>
+
+                <option value="link">
+                    URL
+                </option>
+
+                <option value="youtube">
+                    YouTube
+                </option>
+
+                <option value="donation">
+                    Donation
+                </option>
+
+                <option value="notification">
+                    Notification
+                </option>
+
+                <option value="image">
+                    Image
+                </option>
+
+                <option value="video">
+                    Video
+                </option>
+
+                <option value="advertisement">
+                    Advertisement
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Status</label>
+
+        <select id="filterStatus">
+
+            <option value="all">
+                All
+            </option>
+
+            <option value="enabled">
+                Enabled
+            </option>
+
+            <option value="disabled">
+                Disabled
+            </option>
+
+            <option value="scheduled">
+                Scheduled
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div
+        id="itemsList">
+        Loading...
+    </div>
+
+
+    <div class="actions">
+
+        <button
+            class="btn btn-success"
+            onclick="saveOrder()">
+            💾 Save Homepage Order
+        </button>
+
+    </div>
+
+    <div
+        id="orderStatus"
+        style="margin-top:10px;color:#aaa">
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     RECYCLE BIN
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>🗑️ Recycle Bin</h2>
+
+    <div
+        id="trashList">
+        Recycle Bin خالی ہے
+    </div>
+
+    <div class="actions">
+
+        <button
+            class="btn btn-danger"
+            onclick="emptyTrash()">
+            Empty Recycle Bin
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MEDIA
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>Media Manager</h2>
+
+    <div class="actions"
+         style="margin-bottom:15px">
+
+        <input
+            id="mediaUploadFile"
+            type="file"
+            style="flex:1">
+
+        <button
+            class="btn btn-success"
+            onclick="uploadMedia2()">
+            Upload
+        </button>
+
+        <button
+            class="btn btn-primary"
+            onclick="loadMedia()">
+            Refresh
+        </button>
+
+    </div>
+
+    <div
+        id="mediaList"
+        class="media-grid">
+        No media found
+    </div>
+
+</div>
+
+
+</div>
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
 <script>
 "use strict";
 
-/* =========================================================
-   MAYOTUBE ADMIN PANEL
-   Corrected CMS + Recycle Bin + Home Control
-   ========================================================= */
-
 let adminToken = "";
+
 let cmsContent = {
     items: [],
     home_enabled: true
@@ -14,137 +1305,206 @@ let cmsContent = {
 
 let draggedId = null;
 
-const TRASH_KEY = "mayotube_admin_recycle_bin_v2";
+const TRASH_KEY =
+    "mayotube_admin_recycle_bin_v2";
 
-function $(id) {
+function $(id){
     return document.getElementById(id);
 }
 
-/* =========================================================
-   BASIC HELPERS
-   ========================================================= */
 
-function showToast(message, type = "success") {
-    let toast = document.getElementById("toast");
+/* =====================================================
+   TOAST
+   ===================================================== */
 
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "toast";
-        toast.style.cssText =
-            "position:fixed;bottom:25px;left:50%;transform:translateX(-50%);" +
-            "z-index:99999;padding:13px 20px;border-radius:10px;" +
-            "color:#fff;font-size:14px;max-width:90%;text-align:center;" +
-            "box-shadow:0 8px 25px rgba(0,0,0,.35);";
+function showToast(message,type="success"){
+
+    let toast=$("toast");
+
+    if(!toast){
+
+        toast=document.createElement("div");
+
+        toast.id="toast";
+
+        toast.style.cssText=
+            "position:fixed;bottom:25px;left:50%;" +
+            "transform:translateX(-50%);" +
+            "z-index:99999;padding:13px 20px;" +
+            "border-radius:10px;color:#fff;" +
+            "font-size:14px;max-width:90%;" +
+            "text-align:center;";
 
         document.body.appendChild(toast);
     }
 
-    toast.textContent = message;
+    toast.textContent=message;
 
-    if (type === "error") {
-        toast.style.background = "#c62828";
-    } else if (type === "warning") {
-        toast.style.background = "#ef6c00";
-    } else {
-        toast.style.background = "#2e7d32";
-    }
+    toast.style.background=
+        type==="error"
+        ? "#c62828"
+        : type==="warning"
+        ? "#ef6c00"
+        : "#2e7d32";
 
-    toast.style.display = "block";
+    toast.style.display="block";
 
     clearTimeout(toast._timer);
 
-    toast._timer = setTimeout(function () {
-        toast.style.display = "none";
-    }, 3000);
+    toast._timer=setTimeout(function(){
+        toast.style.display="none";
+    },3000);
 }
 
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
+
+/* =====================================================
+   HELPERS
+   ===================================================== */
+
+function escapeHtml(value){
+
+    if(value===null || value===undefined)
         return "";
-    }
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
-function safePreviewUrl(url) {
-    if (!url) {
-        return "";
-    }
 
-    const value = String(url).trim();
+function safePreviewUrl(url){
 
-    if (
+    if(!url) return "";
+
+    const value=String(url).trim();
+
+    if(
         value.startsWith("https://") ||
         value.startsWith("http://") ||
         value.startsWith("/") ||
         value.startsWith("blob:")
-    ) {
+    ){
         return value;
     }
 
     return "";
 }
 
-function deepClone(value) {
-    try {
-        return JSON.parse(JSON.stringify(value));
-    } catch (e) {
+
+function deepClone(value){
+
+    try{
+        return JSON.parse(
+            JSON.stringify(value)
+        );
+    }catch(e){
         return value;
     }
 }
 
-/* =========================================================
+
+function setValue(id,value){
+
+    const el=$(id);
+
+    if(el)
+        el.value=value;
+}
+
+
+function setChecked(id,value){
+
+    const el=$(id);
+
+    if(el)
+        el.checked=!!value;
+}
+
+
+function setText(id,value){
+
+    const el=$(id);
+
+    if(el)
+        el.textContent=String(value);
+}
+
+
+/* =====================================================
    API
-   ========================================================= */
+   ===================================================== */
 
-async function api(path, options = {}) {
-    const headers = new Headers(options.headers || {});
+async function api(path,options={}){
 
-    if (adminToken) {
-        headers.set("Authorization", "Bearer " + adminToken);
+    const headers=
+        new Headers(
+            options.headers || {}
+        );
+
+    if(adminToken){
+
+        headers.set(
+            "Authorization",
+            "Bearer "+adminToken
+        );
     }
 
-    if (!(options.body instanceof FormData)) {
-        headers.set("Content-Type", "application/json");
+    if(!(options.body instanceof FormData)){
+
+        headers.set(
+            "Content-Type",
+            "application/json"
+        );
     }
 
-    options.headers = headers;
+    options.headers=headers;
 
-    const response = await fetch(path, options);
+    const response=
+        await fetch(path,options);
+
+    const contentType=
+        response.headers.get(
+            "content-type"
+        ) || "";
 
     let data;
 
-    const contentType =
-        response.headers.get("content-type") || "";
+    if(contentType.includes("application/json")){
 
-    if (contentType.includes("application/json")) {
-        data = await response.json();
-    } else {
-        const text = await response.text();
+        data=await response.json();
 
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            data = text;
+    }else{
+
+        const text=await response.text();
+
+        try{
+            data=JSON.parse(text);
+        }catch(e){
+            data=text;
         }
     }
 
-    if (!response.ok) {
-        let message = "Request failed";
+    if(!response.ok){
 
-        if (data && typeof data === "object") {
-            message =
+        let message="Request failed";
+
+        if(data && typeof data==="object"){
+
+            message=
                 data.error ||
                 data.message ||
                 data.detail ||
                 message;
-        } else if (typeof data === "string" && data.trim()) {
-            message = data;
+
+        }else if(
+            typeof data==="string" &&
+            data.trim()
+        ){
+
+            message=data;
         }
 
         throw new Error(message);
@@ -153,111 +1513,112 @@ async function api(path, options = {}) {
     return data;
 }
 
-/* =========================================================
+
+/* =====================================================
    LOGIN
-   ========================================================= */
+   ===================================================== */
 
-async function login() {
-    const input = $("tokenInput");
+async function login(){
 
-    if (!input) {
+    const input=$("tokenInput");
+
+    if(!input) return;
+
+    const token=input.value.trim();
+
+    if(!token){
+
+        showLoginError(
+            "Admin token درج کریں۔"
+        );
+
         return;
     }
 
-    const token = input.value.trim();
+    adminToken=token;
 
-    if (!token) {
-        showLoginError("Admin token درج کریں۔");
-        return;
-    }
-
-    adminToken = token;
-
-    const remember =
+    const remember=
         $("rememberToken") &&
         $("rememberToken").checked;
 
-    if (remember) {
-        localStorage.setItem(
-            "mayotube_admin_token",
-            token
+    try{
+
+        await api(
+            "/api/admin/status"
         );
-    } else {
-        localStorage.removeItem(
-            "mayotube_admin_token"
-        );
-    }
 
-    try {
-        await api("/api/admin/status");
+        if(remember){
 
-        const loginScreen = $("loginScreen");
-        const app = $("app");
+            localStorage.setItem(
+                "mayotube_admin_token",
+                token
+            );
 
-        if (loginScreen) {
-            loginScreen.style.display = "none";
+        }else{
+
+            localStorage.removeItem(
+                "mayotube_admin_token"
+            );
         }
 
-        if (app) {
-            app.style.display = "block";
-        }
+        $("loginScreen").style.display="none";
+        $("app").style.display="block";
 
         await initialize();
 
-    } catch (error) {
-        adminToken = "";
+    }catch(error){
+
+        adminToken="";
 
         showLoginError(
-            error.message || "Invalid admin token"
+            error.message ||
+            "Invalid admin token"
         );
     }
 }
 
-function showLoginError(message) {
-    const box = $("loginError");
 
-    if (box) {
-        box.textContent = message;
-        box.style.display = "block";
-    } else {
-        showToast(message, "error");
+function showLoginError(message){
+
+    const box=$("loginError");
+
+    if(box){
+
+        box.textContent=message;
+        box.style.display="block";
+
+    }else{
+
+        showToast(
+            message,
+            "error"
+        );
     }
 }
 
-function logout() {
-    adminToken = "";
 
-    sessionStorage.removeItem(
-        "mayotube_admin_token"
-    );
+function logout(){
+
+    adminToken="";
 
     localStorage.removeItem(
         "mayotube_admin_token"
     );
 
-    const app = $("app");
-    const loginScreen = $("loginScreen");
+    $("app").style.display="none";
+    $("loginScreen").style.display="flex";
 
-    if (app) {
-        app.style.display = "none";
-    }
-
-    if (loginScreen) {
-        loginScreen.style.display = "flex";
-    }
-
-    const tokenInput = $("tokenInput");
-
-    if (tokenInput) {
-        tokenInput.value = "";
-    }
+    if($("tokenInput"))
+        $("tokenInput").value="";
 }
 
-/* =========================================================
-   INITIALIZE
-   ========================================================= */
 
-async function initialize() {
+/* =====================================================
+   INITIALIZE
+   ===================================================== */
+
+async function initialize(){
+
     addEventListeners();
 
     clearForm();
@@ -265,88 +1626,105 @@ async function initialize() {
     await loadAll();
 }
 
-function addEventListeners() {
-    const colorInputs = [
-        ["boxBackgroundColor", "boxBackgroundColorValue"],
-        ["boxTextColor", "boxTextColorValue"],
-        ["buttonColor", "buttonColorValue"],
-        ["buttonTextColor", "buttonTextColorValue"]
+
+function addEventListeners(){
+
+    const pairs=[
+        ["boxBackgroundColor",
+         "boxBackgroundColorValue"],
+
+        ["boxTextColor",
+         "boxTextColorValue"],
+
+        ["buttonColor",
+         "buttonColorValue"],
+
+        ["buttonTextColor",
+         "buttonTextColorValue"]
     ];
 
-    colorInputs.forEach(function (pair) {
-        const color = $(pair[0]);
-        const value = $(pair[1]);
+    pairs.forEach(function(pair){
 
-        if (!color || !value) {
+        const color=$(pair[0]);
+        const value=$(pair[1]);
+
+        if(!color || !value)
             return;
-        }
 
-        color.oninput = function () {
-            value.value = color.value;
-            loadHomePreview();
+        color.oninput=function(){
+
+            value.value=color.value;
+
+            updatePreviewFromForm();
+        };
+
+        value.oninput=function(){
+
+            color.value=
+                value.value;
+
+            updatePreviewFromForm();
         };
     });
 
-    const scheduleStart = $("scheduleStart");
-    const scheduleEnd = $("scheduleEnd");
 
-    if (scheduleStart) {
-        scheduleStart.addEventListener(
-            "change",
-            updateScheduleStatus
-        );
-    }
+    if($("scheduleStart"))
+        $("scheduleStart")
+            .addEventListener(
+                "change",
+                updateScheduleStatus
+            );
 
-    if (scheduleEnd) {
-        scheduleEnd.addEventListener(
-            "change",
-            updateScheduleStatus
-        );
-    }
 
-    const itemType = $("itemType");
+    if($("scheduleEnd"))
+        $("scheduleEnd")
+            .addEventListener(
+                "change",
+                updateScheduleStatus
+            );
 
-    if (itemType) {
-        itemType.addEventListener(
-            "change",
-            updateEditorFields
-        );
-    }
 
-    const search = $("searchItems");
+    if($("itemType"))
+        $("itemType")
+            .addEventListener(
+                "change",
+                updateEditorFields
+            );
 
-    if (search) {
-        search.addEventListener(
-            "input",
-            renderItems
-        );
-    }
 
-    const filterType = $("filterType");
+    if($("searchItems"))
+        $("searchItems")
+            .addEventListener(
+                "input",
+                renderItems
+            );
 
-    if (filterType) {
-        filterType.addEventListener(
-            "change",
-            renderItems
-        );
-    }
 
-    const filterStatus = $("filterStatus");
+    if($("filterType"))
+        $("filterType")
+            .addEventListener(
+                "change",
+                renderItems
+            );
 
-    if (filterStatus) {
-        filterStatus.addEventListener(
-            "change",
-            renderItems
-        );
-    }
+
+    if($("filterStatus"))
+        $("filterStatus")
+            .addEventListener(
+                "change",
+                renderItems
+            );
 }
 
-/* =========================================================
-   LOAD ALL
-   ========================================================= */
 
-async function loadAll() {
-    try {
+/* =====================================================
+   LOAD
+   ===================================================== */
+
+async function loadAll(){
+
+    try{
+
         await loadContent();
         await loadHomePreview();
         await loadMedia();
@@ -354,84 +1732,95 @@ async function loadAll() {
 
         setConnectionStatus(true);
 
-    } catch (error) {
+    }catch(error){
+
         console.error(error);
 
         setConnectionStatus(false);
 
         showToast(
-            error.message || "Server connection failed",
+            error.message ||
+            "Server connection failed",
             "error"
         );
     }
 }
 
-function setConnectionStatus(connected) {
-    const text = $("connectionText");
 
-    if (!text) {
-        return;
-    }
+function setConnectionStatus(connected){
 
-    text.textContent =
-        connected ? "Connected" : "Disconnected";
+    setText(
+        "connectionText",
+        connected
+        ? "Connected"
+        : "Disconnected"
+    );
 }
 
-/* =========================================================
-   CONTENT
-   ========================================================= */
 
-async function loadContent() {
-    const data = await api(
-        "/api/admin/content"
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+async function loadContent(){
+
+    const data=
+        await api(
+            "/api/admin/content"
+        );
+
+    if(Array.isArray(data)){
+
+        cmsContent={
+            items:data,
+            home_enabled:true
+        };
+
+    }else{
+
+        cmsContent=data || {};
+
+        if(!Array.isArray(cmsContent.items))
+            cmsContent.items=[];
+    }
+
+
+    cmsContent.items.forEach(
+        function(item,index){
+
+            if(item.order===undefined)
+                item.order=index+1;
+
+            if(item.enabled===undefined)
+                item.enabled=true;
+
+            if(!item.style)
+                item.style={};
+
+            if(!item.schedule)
+                item.schedule={};
+        }
     );
 
-    if (Array.isArray(data)) {
-        cmsContent = {
-            items: data,
-            home_enabled: true
-        };
-    } else {
-        cmsContent = data || {};
 
-        if (!Array.isArray(cmsContent.items)) {
-            cmsContent.items = [];
+    cmsContent.items.sort(
+        function(a,b){
+
+            return Number(a.order||0) -
+                   Number(b.order||0);
         }
-    }
+    );
 
-    cmsContent.items.forEach(function (item, index) {
-        if (item.order === undefined) {
-            item.order = index + 1;
-        }
 
-        if (item.enabled === undefined) {
-            item.enabled = true;
-        }
-
-        if (!item.style) {
-            item.style = {};
-        }
-
-        if (!item.schedule) {
-            item.schedule = {};
-        }
-    });
-
-    cmsContent.items.sort(function (a, b) {
-        return Number(a.order || 0) -
-               Number(b.order || 0);
-    });
-
-    const homeEnabled =
+    const enabled=
         cmsContent.home_enabled !== false;
 
-    const homeToggle = $("homeEnabled");
+    setChecked(
+        "homeEnabled",
+        enabled
+    );
 
-    if (homeToggle) {
-        homeToggle.checked = homeEnabled;
-    }
-
-    updateHomeStatus(homeEnabled);
+    updateHomeStatus(enabled);
 
     updateStats();
 
@@ -440,67 +1829,66 @@ async function loadContent() {
     renderTrash();
 }
 
-function updateHomeStatus(enabled) {
-    const text = $("homeStatusText");
 
-    if (!text) {
-        return;
-    }
+function updateHomeStatus(enabled){
 
-    text.textContent =
-        enabled ? "HOME ON" : "HOME OFF";
+    setText(
+        "homeStatusText",
+        enabled
+        ? "HOME ON"
+        : "HOME OFF"
+    );
 }
 
-/* =========================================================
+
+/* =====================================================
    HOME TOGGLE
-   ========================================================= */
+   ===================================================== */
 
-async function toggleHome() {
-    const checkbox = $("homeEnabled");
+async function toggleHome(){
 
-    if (!checkbox) {
-        return;
-    }
+    const checkbox=$("homeEnabled");
 
-    const enabled = checkbox.checked;
+    if(!checkbox) return;
 
-    checkbox.disabled = true;
+    const enabled=checkbox.checked;
 
-    try {
-        const result = await api(
-            "/api/admin/home/toggle",
-            {
-                method: "PATCH",
-                body: JSON.stringify({
-                    enabled: enabled
-                })
-            }
-        );
+    checkbox.disabled=true;
 
-        if (
+    try{
+
+        const result=
+            await api(
+                "/api/admin/home/toggle",
+                {
+                    method:"PATCH",
+                    body:JSON.stringify({
+                        enabled:enabled
+                    })
+                }
+            );
+
+        cmsContent.home_enabled=
             result &&
-            typeof result.home_enabled !== "undefined"
-        ) {
-            cmsContent.home_enabled =
-                result.home_enabled;
-        } else {
-            cmsContent.home_enabled = enabled;
-        }
+            typeof result.home_enabled!=="undefined"
+            ? result.home_enabled
+            : enabled;
 
         updateHomeStatus(
-            cmsContent.home_enabled !== false
+            cmsContent.home_enabled!==false
         );
 
         await loadHomePreview();
 
         showToast(
             enabled
-                ? "Home ON کر دیا گیا۔"
-                : "Home OFF کر دیا گیا۔"
+            ? "Home ON کر دیا گیا۔"
+            : "Home OFF کر دیا گیا۔"
         );
 
-    } catch (error) {
-        checkbox.checked = !enabled;
+    }catch(error){
+
+        checkbox.checked=!enabled;
 
         updateHomeStatus(!enabled);
 
@@ -510,200 +1898,240 @@ async function toggleHome() {
             "error"
         );
 
-    } finally {
-        checkbox.disabled = false;
+    }finally{
+
+        checkbox.disabled=false;
     }
 }
 
-/* =========================================================
-   EDITOR FIELDS
-   ========================================================= */
 
-function updateEditorFields() {
-    const typeElement = $("itemType");
+/* =====================================================
+   TYPE
+   ===================================================== */
 
-    if (!typeElement) {
-        return;
-    }
+function selectType(type,button){
 
-    const type = typeElement.value;
+    setValue(
+        "itemType",
+        type
+    );
 
-    const imageField = $("imageUrl");
-    const videoField = $("videoUrl");
-    const linkField = $("linkUrl");
-    const buttonField = $("buttonText");
+    document
+        .querySelectorAll(".type-button")
+        .forEach(function(btn){
+            btn.classList.remove("active");
+        });
 
-    if (imageField) {
-        imageField.closest(".form-group")?.style &&
-        (imageField.closest(".form-group").style.display =
-            [
-                "image",
-                "donation",
-                "advertisement"
-            ].includes(type)
-                ? ""
-                : "none");
-    }
+    if(button)
+        button.classList.add("active");
 
-    if (videoField) {
-        videoField.closest(".form-group")?.style &&
-        (videoField.closest(".form-group").style.display =
-            [
-                "video",
-                "youtube"
-            ].includes(type)
-                ? ""
-                : "none");
-    }
+    updateEditorFields();
+}
 
-    if (linkField) {
-        linkField.closest(".form-group")?.style &&
-        (linkField.closest(".form-group").style.display =
-            [
-                "button",
-                "link",
-                "website",
-                "channel",
-                "donation",
-                "advertisement"
-            ].includes(type)
-                ? ""
-                : "none");
-    }
 
-    if (buttonField) {
-        buttonField.closest(".form-group")?.style &&
-        (buttonField.closest(".form-group").style.display =
-            type === "button" ||
-            type === "donation" ||
-            type === "advertisement"
-                ? ""
-                : "none");
-    }
+function updateEditorFields(){
+
+    const type=
+        $("itemType")?.value ||
+        "message";
+
+    const imageTypes=[
+        "image",
+        "gif",
+        "donation",
+        "advertisement"
+    ];
+
+    const videoTypes=[
+        "video",
+        "youtube",
+        "gallery_video",
+        "live_channel"
+    ];
+
+    const linkTypes=[
+        "link",
+        "button",
+        "website",
+        "channel",
+        "donation",
+        "advertisement"
+    ];
+
+    if($("imageGroup"))
+        $("imageGroup").style.display=
+            imageTypes.includes(type)
+            ? "block"
+            : "none";
+
+    if($("videoGroup"))
+        $("videoGroup").style.display=
+            videoTypes.includes(type)
+            ? "block"
+            : "none";
+
+    if($("linkGroup"))
+        $("linkGroup").style.display=
+            linkTypes.includes(type)
+            ? "block"
+            : "none";
+
+    if($("buttonGroup"))
+        $("buttonGroup").style.display=
+            (
+                type==="donation" ||
+                type==="advertisement" ||
+                type==="link"
+            )
+            ? "block"
+            : "none";
 
     updatePreviewFromForm();
 }
 
-/* =========================================================
-   FORM STYLE
-   ========================================================= */
 
-function getBoxStyleFromForm() {
+/* =====================================================
+   STYLE
+   ===================================================== */
+
+function getBoxStyleFromForm(){
+
     return {
+
         box_style:
-            $("boxStyle")?.value || "default",
+            $("boxStyle")?.value ||
+            "default",
 
         text_align:
-            $("boxTextAlign")?.value || "center",
+            $("boxTextAlign")?.value ||
+            "center",
 
         background_color:
             $("boxBackgroundColor")?.value ||
-            $("boxBackgroundColorValue")?.value ||
             "",
 
         text_color:
             $("boxTextColor")?.value ||
-            $("boxTextColorValue")?.value ||
             "",
 
         width:
-            $("boxWidth")?.value || "",
+            $("boxWidth")?.value ||
+            "",
 
         height:
-            $("boxHeight")?.value || "",
+            $("boxHeight")?.value ||
+            "",
 
         padding:
-            $("boxPadding")?.value || "",
+            $("boxPadding")?.value ||
+            "",
 
         radius:
-            $("boxRadius")?.value || "",
+            $("boxRadius")?.value ||
+            "",
 
         shadow:
-            $("boxShadow")?.value || "",
+            $("boxShadow")?.value ||
+            "",
 
         border:
-            $("boxBorder")?.value || "",
+            $("boxBorder")?.value ||
+            "",
 
         image_height:
-            $("imageHeight")?.value || "",
+            $("imageHeight")?.value ||
+            "",
 
         image_fit:
-            $("boxImageFit")?.value || "cover",
+            $("boxImageFit")?.value ||
+            "cover",
 
         video_height:
-            $("videoHeight")?.value || "",
+            $("videoHeight")?.value ||
+            "",
 
         video_fit:
-            $("videoFit")?.value || "contain",
+            $("videoFit")?.value ||
+            "contain",
 
         video_autoplay:
-            $("videoAutoplay")?.checked || false,
+            $("videoAutoplay")?.checked ||
+            false,
 
         video_loop:
-            $("videoLoop")?.checked || false,
+            $("videoLoop")?.checked ||
+            false,
 
         button_color:
             $("buttonColor")?.value ||
-            $("buttonColorValue")?.value ||
             "",
 
         button_text_color:
             $("buttonTextColor")?.value ||
-            $("buttonTextColorValue")?.value ||
             ""
     };
 }
 
-function applyBoxStyle(style) {
-    style = style || {};
+
+function applyBoxStyle(style){
+
+    style=style||{};
 
     setValue(
         "boxStyle",
-        style.box_style || "default"
+        style.box_style||"default"
     );
 
     setValue(
         "boxTextAlign",
-        style.text_align || "center"
+        style.text_align||"center"
     );
 
-    setColorValue(
+    setValue(
         "boxBackgroundColor",
+        style.background_color||"#181818"
+    );
+
+    setValue(
         "boxBackgroundColorValue",
-        style.background_color
+        style.background_color||"#181818"
     );
 
-    setColorValue(
+    setValue(
         "boxTextColor",
-        "boxTextColorValue",
-        style.text_color
+        style.text_color||"#ffffff"
     );
 
-    setValue("boxWidth", style.width || "");
-    setValue("boxHeight", style.height || "");
-    setValue("boxPadding", style.padding || "");
-    setValue("boxRadius", style.radius || "");
-    setValue("boxShadow", style.shadow || "");
-    setValue("boxBorder", style.border || "");
+    setValue(
+        "boxTextColorValue",
+        style.text_color||"#ffffff"
+    );
+
+    setValue("boxWidth",style.width||"");
+    setValue("boxHeight",style.height||"");
+    setValue("boxPadding",style.padding||"");
+    setValue("boxRadius",style.radius||"");
+    setValue("boxShadow",style.shadow||"");
+    setValue("boxBorder",style.border||"");
 
     setValue(
         "imageHeight",
-        style.image_height || ""
+        style.image_height||""
     );
 
     setValue(
         "boxImageFit",
-        style.image_fit || "cover"
+        style.image_fit||"cover"
     );
 
     setValue(
         "videoHeight",
-        style.video_height || ""
+        style.video_height||""
     );
 
     setValue(
         "videoFit",
-        style.video_fit || "contain"
+        style.video_fit||"contain"
     );
 
     setChecked(
@@ -716,50 +2144,35 @@ function applyBoxStyle(style) {
         !!style.video_loop
     );
 
-    setColorValue(
+    setValue(
         "buttonColor",
+        style.button_color||"#673ab7"
+    );
+
+    setValue(
         "buttonColorValue",
-        style.button_color
+        style.button_color||"#673ab7"
     );
 
-    setColorValue(
+    setValue(
         "buttonTextColor",
+        style.button_text_color||"#ffffff"
+    );
+
+    setValue(
         "buttonTextColorValue",
-        style.button_text_color
+        style.button_text_color||"#ffffff"
     );
 }
 
-function setValue(id, value) {
-    const element = $(id);
 
-    if (element) {
-        element.value = value;
-    }
-}
+/* =====================================================
+   FORM
+   ===================================================== */
 
-function setChecked(id, value) {
-    const element = $(id);
+function clearForm(){
 
-    if (element) {
-        element.checked = !!value;
-    }
-}
-
-function setColorValue(colorId, valueId, value) {
-    if (!value) {
-        return;
-    }
-
-    setValue(colorId, value);
-    setValue(valueId, value);
-}
-
-/* =========================================================
-   CLEAR FORM
-   ========================================================= */
-
-function clearForm() {
-    const fields = [
+    [
         "itemId",
         "itemTitle",
         "itemMessage",
@@ -770,205 +2183,136 @@ function clearForm() {
         "buttonText",
         "scheduleStart",
         "scheduleEnd"
-    ];
+    ].forEach(function(id){
 
-    fields.forEach(function (id) {
-        const element = $(id);
+        const el=$(id);
 
-        if (element) {
-            element.value = "";
-        }
+        if(el)
+            el.value="";
     });
 
-    setValue("itemType", "message");
-    setValue("itemOrder", getNextOrder());
 
-    setChecked("itemEnabled", true);
-
-    applyBoxStyle({});
-
-    updateEditorFields();
-    updateScheduleStatus();
-
-    updatePreviewFromForm();
-}
-
-function getNextOrder() {
-    if (
-        !cmsContent ||
-        !Array.isArray(cmsContent.items) ||
-        cmsContent.items.length === 0
-    ) {
-        return 1;
-    }
-
-    return (
-        Math.max.apply(
-            null,
-            cmsContent.items.map(function (item) {
-                return Number(item.order || 0);
-            })
-        ) + 1
+    setValue(
+        "itemType",
+        "message"
     );
-}
 
-/* =========================================================
-   EDIT ITEM
-   ========================================================= */
-
-function editItem(id) {
-    const item =
-        cmsContent.items.find(function (x) {
-            return String(x.id) === String(id);
-        });
-
-    if (!item) {
-        showToast(
-            "Item نہیں ملا۔",
-            "error"
-        );
-        return;
-    }
-
-    setValue("itemId", item.id || "");
-    setValue("itemType", item.type || "message");
     setValue(
         "itemOrder",
-        item.order || 1
-    );
-
-    setValue(
-        "itemTitle",
-        item.title || ""
-    );
-
-    setValue(
-        "itemMessage",
-        item.message || ""
-    );
-
-    setValue(
-        "itemDescription",
-        item.description || ""
-    );
-
-    setValue(
-        "imageUrl",
-        item.image_url || ""
-    );
-
-    setValue(
-        "videoUrl",
-        item.video_url || ""
-    );
-
-    setValue(
-        "linkUrl",
-        item.link_url || ""
-    );
-
-    setValue(
-        "buttonText",
-        item.button_text || ""
+        getNextOrder()
     );
 
     setChecked(
         "itemEnabled",
-        item.enabled !== false
+        true
     );
 
-    applyBoxStyle(item.style || {});
-
-    setValue(
-        "scheduleStart",
-        item.schedule?.start || ""
-    );
-
-    setValue(
-        "scheduleEnd",
-        item.schedule?.end || ""
-    );
+    applyBoxStyle({});
 
     updateEditorFields();
+
     updateScheduleStatus();
 
     updatePreviewFromForm();
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
 
-/* =========================================================
-   SAVE ITEM
-   ========================================================= */
 
-async function saveItem() {
-    const id =
-        $("itemId")?.value.trim() || "";
+function getNextOrder(){
 
-    const item = {
+    if(
+        !cmsContent ||
+        !Array.isArray(cmsContent.items) ||
+        !cmsContent.items.length
+    )
+        return 1;
+
+    return Math.max.apply(
+        null,
+        cmsContent.items.map(
+            function(item){
+                return Number(
+                    item.order||0
+                );
+            }
+        )
+    )+1;
+}
+
+
+/* =====================================================
+   SAVE
+   ===================================================== */
+
+async function saveItem(){
+
+    const id=
+        $("itemId")?.value.trim()||"";
+
+    const item={
+
         type:
-            $("itemType")?.value ||
+            $("itemType")?.value||
             "message",
 
         title:
-            $("itemTitle")?.value.trim() ||
+            $("itemTitle")?.value.trim()||
             "",
 
         message:
-            $("itemMessage")?.value ||
+            $("itemMessage")?.value||
             "",
 
         description:
-            $("itemDescription")?.value ||
+            $("itemDescription")?.value||
             "",
 
         image_url:
-            $("imageUrl")?.value.trim() ||
+            $("imageUrl")?.value.trim()||
             "",
 
         video_url:
-            $("videoUrl")?.value.trim() ||
+            $("videoUrl")?.value.trim()||
             "",
 
         link_url:
-            $("linkUrl")?.value.trim() ||
+            $("linkUrl")?.value.trim()||
             "",
 
         button_text:
-            $("buttonText")?.value.trim() ||
+            $("buttonText")?.value.trim()||
             "",
 
         order:
             Number(
-                $("itemOrder")?.value || 1
+                $("itemOrder")?.value||1
             ),
 
         enabled:
-            $("itemEnabled")?.checked !== false,
+            $("itemEnabled")?.checked!==false,
 
         style:
             getBoxStyleFromForm(),
 
-        schedule: {
+        schedule:{
             start:
-                $("scheduleStart")?.value || "",
+                $("scheduleStart")?.value||"",
 
             end:
-                $("scheduleEnd")?.value || ""
+                $("scheduleEnd")?.value||""
         }
     };
 
-    try {
-        if (id) {
+
+    try{
+
+        if(id){
+
             await api(
-                "/api/admin/content/" +
+                "/api/admin/content/"+
                 encodeURIComponent(id),
                 {
-                    method: "PUT",
-                    body: JSON.stringify(item)
+                    method:"PUT",
+                    body:JSON.stringify(item)
                 }
             );
 
@@ -976,12 +2320,13 @@ async function saveItem() {
                 "Content update ہو گیا۔"
             );
 
-        } else {
+        }else{
+
             await api(
                 "/api/admin/content",
                 {
-                    method: "POST",
-                    body: JSON.stringify(item)
+                    method:"POST",
+                    body:JSON.stringify(item)
                 }
             );
 
@@ -993,43 +2338,115 @@ async function saveItem() {
         clearForm();
 
         await loadContent();
+
         await loadHomePreview();
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            error.message ||
+            error.message||
             "Save failed",
             "error"
         );
     }
 }
 
-/* =========================================================
-   TOGGLE ITEM
-   ========================================================= */
 
-async function toggleItem(id) {
-    const item =
-        cmsContent.items.find(function (x) {
-            return String(x.id) === String(id);
-        });
+/* =====================================================
+   EDIT
+   ===================================================== */
 
-    if (!item) {
+function editItem(id){
+
+    const item=
+        cmsContent.items.find(
+            function(x){
+                return String(x.id)===
+                       String(id);
+            }
+        );
+
+    if(!item){
+
+        showToast(
+            "Item نہیں ملا۔",
+            "error"
+        );
+
         return;
     }
 
-    const enabled =
-        item.enabled === false;
 
-    try {
+    setValue("itemId",item.id||"");
+    setValue("itemType",item.type||"message");
+    setValue("itemOrder",item.order||1);
+    setValue("itemTitle",item.title||"");
+    setValue("itemMessage",item.message||"");
+    setValue("itemDescription",item.description||"");
+    setValue("imageUrl",item.image_url||"");
+    setValue("videoUrl",item.video_url||"");
+    setValue("linkUrl",item.link_url||"");
+    setValue("buttonText",item.button_text||"");
+
+    setChecked(
+        "itemEnabled",
+        item.enabled!==false
+    );
+
+    applyBoxStyle(
+        item.style||{}
+    );
+
+    setValue(
+        "scheduleStart",
+        item.schedule?.start||""
+    );
+
+    setValue(
+        "scheduleEnd",
+        item.schedule?.end||""
+    );
+
+    updateEditorFields();
+    updateScheduleStatus();
+    updatePreviewFromForm();
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+
+/* =====================================================
+   TOGGLE
+   ===================================================== */
+
+async function toggleItem(id){
+
+    const item=
+        cmsContent.items.find(
+            function(x){
+                return String(x.id)===
+                       String(id);
+            }
+        );
+
+    if(!item) return;
+
+    const enabled=
+        item.enabled===false;
+
+    try{
+
         await api(
-            "/api/admin/content/" +
-            encodeURIComponent(id) +
+            "/api/admin/content/"+
+            encodeURIComponent(id)+
             "/toggle",
             {
-                method: "PATCH",
-                body: JSON.stringify({
-                    enabled: enabled
+                method:"PATCH",
+                body:JSON.stringify({
+                    enabled:enabled
                 })
             }
         );
@@ -1039,49 +2456,54 @@ async function toggleItem(id) {
 
         showToast(
             enabled
-                ? "Content enabled."
-                : "Content disabled."
+            ? "Content enabled."
+            : "Content disabled."
         );
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            error.message ||
+            error.message||
             "Toggle failed",
             "error"
         );
     }
 }
 
-/* =========================================================
+
+/* =====================================================
    DUPLICATE
-   ========================================================= */
+   ===================================================== */
 
-async function duplicateItem(id) {
-    const item =
-        cmsContent.items.find(function (x) {
-            return String(x.id) === String(id);
-        });
+async function duplicateItem(id){
 
-    if (!item) {
-        return;
-    }
+    const item=
+        cmsContent.items.find(
+            function(x){
+                return String(x.id)===
+                       String(id);
+            }
+        );
 
-    const copy = deepClone(item);
+    if(!item) return;
+
+    const copy=deepClone(item);
 
     delete copy.id;
 
-    copy.title =
-        (copy.title || "Content") +
+    copy.title=
+        (copy.title||"Content")+
         " Copy";
 
-    copy.order = getNextOrder();
+    copy.order=getNextOrder();
 
-    try {
+    try{
+
         await api(
             "/api/admin/content",
             {
-                method: "POST",
-                body: JSON.stringify(copy)
+                method:"POST",
+                body:JSON.stringify(copy)
             }
         );
 
@@ -1092,45 +2514,48 @@ async function duplicateItem(id) {
             "Content duplicate ہو گیا۔"
         );
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            error.message ||
+            error.message||
             "Duplicate failed",
             "error"
         );
     }
 }
 
-/* =========================================================
+
+/* =====================================================
    RECYCLE BIN
-   ========================================================= */
+   ===================================================== */
 
-function getTrash() {
-    try {
-        const raw =
-            localStorage.getItem(TRASH_KEY);
+function getTrash(){
 
-        if (!raw) {
-            return [];
-        }
+    try{
 
-        const data = JSON.parse(raw);
+        const raw=
+            localStorage.getItem(
+                TRASH_KEY
+            );
+
+        if(!raw) return [];
+
+        const data=
+            JSON.parse(raw);
 
         return Array.isArray(data)
             ? data
             : [];
 
-    } catch (error) {
-        console.error(
-            "Recycle Bin read error:",
-            error
-        );
+    }catch(e){
 
         return [];
     }
 }
 
-function setTrash(items) {
+
+function setTrash(items){
+
     localStorage.setItem(
         TRASH_KEY,
         JSON.stringify(items)
@@ -1140,40 +2565,34 @@ function setTrash(items) {
     renderTrash();
 }
 
-/*
- * IMPORTANT:
- * Delete is now a REAL backend delete.
- *
- * First:
- * 1. Find item
- * 2. Save complete copy locally
- * 3. DELETE from backend
- * 4. Only after successful backend delete,
- *    put copy into Recycle Bin
- */
-async function moveToTrash(id) {
-    const item =
-        cmsContent.items.find(function (x) {
-            return String(x.id) === String(id);
-        });
 
-    if (!item) {
+async function moveToTrash(id){
+
+    const item=
+        cmsContent.items.find(
+            function(x){
+                return String(x.id)===
+                       String(id);
+            }
+        );
+
+    if(!item){
+
         showToast(
-            "Delete ہونے والا item نہیں ملا۔",
+            "Item نہیں ملا۔",
             "error"
         );
+
         return;
     }
 
-    const confirmed = confirm(
+    if(!confirm(
         "کیا آپ اس content کو Recycle Bin میں بھیجنا چاہتے ہیں؟"
-    );
-
-    if (!confirmed) {
+    ))
         return;
-    }
 
-    const backup = {
+
+    const backup={
         deletedAt:
             new Date().toISOString(),
 
@@ -1181,30 +2600,28 @@ async function moveToTrash(id) {
             deepClone(item)
     };
 
-    try {
-        /*
-         * IMPORTANT:
-         * Backend must support:
-         * DELETE /api/admin/content/<id>
-         */
+
+    try{
+
         await api(
-            "/api/admin/content/" +
+            "/api/admin/content/"+
             encodeURIComponent(id),
             {
-                method: "DELETE"
+                method:"DELETE"
             }
         );
 
-        const trash = getTrash();
+        const trash=getTrash();
 
-        const alreadyExists =
-            trash.some(function (entry) {
-                return String(
-                    entry.item?.id
-                ) === String(id);
-            });
-
-        if (!alreadyExists) {
+        if(
+            !trash.some(
+                function(entry){
+                    return String(
+                        entry.item?.id
+                    )===String(id);
+                }
+            )
+        ){
             trash.unshift(backup);
         }
 
@@ -1217,56 +2634,54 @@ async function moveToTrash(id) {
             "Content Recycle Bin میں منتقل ہو گیا۔"
         );
 
-    } catch (error) {
-        console.error(error);
+    }catch(error){
 
         showToast(
-            "Delete failed: " +
-            (error.message || "Server error"),
+            "Delete failed: "+
+            (error.message||"Server error"),
             "error"
         );
     }
 }
 
-/* =========================================================
-   RESTORE
-   ========================================================= */
 
-async function restoreTrash(index) {
-    const trash = getTrash();
+async function restoreTrash(index){
 
-    if (
-        index < 0 ||
-        index >= trash.length
-    ) {
+    const trash=getTrash();
+
+    if(
+        index<0 ||
+        index>=trash.length
+    )
         return;
-    }
 
-    const entry = trash[index];
+    const entry=trash[index];
 
-    if (!entry || !entry.item) {
+    if(!entry?.item)
         return;
-    }
 
-    const item =
-        deepClone(entry.item);
+    const item=deepClone(
+        entry.item
+    );
 
-    /*
-     * Existing ID can conflict if backend still
-     * contains it. Since moveToTrash permanently
-     * deleted it, normally this ID is available.
-     */
+    try{
 
-    try {
+        /*
+         * ID restore کرنے کی کوشش نہیں کی جاتی۔
+         * Backend کو item دوبارہ create کرنے دیا جاتا ہے۔
+         */
+
+        delete item.id;
+
         await api(
             "/api/admin/content",
             {
-                method: "POST",
-                body: JSON.stringify(item)
+                method:"POST",
+                body:JSON.stringify(item)
             }
         );
 
-        trash.splice(index, 1);
+        trash.splice(index,1);
 
         setTrash(trash);
 
@@ -1277,47 +2692,40 @@ async function restoreTrash(index) {
             "Content restore ہو گیا۔"
         );
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            "Restore failed: " +
-            (error.message || "Server error"),
+            "Restore failed: "+
+            (error.message||"Server error"),
             "error"
         );
     }
 }
 
-/* =========================================================
-   PERMANENT DELETE
-   ========================================================= */
 
-function permanentDeleteTrash(index) {
-    const trash = getTrash();
+function permanentDeleteTrash(index){
 
-    if (
-        index < 0 ||
-        index >= trash.length
-    ) {
+    const trash=getTrash();
+
+    if(
+        index<0 ||
+        index>=trash.length
+    )
         return;
-    }
 
-    const entry = trash[index];
-
-    const name =
-        entry?.item?.title ||
-        entry?.item?.id ||
+    const name=
+        trash[index]?.item?.title||
+        trash[index]?.item?.id||
         "this item";
 
-    const confirmed = confirm(
-        "یہ item Recycle Bin سے مستقل طور پر حذف ہو جائے گا۔\n\n" +
-        name +
+    if(!confirm(
+        "یہ item Recycle Bin سے مستقل طور پر حذف ہو جائے گا۔\n\n"+
+        name+
         "\n\nکیا آپ واقعی Delete کرنا چاہتے ہیں؟"
-    );
-
-    if (!confirmed) {
+    ))
         return;
-    }
 
-    trash.splice(index, 1);
+    trash.splice(index,1);
 
     setTrash(trash);
 
@@ -1326,36 +2734,29 @@ function permanentDeleteTrash(index) {
     );
 }
 
-/* =========================================================
-   EMPTY TRASH
-   ========================================================= */
 
-function emptyTrash() {
-    const trash = getTrash();
+function emptyTrash(){
 
-    if (trash.length === 0) {
+    const trash=getTrash();
+
+    if(!trash.length){
+
         showToast(
             "Recycle Bin پہلے ہی خالی ہے۔",
             "warning"
         );
+
         return;
     }
 
-    const confirmed = confirm(
+    if(!confirm(
         "Recycle Bin کے تمام items مستقل طور پر حذف ہو جائیں گے۔\n\nکیا آپ واقعی Empty Recycle Bin کرنا چاہتے ہیں؟"
-    );
-
-    if (!confirmed) {
+    ))
         return;
-    }
 
-    /*
-     * Items have already been permanently removed
-     * from backend by moveToTrash().
-     *
-     * Therefore only local trash records are cleared.
-     */
-    localStorage.removeItem(TRASH_KEY);
+    localStorage.removeItem(
+        TRASH_KEY
+    );
 
     updateStats();
     renderTrash();
@@ -1365,23 +2766,21 @@ function emptyTrash() {
     );
 }
 
-/* =========================================================
-   RECYCLE BIN RENDER
-   ========================================================= */
 
-function renderTrash() {
-    const container = $("trashList");
+function renderTrash(){
 
-    if (!container) {
+    const container=$("trashList");
+
+    if(!container)
         return;
-    }
 
-    const trash = getTrash();
+    const trash=getTrash();
 
-    if (trash.length === 0) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "🗑️ Recycle Bin خالی ہے" +
+    if(!trash.length){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "🗑️ Recycle Bin خالی ہے"+
             "</div>";
 
         updateStats();
@@ -1389,91 +2788,86 @@ function renderTrash() {
         return;
     }
 
-    container.innerHTML = trash
-        .map(function (entry, index) {
-            const item =
-                entry.item || {};
 
-            const title =
-                item.title ||
-                item.message ||
-                item.id ||
-                "Untitled";
+    container.innerHTML=
+        trash.map(
+            function(entry,index){
 
-            const type =
-                item.type ||
-                "unknown";
+                const item=
+                    entry.item||{};
 
-            const date =
-                entry.deletedAt
+                const title=
+                    item.title||
+                    item.message||
+                    item.id||
+                    "Untitled";
+
+                const type=
+                    item.type||
+                    "unknown";
+
+                const date=
+                    entry.deletedAt
                     ? new Date(
                         entry.deletedAt
                     ).toLocaleString()
                     : "";
 
-            return (
-                '<div class="trash-item">' +
+                return `
+                <div class="trash-item">
 
-                '<div class="trash-info">' +
+                    <div class="trash-title">
+                        ${escapeHtml(title)}
+                    </div>
 
-                '<div class="trash-title">' +
-                escapeHtml(title) +
-                "</div>" +
+                    <div class="trash-meta">
+                        ${escapeHtml(type)}
+                        •
+                        ${escapeHtml(date)}
+                    </div>
 
-                '<div class="trash-meta">' +
-                escapeHtml(type) +
-                " • " +
-                escapeHtml(date) +
-                "</div>" +
+                    <div class="trash-actions"
+                         style="margin-top:8px">
 
-                "</div>" +
+                        <button
+                            class="btn btn-success btn-small"
+                            onclick="restoreTrash(${index})">
+                            ↩️ Restore
+                        </button>
 
-                '<div class="trash-actions">' +
+                        <button
+                            class="btn btn-danger btn-small"
+                            onclick="permanentDeleteTrash(${index})">
+                            ❌ Permanent Delete
+                        </button>
 
-                '<button class="btn btn-success btn-small" ' +
-                'onclick="restoreTrash(' +
-                index +
-                ')">' +
-                "↩️ Restore" +
-                "</button>" +
+                    </div>
 
-                '<button class="btn btn-danger btn-small" ' +
-                'onclick="permanentDeleteTrash(' +
-                index +
-                ')">' +
-                "❌ Permanent Delete" +
-                "</button>" +
-
-                "</div>" +
-
-                "</div>"
-            );
-        })
-        .join("");
+                </div>`;
+            }
+        ).join("");
 
     updateStats();
 }
 
-/* =========================================================
+
+/* =====================================================
    STATS
-   ========================================================= */
+   ===================================================== */
 
-function updateStats() {
-    const items =
+function updateStats(){
+
+    const items=
         Array.isArray(cmsContent.items)
-            ? cmsContent.items
-            : [];
+        ? cmsContent.items
+        : [];
 
-    const enabled =
-        items.filter(function (item) {
-            return item.enabled !== false;
-        }).length;
-
-    const disabled =
-        items.length - enabled;
-
-    const trash =
-        getTrash().length;
+    const enabled=
+        items.filter(
+            function(item){
+                return item.enabled!==false;
+            }
+        ).length;
 
     setText(
         "statTotal",
@@ -1487,49 +2881,48 @@ function updateStats() {
 
     setText(
         "statDisabled",
-        disabled
+        items.length-enabled
     );
 
     setText(
         "statTrash",
-        trash
+        getTrash().length
     );
 }
 
-function setText(id, value) {
-    const element = $(id);
 
-    if (element) {
-        element.textContent =
-            String(value);
-    }
-}
-
-/* =========================================================
+/* =====================================================
    FILTER
-   ========================================================= */
+   ===================================================== */
 
-function getFilteredItems() {
-    let items =
+function getFilteredItems(){
+
+    let items=
         Array.isArray(cmsContent.items)
-            ? cmsContent.items.slice()
-            : [];
+        ? cmsContent.items.slice()
+        : [];
 
-    const search =
+    const search=
         $("searchItems")?.value
-            .trim()
-            .toLowerCase() || "";
+        .trim()
+        .toLowerCase()||
+        "";
 
-    const type =
-        $("filterType")?.value || "all";
+    const type=
+        $("filterType")?.value||
+        "all";
 
-    const status =
-        $("filterStatus")?.value || "all";
+    const status=
+        $("filterStatus")?.value||
+        "all";
 
-    if (search) {
-        items = items.filter(
-            function (item) {
-                const text = [
+
+    if(search){
+
+        items=items.filter(
+            function(item){
+
+                const text=[
                     item.title,
                     item.message,
                     item.description,
@@ -1538,42 +2931,50 @@ function getFilteredItems() {
                     item.video_url,
                     item.image_url
                 ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
 
                 return text.includes(search);
             }
         );
     }
 
-    if (type !== "all") {
-        items = items.filter(
-            function (item) {
-                return item.type === type;
+
+    if(type!=="all"){
+
+        items=items.filter(
+            function(item){
+                return item.type===type;
             }
         );
     }
 
-    if (status === "enabled") {
-        items = items.filter(
-            function (item) {
-                return item.enabled !== false;
+
+    if(status==="enabled"){
+
+        items=items.filter(
+            function(item){
+                return item.enabled!==false;
             }
         );
     }
 
-    if (status === "disabled") {
-        items = items.filter(
-            function (item) {
-                return item.enabled === false;
+
+    if(status==="disabled"){
+
+        items=items.filter(
+            function(item){
+                return item.enabled===false;
             }
         );
     }
 
-    if (status === "scheduled") {
-        items = items.filter(
-            function (item) {
+
+    if(status==="scheduled"){
+
+        items=items.filter(
+            function(item){
                 return hasSchedule(item);
             }
         );
@@ -1582,311 +2983,438 @@ function getFilteredItems() {
     return items;
 }
 
-/* =========================================================
+
+/* =====================================================
    RENDER ITEMS
-   ========================================================= */
+   ===================================================== */
 
-function renderItems() {
-    const container = $("itemsList");
+function renderItems(){
 
-    if (!container) {
+    const container=$("itemsList");
+
+    if(!container)
         return;
-    }
 
-    const items =
-        getFilteredItems();
+    const items=getFilteredItems();
 
-    if (items.length === 0) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "کوئی content نہیں ملا۔" +
+    if(!items.length){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "کوئی content نہیں ملا۔"+
             "</div>";
 
-        setupDragAndDrop();
-
-        updateStats();
-
         return;
     }
 
-    container.innerHTML =
-        items
-            .map(buildItemCard)
-            .join("");
+
+    container.innerHTML=
+        items.map(buildItemCard).join("");
 
     setupDragAndDrop();
 
     updateStats();
 }
 
-function buildItemCard(item) {
-    const enabled =
-        item.enabled !== false;
 
-    const schedule =
-        hasSchedule(item);
+function buildItemCard(item){
 
-    const scheduleActive =
-        isScheduleActive(item);
+    const enabled=
+        item.enabled!==false;
 
-    return (
-        '<div class="item-card" ' +
-        'draggable="true" ' +
-        'data-id="' +
-        escapeHtml(item.id) +
-        '">' +
+    return `
+    <div class="item-card"
+         draggable="true"
+         data-id="${escapeHtml(item.id)}">
 
-        '<div class="item-card-content">' +
+        <div>
 
-        '<div class="item-title">' +
-        escapeHtml(
-            item.title ||
-            item.message ||
-            "Untitled"
-        ) +
-        "</div>" +
+            <div class="item-title">
+                ${escapeHtml(
+                    item.title||
+                    item.message||
+                    "Untitled"
+                )}
+            </div>
 
-        '<div class="item-meta">' +
-        "Type: " +
-        escapeHtml(
-            item.type || "message"
-        ) +
-        " • Order: " +
-        escapeHtml(
-            item.order || 0
-        ) +
-        "</div>" +
+            <div class="item-meta">
+                Type:
+                ${escapeHtml(
+                    item.type||"message"
+                )}
+                • Order:
+                ${escapeHtml(
+                    item.order||0
+                )}
+            </div>
 
-        '<div class="item-status">' +
-
-        (
-            enabled
-                ? "🟢 Enabled"
-                : "🔴 Disabled"
-        ) +
-
-        (
-            schedule
-                ? (
-                    scheduleActive
-                        ? " • ⏱️ Active"
-                        : " • ⏸️ Scheduled"
-                )
-                : ""
-        ) +
-
-        "</div>" +
-
-        "</div>" +
-
-        '<div class="item-actions">' +
-
-        '<button class="btn btn-primary btn-small" ' +
-        'onclick="editItem(\'' +
-        escapeHtml(item.id) +
-        '\')">' +
-        "✏️ Edit" +
-        "</button>" +
-
-        '<button class="btn btn-success btn-small" ' +
-        'onclick="toggleItem(\'' +
-        escapeHtml(item.id) +
-        '\')">' +
-        (
-            enabled
-                ? "🔴 Disable"
-                : "🟢 Enable"
-        ) +
-        "</button>" +
-
-        '<button class="btn btn-blue btn-small" ' +
-        'onclick="duplicateItem(\'' +
-        escapeHtml(item.id) +
-        '\')">' +
-        "📋 Duplicate" +
-        "</button>" +
-
-        '<button class="btn btn-danger btn-small" ' +
-        'onclick="moveToTrash(\'' +
-        escapeHtml(item.id) +
-        '\')">' +
-        "🗑️ Delete" +
-        "</button>" +
-
-        "</div>" +
-
-        "</div>"
-    );
-}
-
-/* =========================================================
-   DRAG AND DROP
-   ========================================================= */
-
-function setupDragAndDrop() {
-    const cards =
-        document.querySelectorAll(
-            ".item-card"
-        );
-
-    cards.forEach(function (card) {
-        card.addEventListener(
-            "dragstart",
-            function () {
-                draggedId =
-                    card.dataset.id;
-
-                card.classList.add(
-                    "dragging"
-                );
-            }
-        );
-
-        card.addEventListener(
-            "dragend",
-            function () {
-                card.classList.remove(
-                    "dragging"
-                );
-
-                draggedId = null;
-            }
-        );
-
-        card.addEventListener(
-            "dragover",
-            function (event) {
-                event.preventDefault();
-
-                card.classList.add(
-                    "drag-over"
-                );
-            }
-        );
-
-        card.addEventListener(
-            "dragleave",
-            function () {
-                card.classList.remove(
-                    "drag-over"
-                );
-            }
-        );
-
-        card.addEventListener(
-            "drop",
-            async function (event) {
-                event.preventDefault();
-
-                card.classList.remove(
-                    "drag-over"
-                );
-
-                const targetId =
-                    card.dataset.id;
-
-                if (
-                    !draggedId ||
-                    draggedId === targetId
-                ) {
-                    return;
+            <div class="item-status">
+                ${
+                    enabled
+                    ? "🟢 Enabled"
+                    : "🔴 Disabled"
                 }
+            </div>
 
-                await reorderItems(
-                    draggedId,
-                    targetId
-                );
-            }
-        );
-    });
+        </div>
+
+        <div class="item-actions">
+
+            <button
+                class="btn btn-primary btn-small"
+                onclick="editItem('${escapeHtml(item.id)}')">
+                ✏️ Edit
+            </button>
+
+            <button
+                class="btn btn-success btn-small"
+                onclick="toggleItem('${escapeHtml(item.id)}')">
+                ${
+                    enabled
+                    ? "🔴 Disable"
+                    : "🟢 Enable"
+                }
+            </button>
+
+            <button
+                class="btn btn-blue btn-small"
+                onclick="duplicateItem('${escapeHtml(item.id)}')">
+                📋 Duplicate
+            </button>
+
+            <button
+                class="btn btn-danger btn-small"
+                onclick="moveToTrash('${escapeHtml(item.id)}')">
+                🗑️ Delete
+            </button>
+
+        </div>
+
+    </div>`;
 }
+
+
+/* =====================================================
+   DRAG DROP
+   ===================================================== */
+
+function setupDragAndDrop(){
+
+    document
+        .querySelectorAll(".item-card")
+        .forEach(function(card){
+
+            card.addEventListener(
+                "dragstart",
+                function(){
+
+                    draggedId=
+                        card.dataset.id;
+
+                    card.classList.add(
+                        "dragging"
+                    );
+                }
+            );
+
+
+            card.addEventListener(
+                "dragend",
+                function(){
+
+                    card.classList.remove(
+                        "dragging"
+                    );
+
+                    draggedId=null;
+                }
+            );
+
+
+            card.addEventListener(
+                "dragover",
+                function(event){
+
+                    event.preventDefault();
+
+                    card.classList.add(
+                        "drag-over"
+                    );
+                }
+            );
+
+
+            card.addEventListener(
+                "dragleave",
+                function(){
+
+                    card.classList.remove(
+                        "drag-over"
+                    );
+                }
+            );
+
+
+            card.addEventListener(
+                "drop",
+                async function(event){
+
+                    event.preventDefault();
+
+                    card.classList.remove(
+                        "drag-over"
+                    );
+
+                    const targetId=
+                        card.dataset.id;
+
+                    if(
+                        !draggedId||
+                        draggedId===targetId
+                    )
+                        return;
+
+                    await reorderItems(
+                        draggedId,
+                        targetId
+                    );
+                }
+            );
+        });
+}
+
+
+/* =====================================================
+   REORDER
+   ===================================================== */
 
 async function reorderItems(
     draggedIdValue,
     targetId
-) {
-    const items =
-        cmsContent.items
-            .map(deepClone);
+){
 
-    const from =
-        items.findIndex(function (item) {
-            return String(item.id) ===
-                String(draggedIdValue);
-        });
+    const items=
+        cmsContent.items.map(
+            deepClone
+        );
 
-    const to =
-        items.findIndex(function (item) {
-            return String(item.id) ===
-                String(targetId);
-        });
+    const from=
+        items.findIndex(
+            function(item){
+                return String(item.id)===
+                       String(draggedIdValue);
+            }
+        );
 
-    if (
-        from < 0 ||
-        to < 0
-    ) {
+    const to=
+        items.findIndex(
+            function(item){
+                return String(item.id)===
+                       String(targetId);
+            }
+        );
+
+    if(from<0||to<0)
         return;
-    }
 
-    const moved =
-        items.splice(from, 1)[0];
+    const moved=
+        items.splice(from,1)[0];
 
-    items.splice(to, 0, moved);
+    items.splice(to,0,moved);
 
     items.forEach(
-        function (item, index) {
-            item.order =
-                index + 1;
+        function(item,index){
+            item.order=index+1;
         }
     );
 
-    try {
-        for (const item of items) {
+
+    cmsContent.items=items;
+
+    renderItems();
+
+    setText(
+        "orderStatus",
+        "Order تیار ہے۔ Save Homepage Order دبائیں۔"
+    );
+}
+
+
+/* =====================================================
+   SAVE ORDER
+   ===================================================== */
+
+async function saveOrder(){
+
+    const status=$("orderStatus");
+
+    const items=
+        Array.from(
+            document.querySelectorAll(
+                "#itemsList .item-card"
+            )
+        )
+        .map(function(card){
+
+            return card.dataset.id;
+        });
+
+
+    if(!items.length){
+
+        if(status)
+            status.textContent=
+                "Save کرنے کے لیے کوئی content نہیں۔";
+
+        return;
+    }
+
+
+    const orderedItems=[];
+
+    items.forEach(
+        function(id,index){
+
+            const item=
+                cmsContent.items.find(
+                    function(x){
+                        return String(x.id)===
+                               String(id);
+                    }
+                );
+
+            if(item){
+
+                const copy=
+                    deepClone(item);
+
+                copy.order=index+1;
+
+                orderedItems.push(copy);
+            }
+        }
+    );
+
+
+    /*
+     * Filter کے بعد صرف visible items آ سکتے ہیں۔
+     * اس لیے backend کو duplicate/missing order دینے
+     * سے بچانے کے لیے اصل مکمل list استعمال کریں۔
+     */
+
+    const allItems=
+        cmsContent.items
+            .slice()
+            .sort(
+                function(a,b){
+                    return Number(a.order||0)-
+                           Number(b.order||0);
+                }
+            );
+
+
+    const visibleSet=
+        new Set(items.map(String));
+
+    const finalItems=[];
+
+    orderedItems.forEach(
+        function(item){
+            finalItems.push(item);
+        }
+    );
+
+
+    allItems.forEach(
+        function(item){
+
+            if(
+                !visibleSet.has(
+                    String(item.id)
+                )
+            ){
+
+                finalItems.push(
+                    deepClone(item)
+                );
+            }
+        }
+    );
+
+
+    finalItems.forEach(
+        function(item,index){
+            item.order=index+1;
+        }
+    );
+
+
+    try{
+
+        if(status)
+            status.textContent=
+                "Order save ہو رہا ہے...";
+
+
+        for(
+            const item
+            of finalItems
+        ){
+
             await api(
-                "/api/admin/content/" +
+                "/api/admin/content/"+
                 encodeURIComponent(item.id),
                 {
-                    method: "PUT",
-                    body: JSON.stringify({
-                        type: item.type,
-                        title: item.title,
-                        message: item.message,
-                        description:
-                            item.description,
-                        image_url:
-                            item.image_url,
-                        video_url:
-                            item.video_url,
-                        link_url:
-                            item.link_url,
-                        button_text:
-                            item.button_text,
-                        order: item.order,
-                        enabled:
-                            item.enabled !== false,
-                        style:
-                            item.style || {},
-                        schedule:
-                            item.schedule || {}
+                    method:"PUT",
+                    body:JSON.stringify({
+                        type:item.type,
+                        title:item.title,
+                        message:item.message,
+                        description:item.description,
+                        image_url:item.image_url,
+                        video_url:item.video_url,
+                        link_url:item.link_url,
+                        button_text:item.button_text,
+                        order:item.order,
+                        enabled:item.enabled!==false,
+                        style:item.style||{},
+                        schedule:item.schedule||{}
                     })
                 }
             );
         }
 
-        cmsContent.items = items;
+
+        cmsContent.items=
+            finalItems;
+
 
         renderItems();
 
         await loadHomePreview();
 
+
+        if(status)
+            status.textContent=
+                "Homepage Order کامیابی سے محفوظ ہو گیا۔";
+
+
         showToast(
-            "Order update ہو گیا۔"
+            "Homepage Order save ہو گیا۔"
         );
 
-    } catch (error) {
+    }catch(error){
+
+        console.error(error);
+
+        if(status)
+            status.textContent=
+                "Order save failed: "+
+                error.message;
+
         showToast(
-            error.message ||
-            "Reorder failed",
+            "Order save failed: "+
+            error.message,
             "error"
         );
 
@@ -1894,662 +3422,662 @@ async function reorderItems(
     }
 }
 
-/* =========================================================
-   SCHEDULE
-   ========================================================= */
 
-function hasSchedule(item) {
+/* =====================================================
+   SCHEDULE
+   ===================================================== */
+
+function hasSchedule(item){
+
     return !!(
         item &&
         item.schedule &&
         (
-            item.schedule.start ||
+            item.schedule.start||
             item.schedule.end
         )
     );
 }
 
-function isScheduleActive(item) {
-    if (!hasSchedule(item)) {
+
+function isScheduleActive(item){
+
+    if(!hasSchedule(item))
         return true;
-    }
 
-    const now =
-        new Date();
+    const now=new Date();
 
-    const start =
+    const start=
         item.schedule.start
-            ? new Date(
-                item.schedule.start
-            )
-            : null;
+        ? new Date(
+            item.schedule.start
+        )
+        : null;
 
-    const end =
+    const end=
         item.schedule.end
-            ? new Date(
-                item.schedule.end
-            )
-            : null;
+        ? new Date(
+            item.schedule.end
+        )
+        : null;
 
-    if (
+    if(
         start &&
         isNaN(start.getTime())
-    ) {
+    )
         return false;
-    }
 
-    if (
+    if(
         end &&
         isNaN(end.getTime())
-    ) {
+    )
         return false;
-    }
 
-    if (
-        start &&
-        now < start
-    ) {
+    if(start&&now<start)
         return false;
-    }
 
-    if (
-        end &&
-        now > end
-    ) {
+    if(end&&now>end)
         return false;
-    }
 
     return true;
 }
 
-function updateScheduleStatus() {
-    const startValue =
-        $("scheduleStart")?.value || "";
 
-    const endValue =
-        $("scheduleEnd")?.value || "";
+function updateScheduleStatus(){
 
-    const status =
+    const startValue=
+        $("scheduleStart")?.value||"";
+
+    const endValue=
+        $("scheduleEnd")?.value||"";
+
+    const status=
         $("scheduleStatus");
 
-    if (!status) {
+    if(!status)
         return;
-    }
 
-    if (!startValue && !endValue) {
-        status.textContent =
+    if(!startValue&&!endValue){
+
+        status.textContent=
             "No schedule";
 
         return;
     }
 
-    const now =
-        new Date();
+    const now=new Date();
 
-    const start =
+    const start=
         startValue
-            ? new Date(startValue)
-            : null;
+        ? new Date(startValue)
+        : null;
 
-    const end =
+    const end=
         endValue
-            ? new Date(endValue)
-            : null;
+        ? new Date(endValue)
+        : null;
 
-    if (
+    if(
         start &&
         isNaN(start.getTime())
-    ) {
-        status.textContent =
+    ){
+
+        status.textContent=
             "Invalid start date";
 
         return;
     }
 
-    if (
+    if(
         end &&
         isNaN(end.getTime())
-    ) {
-        status.textContent =
+    ){
+
+        status.textContent=
             "Invalid end date";
 
         return;
     }
 
-    if (
-        start &&
-        now < start
-    ) {
-        status.textContent =
+    if(start&&now<start){
+
+        status.textContent=
             "Scheduled";
 
         return;
     }
 
-    if (
-        end &&
-        now > end
-    ) {
-        status.textContent =
+    if(end&&now>end){
+
+        status.textContent=
             "Expired";
 
         return;
     }
 
-    status.textContent =
-        "Active";
+    status.textContent="Active";
 }
 
-/* =========================================================
-   HOME PREVIEW
-   ========================================================= */
 
-async function loadHomePreview() {
-    const container =
+/* =====================================================
+   PREVIEW
+   ===================================================== */
+
+async function loadHomePreview(){
+
+    const container=
         $("homePreview");
 
-    if (!container) {
+    if(!container)
         return;
-    }
 
-    try {
-        const data =
+    try{
+
+        const data=
             await api(
                 "/api/home-content"
             );
 
         renderHomePreview(data);
 
-    } catch (error) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "Home preview unavailable" +
+    }catch(error){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "Home preview unavailable"+
             "</div>";
     }
 }
 
-function renderHomePreview(data) {
-    const container =
+
+function renderHomePreview(data){
+
+    const container=
         $("homePreview");
 
-    if (!container) {
+    if(!container)
         return;
-    }
 
-    let items = [];
+    let items=[];
 
-    if (Array.isArray(data)) {
-        items = data;
-    } else if (
+    if(Array.isArray(data))
+        items=data;
+
+    else if(
         data &&
         Array.isArray(data.items)
-    ) {
-        items = data.items;
-    }
+    )
+        items=data.items;
 
-    items =
+
+    items=
         items
-            .filter(function (item) {
-                return item.enabled !== false;
-            })
-            .filter(function (item) {
-                return isScheduleActive(item);
-            })
-            .sort(function (a, b) {
-                return Number(a.order || 0) -
-                    Number(b.order || 0);
-            });
+        .filter(
+            function(item){
+                return item.enabled!==false;
+            }
+        )
+        .filter(isScheduleActive)
+        .sort(
+            function(a,b){
+                return Number(a.order||0)-
+                       Number(b.order||0);
+            }
+        );
 
-    if (items.length === 0) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "Home پر کوئی enabled content نہیں ہے۔" +
+
+    if(!items.length){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "Home پر کوئی enabled content نہیں ہے۔"+
             "</div>";
 
         return;
     }
 
-    container.innerHTML =
-        items
-            .map(buildPreviewCard)
-            .join("");
+
+    container.innerHTML=
+        items.map(
+            buildPreviewCard
+        ).join("");
 }
 
-function buildPreviewCard(item) {
-    const style =
+
+function buildPreviewCard(item){
+
+    const style=
         getPreviewBoxStyle(
-            item.style || {}
+            item.style||{}
         );
 
-    let html =
-        '<div class="preview-card" style="' +
-        style.box +
+    let html=
+        '<div style="'+
+        style.box+
         '">';
 
-    if (item.title) {
-        html +=
-            '<div style="font-weight:bold;' +
-            'margin-bottom:8px;">' +
-            escapeHtml(item.title) +
+
+    if(item.title){
+
+        html+=
+            '<div style="font-weight:bold;margin-bottom:8px">'+
+            escapeHtml(item.title)+
             "</div>";
     }
 
-    if (item.message) {
-        html +=
-            '<div style="margin-bottom:8px;">' +
+
+    if(item.message){
+
+        html+=
+            '<div style="margin-bottom:8px">'+
             escapeHtml(item.message)
-                .replace(/\n/g, "<br>") +
+                .replace(/\n/g,"<br>")+
             "</div>";
     }
 
-    if (item.description) {
-        html +=
-            '<div style="opacity:.85;' +
-            'margin-bottom:8px;">' +
-            escapeHtml(
-                item.description
-            ) +
+
+    if(item.description){
+
+        html+=
+            '<div style="opacity:.85;margin-bottom:8px">'+
+            escapeHtml(item.description)+
             "</div>";
     }
 
-    const imageUrl =
+
+    const imageUrl=
         safePreviewUrl(
             item.image_url
         );
 
-    if (imageUrl) {
-        html +=
-            '<img src="' +
-            escapeHtml(imageUrl) +
-            '" style="' +
-            style.image +
-            '" alt="">';
+    if(imageUrl){
+
+        html+=
+            '<img src="'+
+            escapeHtml(imageUrl)+
+            '" alt="" style="'+
+            style.image+
+            '">';
     }
 
-    const videoUrl =
+
+    const videoUrl=
         safePreviewUrl(
             item.video_url
         );
 
-    if (videoUrl) {
-        html +=
-            '<video src="' +
-            escapeHtml(videoUrl) +
-            '" controls preload="metadata" ' +
+    if(videoUrl){
+
+        html+=
+            '<video src="'+
+            escapeHtml(videoUrl)+
+            '" controls preload="metadata" '+
             (
                 style.autoplay
-                    ? "autoplay muted "
-                    : ""
-            ) +
+                ? "autoplay muted "
+                : ""
+            )+
             (
                 style.loop
-                    ? "loop "
-                    : ""
-            ) +
-            'style="' +
-            style.video +
+                ? "loop "
+                : ""
+            )+
+            'style="'+
+            style.video+
             '"></video>';
     }
 
-    const linkUrl =
+
+    const linkUrl=
         safePreviewUrl(
             item.link_url
         );
 
-    if (linkUrl) {
-        html +=
-            '<a href="' +
-            escapeHtml(linkUrl) +
-            '" target="_blank" ' +
-            'rel="noopener noreferrer" ' +
-            'style="' +
-            style.link +
-            '">' +
+    if(linkUrl){
+
+        html+=
+            '<a href="'+
+            escapeHtml(linkUrl)+
+            '" target="_blank" rel="noopener noreferrer" '+
+            'style="'+
+            style.link+
+            '">'+
             escapeHtml(
-                item.button_text ||
+                item.button_text||
                 item.link_url
-            ) +
+            )+
             "</a>";
     }
 
-    html += "</div>";
+
+    html+="</div>";
 
     return html;
 }
 
-function getPreviewBoxStyle(style) {
-    style = style || {};
 
-    const box = [
-        "text-align:" +
+function getPreviewBoxStyle(style){
+
+    style=style||{};
+
+    const box=[
+        "text-align:"+
             escapeHtml(
-                style.text_align ||
+                style.text_align||
                 "center"
             ),
 
-        "color:" +
+        "color:"+
             escapeHtml(
-                style.text_color ||
+                style.text_color||
                 "inherit"
             ),
 
-        "background:" +
+        "background:"+
             escapeHtml(
-                style.background_color ||
+                style.background_color||
                 "transparent"
             ),
 
         style.width
-            ? "width:" +
+            ? "width:"+
               escapeHtml(style.width)
             : "",
 
         style.height
-            ? "min-height:" +
+            ? "min-height:"+
               escapeHtml(style.height)
             : "",
 
         style.padding
-            ? "padding:" +
+            ? "padding:"+
               escapeHtml(style.padding)
             : "",
 
         style.radius
-            ? "border-radius:" +
+            ? "border-radius:"+
               escapeHtml(style.radius)
             : "",
 
         style.shadow
-            ? "box-shadow:" +
+            ? "box-shadow:"+
               escapeHtml(style.shadow)
             : "",
 
         style.border
-            ? "border:" +
+            ? "border:"+
               escapeHtml(style.border)
             : ""
     ]
-        .filter(Boolean)
-        .join(";");
+    .filter(Boolean)
+    .join(";");
 
-    const image =
-        [
+
+    return {
+
+        box:box,
+
+        image:[
             "display:block",
             "max-width:100%",
             "margin:8px auto",
-
             style.image_height
-                ? "height:" +
+                ? "height:"+
                   escapeHtml(
                       style.image_height
                   )
                 : "",
-
-            "object-fit:" +
+            "object-fit:"+
                 escapeHtml(
-                    style.image_fit ||
+                    style.image_fit||
                     "cover"
                 )
         ]
-            .filter(Boolean)
-            .join(";");
+        .filter(Boolean)
+        .join(";"),
 
-    const video =
-        [
+        video:[
             "display:block",
             "width:100%",
             "max-width:100%",
-
             style.video_height
-                ? "height:" +
+                ? "height:"+
                   escapeHtml(
                       style.video_height
                   )
                 : "",
-
-            "object-fit:" +
+            "object-fit:"+
                 escapeHtml(
-                    style.video_fit ||
+                    style.video_fit||
                     "contain"
                 )
         ]
-            .filter(Boolean)
-            .join(";");
+        .filter(Boolean)
+        .join(";"),
 
-    const link =
-        [
+        link:[
             "display:inline-block",
             "margin-top:8px",
             "padding:8px 14px",
             "text-decoration:none",
             "border-radius:8px",
-            "background:" +
+            "background:"+
                 escapeHtml(
-                    style.button_color ||
+                    style.button_color||
                     "#673ab7"
                 ),
-            "color:" +
+            "color:"+
                 escapeHtml(
-                    style.button_text_color ||
+                    style.button_text_color||
                     "#fff"
                 )
-        ].join(";");
+        ].join(";"),
 
-    return {
-        box: box,
-        image: image,
-        video: video,
-        link: link,
         autoplay:
             !!style.video_autoplay,
+
         loop:
             !!style.video_loop
     };
 }
 
-/* =========================================================
-   LIVE PREVIEW FROM FORM
-   ========================================================= */
 
-function updatePreviewFromForm() {
-    const container =
+function updatePreviewFromForm(){
+
+    const container=
         $("homePreview");
 
-    if (!container) {
+    if(!container)
         return;
-    }
 
-    const item = {
-        type:
-            $("itemType")?.value ||
-            "message",
+    const item={
 
         title:
-            $("itemTitle")?.value || "",
+            $("itemTitle")?.value||"",
 
         message:
-            $("itemMessage")?.value || "",
+            $("itemMessage")?.value||"",
 
         description:
-            $("itemDescription")?.value || "",
+            $("itemDescription")?.value||"",
 
         image_url:
-            $("imageUrl")?.value || "",
+            $("imageUrl")?.value||"",
 
         video_url:
-            $("videoUrl")?.value || "",
+            $("videoUrl")?.value||"",
 
         link_url:
-            $("linkUrl")?.value || "",
+            $("linkUrl")?.value||"",
 
         button_text:
-            $("buttonText")?.value || "",
+            $("buttonText")?.value||"",
 
         style:
             getBoxStyleFromForm()
     };
 
-    const current =
-        container.innerHTML;
+    try{
 
-    try {
-        container.innerHTML =
+        container.innerHTML=
             buildPreviewCard(item);
-    } catch (error) {
-        container.innerHTML =
-            current;
-    }
+
+    }catch(error){}
 }
 
-/* =========================================================
-   MEDIA
-   ========================================================= */
 
-async function loadMedia() {
-    const container =
+/* =====================================================
+   MEDIA
+   ===================================================== */
+
+async function loadMedia(){
+
+    const container=
         $("mediaList");
 
-    if (!container) {
+    if(!container)
         return;
-    }
 
-    try {
-        const data =
+    try{
+
+        const data=
             await api(
                 "/api/admin/media"
             );
 
-        const media =
+        const media=
             Array.isArray(data)
-                ? data
-                : (
-                    Array.isArray(data?.media)
-                        ? data.media
-                        : []
-                );
+            ? data
+            : Array.isArray(data?.media)
+            ? data.media
+            : [];
 
         renderMedia(media);
 
-    } catch (error) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "Media load failed" +
+    }catch(error){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "Media load failed"+
             "</div>";
     }
 }
 
-function renderMedia(media) {
-    const container =
+
+function renderMedia(media){
+
+    const container=
         $("mediaList");
 
-    if (!container) {
+    if(!container)
         return;
-    }
 
-    if (!media.length) {
-        container.innerHTML =
-            '<div class="empty-state">' +
-            "No media found" +
+    if(!media.length){
+
+        container.innerHTML=
+            '<div class="empty-state">'+
+            "No media found"+
             "</div>";
 
         return;
     }
 
-    container.innerHTML =
-        media
-            .map(function (file) {
-                const url =
-                    file.url ||
-                    file.public_url ||
-                    file.href ||
+
+    container.innerHTML=
+        media.map(
+            function(file){
+
+                const url=
+                    file.url||
+                    file.public_url||
+                    file.href||
                     "";
 
-                const name =
-                    file.name ||
-                    file.filename ||
+                const name=
+                    file.name||
+                    file.filename||
                     "Media";
 
-                const id =
-                    file.id ||
-                    file.key ||
-                    file.name ||
-                    file.filename ||
+                const id=
+                    file.id||
+                    file.key||
+                    file.name||
+                    file.filename||
                     "";
 
-                let preview = "";
-
-                if (
+                const isVideo=
                     String(
-                        file.content_type ||
-                        ""
-                    ).startsWith("video/")
-                ) {
-                    preview =
-                        '<video src="' +
-                        escapeHtml(url) +
-                        '" controls ' +
-                        'style="max-width:100%;"></video>';
-                } else {
-                    preview =
-                        '<img src="' +
-                        escapeHtml(url) +
-                        '" alt="" ' +
-                        'style="max-width:100%;height:120px;object-fit:cover;">';
-                }
+                        file.content_type||""
+                    )
+                    .startsWith("video/");
 
-                return (
-                    '<div class="media-card">' +
+                const preview=
+                    isVideo
+                    ?
+                    '<video src="'+
+                    escapeHtml(url)+
+                    '" controls></video>'
+                    :
+                    '<img src="'+
+                    escapeHtml(url)+
+                    '" alt="">';
 
-                    preview +
+                return `
+                <div class="media-card">
 
-                    '<div class="media-name">' +
-                    escapeHtml(name) +
-                    "</div>" +
+                    ${preview}
 
-                    '<div class="media-actions">' +
+                    <div class="media-name">
+                        ${escapeHtml(name)}
+                    </div>
 
-                    '<button class="btn btn-primary btn-small" ' +
-                    'onclick="useMediaUrl(\'' +
-                    escapeHtml(url) +
-                    '\')">' +
-                    "Use" +
-                    "</button>" +
+                    <div class="media-actions">
 
-                    '<button class="btn btn-danger btn-small" ' +
-                    'onclick="deleteMedia(\'' +
-                    escapeHtml(id) +
-                    '\')">' +
-                    "Delete" +
-                    "</button>" +
+                        <button
+                            class="btn btn-primary btn-small"
+                            onclick="useMediaUrl('${escapeHtml(url)}')">
+                            Use
+                        </button>
 
-                    "</div>" +
+                        <button
+                            class="btn btn-danger btn-small"
+                            onclick="deleteMedia('${escapeHtml(id)}')">
+                            Delete
+                        </button>
 
-                    "</div>"
-                );
-            })
-            .join("");
+                    </div>
+
+                </div>`;
+            }
+        ).join("");
 }
 
-function useMediaUrl(url) {
-    if (!url) {
-        return;
-    }
 
-    const type =
-        $("itemType")?.value ||
+function useMediaUrl(url){
+
+    if(!url)
+        return;
+
+    const type=
+        $("itemType")?.value||
         "message";
 
-    if (
+    if(
         [
             "video",
-            "youtube"
+            "youtube",
+            "gallery_video",
+            "live_channel"
         ].includes(type)
-    ) {
+    ){
+
         setValue(
             "videoUrl",
             url
         );
-    } else {
+
+    }else{
+
         setValue(
             "imageUrl",
             url
@@ -2564,23 +4092,28 @@ function useMediaUrl(url) {
     );
 }
 
-async function uploadMedia() {
-    const input =
-        $("mediaFile");
 
-    if (
-        !input ||
-        !input.files ||
+async function uploadMedia2(){
+
+    const input=
+        $("mediaUploadFile");
+
+    if(
+        !input||
+        !input.files||
         !input.files.length
-    ) {
+    ){
+
         showToast(
             "پہلے media file منتخب کریں۔",
             "warning"
         );
+
         return;
     }
 
-    const form =
+
+    const form=
         new FormData();
 
     form.append(
@@ -2588,16 +4121,18 @@ async function uploadMedia() {
         input.files[0]
     );
 
-    try {
+
+    try{
+
         await api(
             "/api/admin/media",
             {
-                method: "POST",
-                body: form
+                method:"POST",
+                body:form
             }
         );
 
-        input.value = "";
+        input.value="";
 
         await loadMedia();
 
@@ -2605,34 +4140,35 @@ async function uploadMedia() {
             "Media upload ہو گیا۔"
         );
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            error.message ||
+            error.message||
             "Upload failed",
             "error"
         );
     }
 }
 
-async function deleteMedia(id) {
-    if (!id) {
-        return;
-    }
 
-    const confirmed = confirm(
+async function deleteMedia(id){
+
+    if(!id)
+        return;
+
+    if(!confirm(
         "کیا آپ یہ media delete کرنا چاہتے ہیں؟"
-    );
-
-    if (!confirmed) {
+    ))
         return;
-    }
 
-    try {
+
+    try{
+
         await api(
-            "/api/admin/media/" +
+            "/api/admin/media/"+
             encodeURIComponent(id),
             {
-                method: "DELETE"
+                method:"DELETE"
             }
         );
 
@@ -2642,31 +4178,36 @@ async function deleteMedia(id) {
             "Media delete ہو گیا۔"
         );
 
-    } catch (error) {
+    }catch(error){
+
         showToast(
-            error.message ||
+            error.message||
             "Media delete failed",
             "error"
         );
     }
 }
 
-/* =========================================================
-   SYSTEM STATUS
-   ========================================================= */
 
-async function loadStatus() {
-    const container =
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+async function loadStatus(){
+
+    const container=
         $("systemStatus");
 
-    try {
-        const data =
+    try{
+
+        const data=
             await api(
                 "/api/admin/status"
             );
 
-        if (container) {
-            container.textContent =
+        if(container){
+
+            container.textContent=
                 JSON.stringify(
                     data,
                     null,
@@ -2674,59 +4215,108 @@ async function loadStatus() {
                 );
         }
 
-    } catch (error) {
-        if (container) {
-            container.textContent =
-                error.message ||
+    }catch(error){
+
+        if(container){
+
+            container.textContent=
+                error.message||
                 "Status unavailable";
         }
     }
 }
 
-/* =========================================================
-   AUTO SCHEDULE UPDATE
-   ========================================================= */
+
+/* =====================================================
+   STARTUP
+   ===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function(){
+
+        try{
+
+            const saved=
+                localStorage.getItem(
+                    "mayotube_admin_token"
+                );
+
+            if(saved){
+
+                $("tokenInput").value=
+                    saved;
+
+                $("rememberToken").checked=
+                    true;
+
+                adminToken=saved;
+
+                try{
+
+                    await api(
+                        "/api/admin/status"
+                    );
+
+                    $("loginScreen")
+                        .style.display="none";
+
+                    $("app")
+                        .style.display="block";
+
+                    await initialize();
+
+                    return;
+
+                }catch(error){
+
+                    adminToken="";
+
+                    localStorage.removeItem(
+                        "mayotube_admin_token"
+                    );
+
+                    $("tokenInput").value="";
+                    $("rememberToken").checked=false;
+                }
+            }
+
+            renderTrash();
+            updateStats();
+
+        }catch(error){
+
+            console.error(
+                "Admin startup error:",
+                error
+            );
+
+            showToast(
+                error.message||
+                "Admin Panel startup failed",
+                "error"
+            );
+        }
+    }
+);
+
 
 setInterval(
-    function () {
-        if (
-            document.visibilityState ===
+    function(){
+
+        if(
+            document.visibilityState===
             "visible"
-        ) {
+        ){
+
             updateScheduleStatus();
-            renderItems();
         }
+
     },
     30000
 );
 
-/* =========================================================
-   STARTUP
-   ========================================================= */
-
-(function startup() {
-    const saved =
-        localStorage.getItem(
-            "mayotube_admin_token"
-        );
-
-    if (saved) {
-        const input =
-            $("tokenInput");
-
-        const remember =
-            $("rememberToken");
-
-        if (input) {
-            input.value = saved;
-        }
-
-        if (remember) {
-            remember.checked = true;
-        }
-    }
-
-    renderTrash();
-    updateStats();
-})();
 </script>
+
+</body>
+</html>
