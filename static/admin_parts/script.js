@@ -1,18 +1,68 @@
+let adminToken="";
+
 const $=id=>document.getElementById(id);
 
 async function api(url,opt={}){
+  const headers=opt.body instanceof FormData
+    ? {...(opt.headers||{})}
+    : {"Content-Type":"application/json",...(opt.headers||{})};
+
+  if(adminToken)headers["X-Admin-Token"]=adminToken;
+
   const r=await fetch(url,{
     credentials:"same-origin",
-    headers:{"Content-Type":"application/json",...(opt.headers||{})},
-    ...opt
+    ...opt,
+    headers
   });
+
   const data=await r.json().catch(()=>({}));
+
   if(!r.ok)throw new Error(data.error||data.message||`HTTP ${r.status}`);
   return data;
 }
 
+async function login(){
+  const token=$("tokenInput").value.trim();
+
+  if(!token){
+    $("loginError").textContent="Admin Token درج کریں۔";
+    return;
+  }
+
+  adminToken=token;
+  $("loginError").textContent="";
+
+  try{
+    await api("/api/admin/status");
+
+    if($("rememberToken").checked)
+      localStorage.setItem("mayotube_admin_token",token);
+    else
+      localStorage.removeItem("mayotube_admin_token");
+
+    $("loginScreen").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("connectionText").textContent="Connected";
+
+    updateEditorFields();
+    refreshPreview({});
+  }catch(e){
+    adminToken="";
+    $("loginError").textContent="Login failed: "+e.message;
+  }
+}
+
+function logout(){
+  adminToken="";
+  sessionStorage.removeItem("mayotube_admin_token");
+  $("app").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  $("tokenInput").value="";
+}
+
 function updateEditorFields(){
   const t=$("itemType")?.value||"message";
+
   const m={
     fieldMessage:["message","format"].includes(t),
     fieldDescription:["message","format","donation","advertisement"].includes(t),
@@ -25,6 +75,7 @@ function updateEditorFields(){
     fieldDonation:t==="donation",
     fieldLive:t==="live"
   };
+
   Object.entries(m).forEach(([id,on])=>{
     const e=$(id);
     if(e)e.style.display=on?"":"none";
@@ -84,17 +135,17 @@ async function saveItem(){
     const url=id
       ?"/api/admin/content/"+encodeURIComponent(id)
       :"/api/admin/content";
-    const method=id?"PUT":"POST";
 
     const result=await api(url,{
-      method,
+      method:id?"PUT":"POST",
       body:JSON.stringify(item)
     });
 
     const saved=result.item||result.content||result;
+
     if(saved?.id)$("itemId").value=saved.id;
 
-    refreshPreview(saved.item||saved);
+    refreshPreview(saved);
     alert("Content saved successfully.");
   }catch(e){
     alert("Save failed: "+e.message);
@@ -102,9 +153,12 @@ async function saveItem(){
 }
 
 function newItem(){
-  ["itemId","itemTitle","itemMessage","itemDescription",
-   "imageUrl","videoUrl","audioUrl","linkUrl","buttonText"]
-  .forEach(id=>{if($(id))$(id).value=""});
+  [
+    "itemId","itemTitle","itemMessage","itemDescription",
+    "imageUrl","videoUrl","audioUrl","linkUrl","buttonText"
+  ].forEach(id=>{
+    if($(id))$(id).value="";
+  });
 
   if($("itemType"))$("itemType").value="message";
   if($("itemOrder"))$("itemOrder").value="0";
@@ -119,9 +173,11 @@ function refreshPreview(item={}){
   if(!box)return;
 
   const s=item.style||getStyleControls();
+
   box.innerHTML="";
 
   const card=document.createElement("div");
+
   Object.assign(card.style,{
     width:s.width||"100%",
     minHeight:s.height||"auto",
@@ -158,7 +214,17 @@ function refreshPreview(item={}){
   box.appendChild(card);
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+async function initialize(){
   updateEditorFields();
   refreshPreview({});
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const saved=localStorage.getItem("mayotube_admin_token");
+
+  if(saved){
+    $("tokenInput").value=saved;
+    $("rememberToken").checked=true;
+    login();
+  }
 });
