@@ -119,6 +119,14 @@
         padding: 12px;  
         outline: none;  
         font-size: 14px;  
+    }
+
+    /* Compact Content Type selector */
+    #itemType.compact-type-select {
+        width: 190px;
+        max-width: 100%;
+        padding: 8px 10px;
+        font-size: 13px;
     }  
 
     input:focus,  
@@ -872,7 +880,7 @@
      <div class="editor-grid">
       <!-- TYPE -->
       <div class="input-group">
-       <label for="itemType"> Content Type </label> <select id="itemType" onchange="updateEditorFields()"> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
+       <label for="itemType"> Content Type </label> <select id="itemType" class="compact-type-select" onchange="updateEditorFields()"> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
       </div>
       <!-- ORDER -->
       <div class="input-group">
@@ -1114,7 +1122,7 @@
      <div class="card-subtitle">Drag &amp; Drop کر کے Content کی ترتیب تبدیل کریں۔</div>
      <!-- SEARCH -->
      <div class="toolbar">
-      <input id="searchItems" type="search" placeholder="🔍 Search content..." oninput="renderItems()"> <select id="filterType" onchange="renderItems()"> <option value="all"> All Types </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select> <select id="filterStatus" onchange="renderItems()"> <option value="all"> All Status </option> <option value="enabled"> Enabled </option> <option value="disabled"> Disabled </option> <option value="scheduled"> Scheduled </option> </select>
+      <input id="searchItems" type="search" placeholder="🔍 Search content..." oninput="renderItems()"> <select id="filterType" onchange="renderItems()"> <option value="all"> All Types </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select> <select id="filterStatus" onchange="renderItems()"> <option value="all"> All Status </option> <option value="enabled"> Enabled </option> <option value="disabled"> Disabled </option> <option value="scheduled"> Scheduled </option> </select>
      </div>
      <div id="itemsList" class="items-list"></div>
     </div>
@@ -1576,66 +1584,96 @@ async function toggleHome() {
   
 function updateEditorFields() {  
   
-    const type =  
-        $("itemType").value;  
-  
-    const imageTypes = [  
-        "image",  
-        "donation",  
-        "advertisement"  
-    ];  
-  
-    const videoTypes = [  
-        "video"  
-    ];  
+    const type =
+        $("itemType").value;
 
-    const audioTypes = [  
-        "audio",  
-        "music"  
-    ];  
-  
-    const linkTypes = [  
-        "button",  
-        "link",  
-        "website",  
-        "youtube",  
-        "channel",  
-        "donation",  
-        "advertisement"  
-    ];  
-  
-    $("fieldImageUrl").style.display =  
-        imageTypes.includes(type)  
-            ? ""  
-            : "none";  
-  
-    $("fieldVideoUrl").style.display =  
-        videoTypes.includes(type)  
-            ? ""  
-            : "none";  
+    /* صرف متعلقہ fields دکھائیں؛ API/CRUD کے تمام field names برقرار ہیں۔ */
+    const messageTypes = [
+        "message",
+        "announcement",
+        "notification"
+    ];
 
-    $("fieldAudioUrl").style.display =  
-        audioTypes.includes(type)  
-            ? ""  
-            : "none";  
-  
-    $("fieldLinkUrl").style.display =  
-        linkTypes.includes(type)  
-            ? ""  
-            : "none";  
-  
-    $("fieldButtonText").style.display =  
-        [  
-            "button",  
-            "donation",  
-            "advertisement"  
-        ].includes(type)  
-            ? ""  
-            : "none";  
-  
-}  
-  
-  
+    const imageTypes = [
+        "image",
+        "donation",
+        "advertisement"
+    ];
+
+    const videoTypes = [
+        "video"
+    ];
+
+    const audioTypes = [
+        "audio"
+    ];
+
+    const linkTypes = [
+        "button",
+        "link",
+        "youtube",
+        "website",
+        "channel",
+        "donation",
+        "advertisement"
+    ];
+
+    const descriptionTypes = [
+        ...messageTypes,
+        "image",
+        "video",
+        "youtube",
+        "audio",
+        "button",
+        "link",
+        "donation",
+        "advertisement",
+        "website",
+        "channel"
+    ];
+
+    const buttonTextTypes = [
+        "button",
+        "donation",
+        "advertisement"
+    ];
+
+    $("fieldMessage").style.display =
+        messageTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldDescription").style.display =
+        descriptionTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldImageUrl").style.display =
+        imageTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldVideoUrl").style.display =
+        videoTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldAudioUrl").style.display =
+        audioTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldLinkUrl").style.display =
+        linkTypes.includes(type)
+            ? ""
+            : "none";
+
+    $("fieldButtonText").style.display =
+        buttonTextTypes.includes(type)
+            ? ""
+            : "none";
+
+}
 /* =========================================================  
    BOX DESIGN  
    ========================================================= */  
