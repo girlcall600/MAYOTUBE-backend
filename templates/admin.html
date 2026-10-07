@@ -123,11 +123,71 @@
 
     /* Compact Content Type selector */
     #itemType.compact-type-select {
-        width: 190px;
+        width: 100%;
         max-width: 100%;
-        padding: 8px 10px;
+        padding: 9px 10px;
         font-size: 13px;
-    }  
+        font-weight: 700;
+    }
+
+    .selected-feature-panel {
+        background: #101010;
+        border: 1px solid #292929;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 4px;
+    }
+
+    .selected-feature-title {
+        color: #aaa;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .selected-feature-panel .input-group {
+        margin-bottom: 9px;
+    }
+
+    .selected-feature-panel .input-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .editor-collapse {
+        background: #101010;
+        border: 1px solid #292929;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .editor-collapse summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #ddd;
+    }
+
+    .editor-collapse summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .editor-collapse summary span {
+        color: #777;
+        font-size: 10px;
+        font-weight: 500;
+        margin-right: 6px;
+    }
+
+    .editor-collapse[open] summary {
+        border-bottom: 1px solid #292929;
+    }
+
+    .editor-collapse .design-controls {
+        border: 0;
+        border-radius: 0;
+    }
 
     input:focus,  
     select:focus,  
@@ -882,41 +942,40 @@
       <div class="input-group">
        <label for="itemType"> Content Type </label> <select id="itemType" class="compact-type-select" onchange="updateEditorFields()"> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
       </div>
-      <!-- ORDER -->
-      <div class="input-group">
-       <label for="itemOrder"> Order </label> <input id="itemOrder" type="number" value="0">
-       <div class="muted">Drag &amp; Drop سے بھی ترتیب تبدیل کر سکتے ہیں۔</div>
-      </div>
-      <!-- TITLE -->
-      <div class="input-group full">
-       <label for="itemTitle"> Title </label> <input id="itemTitle" type="text" placeholder="Content title">
-      </div>
-      <!-- MESSAGE -->
-      <div id="fieldMessage" class="input-group full">
-       <label for="itemMessage"> Message </label> <textarea id="itemMessage" placeholder="Message..."></textarea>
-      </div>
-      <!-- DESCRIPTION -->
-      <div id="fieldDescription" class="input-group full">
-       <label for="itemDescription"> Description </label> <textarea id="itemDescription" placeholder="Description..."></textarea>
-      </div>
-      <!-- IMAGE -->
-      <div id="fieldImageUrl" class="input-group full">
-       <label for="imageUrl"> 🖼️ Image URL </label> <input id="imageUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- VIDEO -->
-      <div id="fieldVideoUrl" class="input-group full">
-       <label for="videoUrl"> 🎬 Video URL </label> <input id="videoUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- LINK -->
-      <div id="fieldAudioUrl" class="input-group full">
-       <label for="audioUrl"> 🎵 Audio URL </label> <input id="audioUrl" type="url" placeholder="https://...">
-      </div>
-      <div id="fieldLinkUrl" class="input-group full">
-       <label for="linkUrl"> 🔗 Link URL </label> <input id="linkUrl" type="url" placeholder="https://...">
-      </div>
-      <!-- BUTTON TEXT -->
-      <div id="fieldButtonText" class="input-group">
-       <label for="buttonText"> Button Text </label> <input id="buttonText" type="text" placeholder="Open">
+      <!-- SELECTED FEATURE FIELDS -->
+      <div class="selected-feature-panel full">
+       <div class="selected-feature-title">✨ Selected Feature Fields</div>
+       <!-- TITLE -->
+       <div class="input-group">
+        <label for="itemTitle"> Title </label> <input id="itemTitle" type="text" placeholder="Content title">
+       </div>
+       <!-- MESSAGE -->
+       <div id="fieldMessage" class="input-group full">
+        <label for="itemMessage"> Message </label> <textarea id="itemMessage" placeholder="Message..."></textarea>
+       </div>
+       <!-- DESCRIPTION -->
+       <div id="fieldDescription" class="input-group full">
+        <label for="itemDescription"> Description </label> <textarea id="itemDescription" placeholder="Description..."></textarea>
+       </div>
+       <!-- IMAGE -->
+       <div id="fieldImageUrl" class="input-group full">
+        <label for="imageUrl"> 🖼️ Image URL </label> <input id="imageUrl" type="url" placeholder="https://...">
+       </div>
+       <!-- VIDEO -->
+       <div id="fieldVideoUrl" class="input-group full">
+        <label for="videoUrl"> 🎬 Video URL </label> <input id="videoUrl" type="url" placeholder="https://...">
+       </div>
+       <!-- LINK -->
+       <div id="fieldAudioUrl" class="input-group full">
+        <label for="audioUrl"> 🎵 Audio URL </label> <input id="audioUrl" type="url" placeholder="https://...">
+       </div>
+       <div id="fieldLinkUrl" class="input-group full">
+        <label for="linkUrl"> 🔗 Link URL </label> <input id="linkUrl" type="url" placeholder="https://...">
+       </div>
+       <!-- BUTTON TEXT -->
+       <div id="fieldButtonText" class="input-group">
+        <label for="buttonText"> Button Text </label> <input id="buttonText" type="text" placeholder="Open">
+       </div>
       </div>
       <!-- ENABLE -->
       <div class="input-group">
@@ -934,101 +993,103 @@
                  BOX DESIGN  
                  ================================================= -->
       <div class="input-group full">
-       <div class="design-controls">
-        <div class="design-controls-title">📦 Box Design Controls</div>
-        <!-- BOX STYLE -->
-        <div class="design-section">
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="boxStyle"> Box Style </label> <select id="boxStyle"> <option value="card"> Card </option> <option value="flat"> Flat </option> <option value="transparent"> Transparent </option> </select>
-          </div>
-          <div class="input-group">
-           <label for="boxTextAlign"> Text Alignment </label> <select id="boxTextAlign"> <option value="right"> Right </option> <option value="center"> Center </option> <option value="left"> Left </option> </select>
-          </div>
-         </div>
-        </div>
-        <!-- COLORS -->
-        <div class="design-section">
-         <div class="form-grid">
-          <div class="input-group">
-           <label> Background Color </label>
-           <div class="color-row">
-            <input id="boxBackgroundColor" type="color" value="#181818"> <span id="boxBackgroundColorValue" class="range-value"> #181818 </span>
+       <details class="editor-collapse">
+        <summary>⚙️ Box Design &amp; Schedule <span>اختیاری</span></summary>
+        <div class="design-controls">
+         <div class="design-controls-title">📦 Box Design Controls</div>
+         <!-- BOX STYLE -->
+         <div class="design-section">
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="boxStyle"> Box Style </label> <select id="boxStyle"> <option value="card"> Card </option> <option value="flat"> Flat </option> <option value="transparent"> Transparent </option> </select>
            </div>
-          </div>
-          <div class="input-group">
-           <label> Text Color </label>
-           <div class="color-row">
-            <input id="boxTextColor" type="color" value="#ffffff"> <span id="boxTextColorValue" class="range-value"> #ffffff </span>
+           <div class="input-group">
+            <label for="boxTextAlign"> Text Alignment </label> <select id="boxTextAlign"> <option value="right"> Right </option> <option value="center"> Center </option> <option value="left"> Left </option> </select>
            </div>
           </div>
          </div>
-        </div>
-        <!-- SIZE -->
-        <div class="design-section">
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="boxWidth"> Box Width </label> <input id="boxWidth" type="number" min="10" max="100" value="100">
-           <div class="muted">Percentage</div>
-          </div>
-          <div class="input-group">
-           <label for="boxHeight"> Box Height </label> <input id="boxHeight" type="number" min="0" max="2000" value="0">
-           <div class="muted">0 = Auto</div>
-          </div>
-          <div class="input-group">
-           <label for="boxPadding"> Padding </label> <input id="boxPadding" type="number" min="0" max="100" value="11">
-           <div class="muted">px</div>
-          </div>
-          <div class="input-group">
-           <label for="boxRadius"> Border Radius </label> <input id="boxRadius" type="number" min="0" max="100" value="13">
-           <div class="muted">px</div>
+         <!-- COLORS -->
+         <div class="design-section">
+          <div class="form-grid">
+           <div class="input-group">
+            <label> Background Color </label>
+            <div class="color-row">
+             <input id="boxBackgroundColor" type="color" value="#181818"> <span id="boxBackgroundColorValue" class="range-value"> #181818 </span>
+            </div>
+           </div>
+           <div class="input-group">
+            <label> Text Color </label>
+            <div class="color-row">
+             <input id="boxTextColor" type="color" value="#ffffff"> <span id="boxTextColorValue" class="range-value"> #ffffff </span>
+            </div>
+           </div>
           </div>
          </div>
-        </div>
-        <!-- SHADOW -->
-        <div class="design-section">
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="boxShadow"> Shadow </label> <select id="boxShadow"> <option value="none"> None </option> <option value="small"> Small </option> <option value="medium" selected> Medium </option> <option value="large"> Large </option> </select>
-          </div>
-          <div class="input-group">
-           <label for="boxBorder"> Border </label> <select id="boxBorder"> <option value="none"> None </option> <option value="subtle" selected> Subtle </option> <option value="strong"> Strong </option> </select>
+         <!-- SIZE -->
+         <div class="design-section">
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="boxWidth"> Box Width </label> <input id="boxWidth" type="number" min="10" max="100" value="100">
+            <div class="muted">Percentage</div>
+           </div>
+           <div class="input-group">
+            <label for="boxHeight"> Box Height </label> <input id="boxHeight" type="number" min="0" max="2000" value="0">
+            <div class="muted">0 = Auto</div>
+           </div>
+           <div class="input-group">
+            <label for="boxPadding"> Padding </label> <input id="boxPadding" type="number" min="0" max="100" value="11">
+            <div class="muted">px</div>
+           </div>
+           <div class="input-group">
+            <label for="boxRadius"> Border Radius </label> <input id="boxRadius" type="number" min="0" max="100" value="13">
+            <div class="muted">px</div>
+           </div>
           </div>
          </div>
-        </div>
-        <!-- IMAGE CONTROLS -->
-        <div class="design-section">
-         <div style="  
+         <!-- SHADOW -->
+         <div class="design-section">
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="boxShadow"> Shadow </label> <select id="boxShadow"> <option value="none"> None </option> <option value="small"> Small </option> <option value="medium" selected> Medium </option> <option value="large"> Large </option> </select>
+           </div>
+           <div class="input-group">
+            <label for="boxBorder"> Border </label> <select id="boxBorder"> <option value="none"> None </option> <option value="subtle" selected> Subtle </option> <option value="strong"> Strong </option> </select>
+           </div>
+          </div>
+         </div>
+         <!-- IMAGE CONTROLS -->
+         <div class="design-section">
+          <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🖼️ Image Controls</div>
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="imageHeight"> Image Height </label> <input id="imageHeight" type="number" min="0" max="1500" value="230">
-           <div class="muted">px</div>
-          </div>
-          <div class="input-group">
-           <label for="boxImageFit"> Image Fit </label> <select id="boxImageFit"> <option value="cover"> Cover </option> <option value="contain"> Contain </option> <option value="fill"> Fill </option> </select>
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="imageHeight"> Image Height </label> <input id="imageHeight" type="number" min="0" max="1500" value="230">
+            <div class="muted">px</div>
+           </div>
+           <div class="input-group">
+            <label for="boxImageFit"> Image Fit </label> <select id="boxImageFit"> <option value="cover"> Cover </option> <option value="contain"> Contain </option> <option value="fill"> Fill </option> </select>
+           </div>
           </div>
          </div>
-        </div>
-        <!-- VIDEO CONTROLS -->
-        <div class="design-section">
-         <div style="  
+         <!-- VIDEO CONTROLS -->
+         <div class="design-section">
+          <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🎬 Video Controls</div>
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="videoHeight"> Video Height </label> <input id="videoHeight" type="number" min="0" max="1500" value="240">
-          </div>
-          <div class="input-group">
-           <label for="videoFit"> Video Fit </label> <select id="videoFit"> <option value="contain"> Contain </option> <option value="cover"> Cover </option> </select>
-          </div>
-          <div class="input-group">
-           <label> Autoplay </label> <label style="  
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="videoHeight"> Video Height </label> <input id="videoHeight" type="number" min="0" max="1500" value="240">
+           </div>
+           <div class="input-group">
+            <label for="videoFit"> Video Fit </label> <select id="videoFit"> <option value="contain"> Contain </option> <option value="cover"> Cover </option> </select>
+           </div>
+           <div class="input-group">
+            <label> Autoplay </label> <label style="  
                                         display:flex;  
                                         gap:8px;  
                                         align-items:center;  
@@ -1036,9 +1097,9 @@
                                         background:#0d0d0d;  
                                         border-radius:9px;  
                                     "> <input id="videoAutoplay" type="checkbox" style="width:auto"> Autoplay </label>
-          </div>
-          <div class="input-group">
-           <label> Loop </label> <label style="  
+           </div>
+           <div class="input-group">
+            <label> Loop </label> <label style="  
                                         display:flex;  
                                         gap:8px;  
                                         align-items:center;  
@@ -1046,51 +1107,52 @@
                                         background:#0d0d0d;  
                                         border-radius:9px;  
                                     "> <input id="videoLoop" type="checkbox" style="width:auto"> Loop </label>
+           </div>
           </div>
          </div>
-        </div>
-        <!-- BUTTON LINK -->
-        <div class="design-section">
-         <div style="  
+         <!-- BUTTON LINK -->
+         <div class="design-section">
+          <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🔗 Button / Link Controls</div>
-         <div class="form-grid">
-          <div class="input-group">
-           <label for="buttonColor"> Button Color </label>
-           <div class="color-row">
-            <input id="buttonColor" type="color" value="#6d28d9"> <span id="buttonColorValue" class="range-value"> #6d28d9 </span>
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="buttonColor"> Button Color </label>
+            <div class="color-row">
+             <input id="buttonColor" type="color" value="#6d28d9"> <span id="buttonColorValue" class="range-value"> #6d28d9 </span>
+            </div>
            </div>
-          </div>
-          <div class="input-group">
-           <label for="buttonTextColor"> Button Text Color </label>
-           <div class="color-row">
-            <input id="buttonTextColor" type="color" value="#ffffff"> <span id="buttonTextColorValue" class="range-value"> #ffffff </span>
+           <div class="input-group">
+            <label for="buttonTextColor"> Button Text Color </label>
+            <div class="color-row">
+             <input id="buttonTextColor" type="color" value="#ffffff"> <span id="buttonTextColorValue" class="range-value"> #ffffff </span>
+            </div>
            </div>
           </div>
          </div>
-        </div>
-        <!-- SCHEDULE -->
-        <div class="design-section">
-         <div style="  
+         <!-- SCHEDULE -->
+         <div class="design-section">
+          <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">📅 Scheduled Show / Hide</div>
-         <div class="schedule-box">
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="scheduleStart"> Show From </label> <input id="scheduleStart" type="datetime-local">
+          <div class="schedule-box">
+           <div class="form-grid">
+            <div class="input-group">
+             <label for="scheduleStart"> Show From </label> <input id="scheduleStart" type="datetime-local">
+            </div>
+            <div class="input-group">
+             <label for="scheduleEnd"> Hide After </label> <input id="scheduleEnd" type="datetime-local">
+            </div>
            </div>
-           <div class="input-group">
-            <label for="scheduleEnd"> Hide After </label> <input id="scheduleEnd" type="datetime-local">
-           </div>
+           <div id="scheduleStatus" class="schedule-status">No schedule</div>
           </div>
-          <div id="scheduleStatus" class="schedule-status">No schedule</div>
          </div>
         </div>
-       </div>
+       </details>
       </div>
       <!-- SAVE -->
       <div class="input-group full">
@@ -1673,6 +1735,20 @@ function updateEditorFields() {
             ? ""
             : "none";
 
+    /* منتخب feature کے fields ہی visible رہیں؛ باقی مکمل hide رہیں۔ */
+    const featureFields = document.querySelectorAll(
+        "#fieldMessage, #fieldDescription, #fieldImageUrl, #fieldVideoUrl, #fieldAudioUrl, #fieldLinkUrl, #fieldButtonText"
+    );
+
+    featureFields.forEach(field => {
+        field.setAttribute(
+            "aria-hidden",
+            field.style.display === "none"
+                ? "true"
+                : "false"
+        );
+    });
+
 }
 /* =========================================================  
    BOX DESIGN  
@@ -2042,9 +2118,6 @@ function clearForm() {
     $("itemType").value =  
         "message";  
   
-    $("itemOrder").value =  
-        getNextOrder();  
-  
     $("itemTitle").value =  
         "";  
   
@@ -2170,11 +2243,6 @@ function editItem(id) {
         item.type ||  
         "message";  
   
-    $("itemOrder").value =  
-        item.order !== undefined  
-            ? item.order  
-            : 0;  
-  
     $("itemTitle").value =  
         item.title || "";  
   
@@ -2239,6 +2307,17 @@ async function saveItem() {
   
     const id =  
         $("itemId").value.trim();  
+
+    const existingItem = id
+        ? cmsContent.items.find(
+            x => String(x.id) === String(id)
+        )
+        : null;
+
+    const itemOrder = existingItem &&
+        existingItem.order !== undefined
+            ? Number(existingItem.order)
+            : getNextOrder();
   
     const item = {  
   
@@ -2270,9 +2349,7 @@ async function saveItem() {
             $("buttonText").value.trim(),  
   
         order:  
-            Number(  
-                $("itemOrder").value || 0  
-            ),  
+            itemOrder,
   
         enabled:  
             $("itemEnabled").checked,  
