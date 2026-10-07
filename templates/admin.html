@@ -1,171 +1,2732 @@
-/* ============================================================
-   SAVE ORDER — FIXED
-   ہر موجودہ Content Item کا order الگ محفوظ کیا جاتا ہے۔
-   اس سے "Order does not match content count" ختم ہوگا۔
-   ============================================================ */
+<script>
+"use strict";
 
-async function saveOrder(){
+/* =========================================================
+   MAYOTUBE ADMIN PANEL
+   Corrected CMS + Recycle Bin + Home Control
+   ========================================================= */
+
+let adminToken = "";
+let cmsContent = {
+    items: [],
+    home_enabled: true
+};
+
+let draggedId = null;
+
+const TRASH_KEY = "mayotube_admin_recycle_bin_v2";
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
+
+function showToast(message, type = "success") {
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.style.cssText =
+            "position:fixed;bottom:25px;left:50%;transform:translateX(-50%);" +
+            "z-index:99999;padding:13px 20px;border-radius:10px;" +
+            "color:#fff;font-size:14px;max-width:90%;text-align:center;" +
+            "box-shadow:0 8px 25px rgba(0,0,0,.35);";
+
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+
+    if (type === "error") {
+        toast.style.background = "#c62828";
+    } else if (type === "warning") {
+        toast.style.background = "#ef6c00";
+    } else {
+        toast.style.background = "#2e7d32";
+    }
+
+    toast.style.display = "block";
+
+    clearTimeout(toast._timer);
+
+    toast._timer = setTimeout(function () {
+        toast.style.display = "none";
+    }, 3000);
+}
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function safePreviewUrl(url) {
+    if (!url) {
+        return "";
+    }
+
+    const value = String(url).trim();
+
+    if (
+        value.startsWith("https://") ||
+        value.startsWith("http://") ||
+        value.startsWith("/") ||
+        value.startsWith("blob:")
+    ) {
+        return value;
+    }
+
+    return "";
+}
+
+function deepClone(value) {
+    try {
+        return JSON.parse(JSON.stringify(value));
+    } catch (e) {
+        return value;
+    }
+}
+
+/* =========================================================
+   API
+   ========================================================= */
+
+async function api(path, options = {}) {
+    const headers = new Headers(options.headers || {});
+
+    if (adminToken) {
+        headers.set("Authorization", "Bearer " + adminToken);
+    }
+
+    if (!(options.body instanceof FormData)) {
+        headers.set("Content-Type", "application/json");
+    }
+
+    options.headers = headers;
+
+    const response = await fetch(path, options);
+
+    let data;
+
+    const contentType =
+        response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        const text = await response.text();
+
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            data = text;
+        }
+    }
+
+    if (!response.ok) {
+        let message = "Request failed";
+
+        if (data && typeof data === "object") {
+            message =
+                data.error ||
+                data.message ||
+                data.detail ||
+                message;
+        } else if (typeof data === "string" && data.trim()) {
+            message = data;
+        }
+
+        throw new Error(message);
+    }
+
+    return data;
+}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function login() {
+    const input = $("tokenInput");
+
+    if (!input) {
+        return;
+    }
+
+    const token = input.value.trim();
+
+    if (!token) {
+        showLoginError("Admin token درج کریں۔");
+        return;
+    }
+
+    adminToken = token;
+
+    const remember =
+        $("rememberToken") &&
+        $("rememberToken").checked;
+
+    if (remember) {
+        localStorage.setItem(
+            "mayotube_admin_token",
+            token
+        );
+    } else {
+        localStorage.removeItem(
+            "mayotube_admin_token"
+        );
+    }
+
+    try {
+        await api("/api/admin/status");
+
+        const loginScreen = $("loginScreen");
+        const app = $("app");
+
+        if (loginScreen) {
+            loginScreen.style.display = "none";
+        }
+
+        if (app) {
+            app.style.display = "block";
+        }
+
+        await initialize();
+
+    } catch (error) {
+        adminToken = "";
+
+        showLoginError(
+            error.message || "Invalid admin token"
+        );
+    }
+}
+
+function showLoginError(message) {
+    const box = $("loginError");
+
+    if (box) {
+        box.textContent = message;
+        box.style.display = "block";
+    } else {
+        showToast(message, "error");
+    }
+}
+
+function logout() {
+    adminToken = "";
+
+    sessionStorage.removeItem(
+        "mayotube_admin_token"
+    );
+
+    localStorage.removeItem(
+        "mayotube_admin_token"
+    );
+
+    const app = $("app");
+    const loginScreen = $("loginScreen");
+
+    if (app) {
+        app.style.display = "none";
+    }
+
+    if (loginScreen) {
+        loginScreen.style.display = "flex";
+    }
+
+    const tokenInput = $("tokenInput");
+
+    if (tokenInput) {
+        tokenInput.value = "";
+    }
+}
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+async function initialize() {
+    addEventListeners();
+
+    clearForm();
+
+    await loadAll();
+}
+
+function addEventListeners() {
+    const colorInputs = [
+        ["boxBackgroundColor", "boxBackgroundColorValue"],
+        ["boxTextColor", "boxTextColorValue"],
+        ["buttonColor", "buttonColorValue"],
+        ["buttonTextColor", "buttonTextColorValue"]
+    ];
+
+    colorInputs.forEach(function (pair) {
+        const color = $(pair[0]);
+        const value = $(pair[1]);
+
+        if (!color || !value) {
+            return;
+        }
+
+        color.oninput = function () {
+            value.value = color.value;
+            loadHomePreview();
+        };
+    });
+
+    const scheduleStart = $("scheduleStart");
+    const scheduleEnd = $("scheduleEnd");
+
+    if (scheduleStart) {
+        scheduleStart.addEventListener(
+            "change",
+            updateScheduleStatus
+        );
+    }
+
+    if (scheduleEnd) {
+        scheduleEnd.addEventListener(
+            "change",
+            updateScheduleStatus
+        );
+    }
+
+    const itemType = $("itemType");
+
+    if (itemType) {
+        itemType.addEventListener(
+            "change",
+            updateEditorFields
+        );
+    }
+
+    const search = $("searchItems");
+
+    if (search) {
+        search.addEventListener(
+            "input",
+            renderItems
+        );
+    }
+
+    const filterType = $("filterType");
+
+    if (filterType) {
+        filterType.addEventListener(
+            "change",
+            renderItems
+        );
+    }
+
+    const filterStatus = $("filterStatus");
+
+    if (filterStatus) {
+        filterStatus.addEventListener(
+            "change",
+            renderItems
+        );
+    }
+}
+
+/* =========================================================
+   LOAD ALL
+   ========================================================= */
+
+async function loadAll() {
+    try {
+        await loadContent();
+        await loadHomePreview();
+        await loadMedia();
+        await loadStatus();
+
+        setConnectionStatus(true);
+
+    } catch (error) {
+        console.error(error);
+
+        setConnectionStatus(false);
+
+        showToast(
+            error.message || "Server connection failed",
+            "error"
+        );
+    }
+}
+
+function setConnectionStatus(connected) {
+    const text = $("connectionText");
+
+    if (!text) {
+        return;
+    }
+
+    text.textContent =
+        connected ? "Connected" : "Disconnected";
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+async function loadContent() {
+    const data = await api(
+        "/api/admin/content"
+    );
+
+    if (Array.isArray(data)) {
+        cmsContent = {
+            items: data,
+            home_enabled: true
+        };
+    } else {
+        cmsContent = data || {};
+
+        if (!Array.isArray(cmsContent.items)) {
+            cmsContent.items = [];
+        }
+    }
+
+    cmsContent.items.forEach(function (item, index) {
+        if (item.order === undefined) {
+            item.order = index + 1;
+        }
+
+        if (item.enabled === undefined) {
+            item.enabled = true;
+        }
+
+        if (!item.style) {
+            item.style = {};
+        }
+
+        if (!item.schedule) {
+            item.schedule = {};
+        }
+    });
+
+    cmsContent.items.sort(function (a, b) {
+        return Number(a.order || 0) -
+               Number(b.order || 0);
+    });
+
+    const homeEnabled =
+        cmsContent.home_enabled !== false;
+
+    const homeToggle = $("homeEnabled");
+
+    if (homeToggle) {
+        homeToggle.checked = homeEnabled;
+    }
+
+    updateHomeStatus(homeEnabled);
+
+    updateStats();
+
+    renderItems();
+
+    renderTrash();
+}
+
+function updateHomeStatus(enabled) {
+    const text = $("homeStatusText");
+
+    if (!text) {
+        return;
+    }
+
+    text.textContent =
+        enabled ? "HOME ON" : "HOME OFF";
+}
+
+/* =========================================================
+   HOME TOGGLE
+   ========================================================= */
+
+async function toggleHome() {
+    const checkbox = $("homeEnabled");
+
+    if (!checkbox) {
+        return;
+    }
+
+    const enabled = checkbox.checked;
+
+    checkbox.disabled = true;
+
+    try {
+        const result = await api(
+            "/api/admin/home/toggle",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    enabled: enabled
+                })
+            }
+        );
+
+        if (
+            result &&
+            typeof result.home_enabled !== "undefined"
+        ) {
+            cmsContent.home_enabled =
+                result.home_enabled;
+        } else {
+            cmsContent.home_enabled = enabled;
+        }
+
+        updateHomeStatus(
+            cmsContent.home_enabled !== false
+        );
+
+        await loadHomePreview();
+
+        showToast(
+            enabled
+                ? "Home ON کر دیا گیا۔"
+                : "Home OFF کر دیا گیا۔"
+        );
+
+    } catch (error) {
+        checkbox.checked = !enabled;
+
+        updateHomeStatus(!enabled);
+
+        showToast(
+            error.message ||
+            "Home toggle failed",
+            "error"
+        );
+
+    } finally {
+        checkbox.disabled = false;
+    }
+}
+
+/* =========================================================
+   EDITOR FIELDS
+   ========================================================= */
+
+function updateEditorFields() {
+    const typeElement = $("itemType");
+
+    if (!typeElement) {
+        return;
+    }
+
+    const type = typeElement.value;
+
+    const imageField = $("imageUrl");
+    const videoField = $("videoUrl");
+    const linkField = $("linkUrl");
+    const buttonField = $("buttonText");
+
+    if (imageField) {
+        imageField.closest(".form-group")?.style &&
+        (imageField.closest(".form-group").style.display =
+            [
+                "image",
+                "donation",
+                "advertisement"
+            ].includes(type)
+                ? ""
+                : "none");
+    }
+
+    if (videoField) {
+        videoField.closest(".form-group")?.style &&
+        (videoField.closest(".form-group").style.display =
+            [
+                "video",
+                "youtube"
+            ].includes(type)
+                ? ""
+                : "none");
+    }
+
+    if (linkField) {
+        linkField.closest(".form-group")?.style &&
+        (linkField.closest(".form-group").style.display =
+            [
+                "button",
+                "link",
+                "website",
+                "channel",
+                "donation",
+                "advertisement"
+            ].includes(type)
+                ? ""
+                : "none");
+    }
+
+    if (buttonField) {
+        buttonField.closest(".form-group")?.style &&
+        (buttonField.closest(".form-group").style.display =
+            type === "button" ||
+            type === "donation" ||
+            type === "advertisement"
+                ? ""
+                : "none");
+    }
+
+    updatePreviewFromForm();
+}
+
+/* =========================================================
+   FORM STYLE
+   ========================================================= */
+
+function getBoxStyleFromForm() {
+    return {
+        box_style:
+            $("boxStyle")?.value || "default",
+
+        text_align:
+            $("boxTextAlign")?.value || "center",
+
+        background_color:
+            $("boxBackgroundColor")?.value ||
+            $("boxBackgroundColorValue")?.value ||
+            "",
+
+        text_color:
+            $("boxTextColor")?.value ||
+            $("boxTextColorValue")?.value ||
+            "",
+
+        width:
+            $("boxWidth")?.value || "",
+
+        height:
+            $("boxHeight")?.value || "",
+
+        padding:
+            $("boxPadding")?.value || "",
+
+        radius:
+            $("boxRadius")?.value || "",
+
+        shadow:
+            $("boxShadow")?.value || "",
+
+        border:
+            $("boxBorder")?.value || "",
+
+        image_height:
+            $("imageHeight")?.value || "",
+
+        image_fit:
+            $("boxImageFit")?.value || "cover",
+
+        video_height:
+            $("videoHeight")?.value || "",
+
+        video_fit:
+            $("videoFit")?.value || "contain",
+
+        video_autoplay:
+            $("videoAutoplay")?.checked || false,
+
+        video_loop:
+            $("videoLoop")?.checked || false,
+
+        button_color:
+            $("buttonColor")?.value ||
+            $("buttonColorValue")?.value ||
+            "",
+
+        button_text_color:
+            $("buttonTextColor")?.value ||
+            $("buttonTextColorValue")?.value ||
+            ""
+    };
+}
+
+function applyBoxStyle(style) {
+    style = style || {};
+
+    setValue(
+        "boxStyle",
+        style.box_style || "default"
+    );
+
+    setValue(
+        "boxTextAlign",
+        style.text_align || "center"
+    );
+
+    setColorValue(
+        "boxBackgroundColor",
+        "boxBackgroundColorValue",
+        style.background_color
+    );
+
+    setColorValue(
+        "boxTextColor",
+        "boxTextColorValue",
+        style.text_color
+    );
+
+    setValue("boxWidth", style.width || "");
+    setValue("boxHeight", style.height || "");
+    setValue("boxPadding", style.padding || "");
+    setValue("boxRadius", style.radius || "");
+    setValue("boxShadow", style.shadow || "");
+    setValue("boxBorder", style.border || "");
+
+    setValue(
+        "imageHeight",
+        style.image_height || ""
+    );
+
+    setValue(
+        "boxImageFit",
+        style.image_fit || "cover"
+    );
+
+    setValue(
+        "videoHeight",
+        style.video_height || ""
+    );
+
+    setValue(
+        "videoFit",
+        style.video_fit || "contain"
+    );
+
+    setChecked(
+        "videoAutoplay",
+        !!style.video_autoplay
+    );
+
+    setChecked(
+        "videoLoop",
+        !!style.video_loop
+    );
+
+    setColorValue(
+        "buttonColor",
+        "buttonColorValue",
+        style.button_color
+    );
+
+    setColorValue(
+        "buttonTextColor",
+        "buttonTextColorValue",
+        style.button_text_color
+    );
+}
+
+function setValue(id, value) {
+    const element = $(id);
+
+    if (element) {
+        element.value = value;
+    }
+}
+
+function setChecked(id, value) {
+    const element = $(id);
+
+    if (element) {
+        element.checked = !!value;
+    }
+}
+
+function setColorValue(colorId, valueId, value) {
+    if (!value) {
+        return;
+    }
+
+    setValue(colorId, value);
+    setValue(valueId, value);
+}
+
+/* =========================================================
+   CLEAR FORM
+   ========================================================= */
+
+function clearForm() {
+    const fields = [
+        "itemId",
+        "itemTitle",
+        "itemMessage",
+        "itemDescription",
+        "imageUrl",
+        "videoUrl",
+        "linkUrl",
+        "buttonText",
+        "scheduleStart",
+        "scheduleEnd"
+    ];
+
+    fields.forEach(function (id) {
+        const element = $(id);
+
+        if (element) {
+            element.value = "";
+        }
+    });
+
+    setValue("itemType", "message");
+    setValue("itemOrder", getNextOrder());
+
+    setChecked("itemEnabled", true);
+
+    applyBoxStyle({});
+
+    updateEditorFields();
+    updateScheduleStatus();
+
+    updatePreviewFromForm();
+}
+
+function getNextOrder() {
+    if (
+        !cmsContent ||
+        !Array.isArray(cmsContent.items) ||
+        cmsContent.items.length === 0
+    ) {
+        return 1;
+    }
+
+    return (
+        Math.max.apply(
+            null,
+            cmsContent.items.map(function (item) {
+                return Number(item.order || 0);
+            })
+        ) + 1
+    );
+}
+
+/* =========================================================
+   EDIT ITEM
+   ========================================================= */
+
+function editItem(id) {
+    const item =
+        cmsContent.items.find(function (x) {
+            return String(x.id) === String(id);
+        });
+
+    if (!item) {
+        showToast(
+            "Item نہیں ملا۔",
+            "error"
+        );
+        return;
+    }
+
+    setValue("itemId", item.id || "");
+    setValue("itemType", item.type || "message");
+    setValue(
+        "itemOrder",
+        item.order || 1
+    );
+
+    setValue(
+        "itemTitle",
+        item.title || ""
+    );
+
+    setValue(
+        "itemMessage",
+        item.message || ""
+    );
+
+    setValue(
+        "itemDescription",
+        item.description || ""
+    );
+
+    setValue(
+        "imageUrl",
+        item.image_url || ""
+    );
+
+    setValue(
+        "videoUrl",
+        item.video_url || ""
+    );
+
+    setValue(
+        "linkUrl",
+        item.link_url || ""
+    );
+
+    setValue(
+        "buttonText",
+        item.button_text || ""
+    );
+
+    setChecked(
+        "itemEnabled",
+        item.enabled !== false
+    );
+
+    applyBoxStyle(item.style || {});
+
+    setValue(
+        "scheduleStart",
+        item.schedule?.start || ""
+    );
+
+    setValue(
+        "scheduleEnd",
+        item.schedule?.end || ""
+    );
+
+    updateEditorFields();
+    updateScheduleStatus();
+
+    updatePreviewFromForm();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+/* =========================================================
+   SAVE ITEM
+   ========================================================= */
+
+async function saveItem() {
+    const id =
+        $("itemId")?.value.trim() || "";
+
+    const item = {
+        type:
+            $("itemType")?.value ||
+            "message",
+
+        title:
+            $("itemTitle")?.value.trim() ||
+            "",
+
+        message:
+            $("itemMessage")?.value ||
+            "",
+
+        description:
+            $("itemDescription")?.value ||
+            "",
+
+        image_url:
+            $("imageUrl")?.value.trim() ||
+            "",
+
+        video_url:
+            $("videoUrl")?.value.trim() ||
+            "",
+
+        link_url:
+            $("linkUrl")?.value.trim() ||
+            "",
+
+        button_text:
+            $("buttonText")?.value.trim() ||
+            "",
+
+        order:
+            Number(
+                $("itemOrder")?.value || 1
+            ),
+
+        enabled:
+            $("itemEnabled")?.checked !== false,
+
+        style:
+            getBoxStyleFromForm(),
+
+        schedule: {
+            start:
+                $("scheduleStart")?.value || "",
+
+            end:
+                $("scheduleEnd")?.value || ""
+        }
+    };
+
+    try {
+        if (id) {
+            await api(
+                "/api/admin/content/" +
+                encodeURIComponent(id),
+                {
+                    method: "PUT",
+                    body: JSON.stringify(item)
+                }
+            );
+
+            showToast(
+                "Content update ہو گیا۔"
+            );
+
+        } else {
+            await api(
+                "/api/admin/content",
+                {
+                    method: "POST",
+                    body: JSON.stringify(item)
+                }
+            );
+
+            showToast(
+                "نیا content بن گیا۔"
+            );
+        }
+
+        clearForm();
+
+        await loadContent();
+        await loadHomePreview();
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Save failed",
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   TOGGLE ITEM
+   ========================================================= */
+
+async function toggleItem(id) {
+    const item =
+        cmsContent.items.find(function (x) {
+            return String(x.id) === String(id);
+        });
+
+    if (!item) {
+        return;
+    }
+
+    const enabled =
+        item.enabled === false;
+
+    try {
+        await api(
+            "/api/admin/content/" +
+            encodeURIComponent(id) +
+            "/toggle",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    enabled: enabled
+                })
+            }
+        );
+
+        await loadContent();
+        await loadHomePreview();
+
+        showToast(
+            enabled
+                ? "Content enabled."
+                : "Content disabled."
+        );
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Toggle failed",
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   DUPLICATE
+   ========================================================= */
+
+async function duplicateItem(id) {
+    const item =
+        cmsContent.items.find(function (x) {
+            return String(x.id) === String(id);
+        });
+
+    if (!item) {
+        return;
+    }
+
+    const copy = deepClone(item);
+
+    delete copy.id;
+
+    copy.title =
+        (copy.title || "Content") +
+        " Copy";
+
+    copy.order = getNextOrder();
+
+    try {
+        await api(
+            "/api/admin/content",
+            {
+                method: "POST",
+                body: JSON.stringify(copy)
+            }
+        );
+
+        await loadContent();
+        await loadHomePreview();
+
+        showToast(
+            "Content duplicate ہو گیا۔"
+        );
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Duplicate failed",
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   RECYCLE BIN
+   ========================================================= */
+
+function getTrash() {
+    try {
+        const raw =
+            localStorage.getItem(TRASH_KEY);
+
+        if (!raw) {
+            return [];
+        }
+
+        const data = JSON.parse(raw);
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    } catch (error) {
+        console.error(
+            "Recycle Bin read error:",
+            error
+        );
+
+        return [];
+    }
+}
+
+function setTrash(items) {
+    localStorage.setItem(
+        TRASH_KEY,
+        JSON.stringify(items)
+    );
+
+    updateStats();
+    renderTrash();
+}
+
+/*
+ * IMPORTANT:
+ * Delete is now a REAL backend delete.
+ *
+ * First:
+ * 1. Find item
+ * 2. Save complete copy locally
+ * 3. DELETE from backend
+ * 4. Only after successful backend delete,
+ *    put copy into Recycle Bin
+ */
+async function moveToTrash(id) {
+    const item =
+        cmsContent.items.find(function (x) {
+            return String(x.id) === String(id);
+        });
+
+    if (!item) {
+        showToast(
+            "Delete ہونے والا item نہیں ملا۔",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        "کیا آپ اس content کو Recycle Bin میں بھیجنا چاہتے ہیں؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const backup = {
+        deletedAt:
+            new Date().toISOString(),
+
+        item:
+            deepClone(item)
+    };
+
+    try {
+        /*
+         * IMPORTANT:
+         * Backend must support:
+         * DELETE /api/admin/content/<id>
+         */
+        await api(
+            "/api/admin/content/" +
+            encodeURIComponent(id),
+            {
+                method: "DELETE"
+            }
+        );
+
+        const trash = getTrash();
+
+        const alreadyExists =
+            trash.some(function (entry) {
+                return String(
+                    entry.item?.id
+                ) === String(id);
+            });
+
+        if (!alreadyExists) {
+            trash.unshift(backup);
+        }
+
+        setTrash(trash);
+
+        await loadContent();
+        await loadHomePreview();
+
+        showToast(
+            "Content Recycle Bin میں منتقل ہو گیا۔"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "Delete failed: " +
+            (error.message || "Server error"),
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   RESTORE
+   ========================================================= */
+
+async function restoreTrash(index) {
+    const trash = getTrash();
+
+    if (
+        index < 0 ||
+        index >= trash.length
+    ) {
+        return;
+    }
+
+    const entry = trash[index];
+
+    if (!entry || !entry.item) {
+        return;
+    }
+
+    const item =
+        deepClone(entry.item);
+
+    /*
+     * Existing ID can conflict if backend still
+     * contains it. Since moveToTrash permanently
+     * deleted it, normally this ID is available.
+     */
+
+    try {
+        await api(
+            "/api/admin/content",
+            {
+                method: "POST",
+                body: JSON.stringify(item)
+            }
+        );
+
+        trash.splice(index, 1);
+
+        setTrash(trash);
+
+        await loadContent();
+        await loadHomePreview();
+
+        showToast(
+            "Content restore ہو گیا۔"
+        );
+
+    } catch (error) {
+        showToast(
+            "Restore failed: " +
+            (error.message || "Server error"),
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   PERMANENT DELETE
+   ========================================================= */
+
+function permanentDeleteTrash(index) {
+    const trash = getTrash();
+
+    if (
+        index < 0 ||
+        index >= trash.length
+    ) {
+        return;
+    }
+
+    const entry = trash[index];
+
+    const name =
+        entry?.item?.title ||
+        entry?.item?.id ||
+        "this item";
+
+    const confirmed = confirm(
+        "یہ item Recycle Bin سے مستقل طور پر حذف ہو جائے گا۔\n\n" +
+        name +
+        "\n\nکیا آپ واقعی Delete کرنا چاہتے ہیں؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    trash.splice(index, 1);
+
+    setTrash(trash);
+
+    showToast(
+        "Recycle Bin item مستقل طور پر حذف ہو گیا۔"
+    );
+}
+
+/* =========================================================
+   EMPTY TRASH
+   ========================================================= */
+
+function emptyTrash() {
+    const trash = getTrash();
+
+    if (trash.length === 0) {
+        showToast(
+            "Recycle Bin پہلے ہی خالی ہے۔",
+            "warning"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        "Recycle Bin کے تمام items مستقل طور پر حذف ہو جائیں گے۔\n\nکیا آپ واقعی Empty Recycle Bin کرنا چاہتے ہیں؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    /*
+     * Items have already been permanently removed
+     * from backend by moveToTrash().
+     *
+     * Therefore only local trash records are cleared.
+     */
+    localStorage.removeItem(TRASH_KEY);
+
+    updateStats();
+    renderTrash();
+
+    showToast(
+        "Recycle Bin مکمل طور پر خالی کر دیا گیا۔"
+    );
+}
+
+/* =========================================================
+   RECYCLE BIN RENDER
+   ========================================================= */
+
+function renderTrash() {
+    const container = $("trashList");
+
+    if (!container) {
+        return;
+    }
+
+    const trash = getTrash();
+
+    if (trash.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "🗑️ Recycle Bin خالی ہے" +
+            "</div>";
+
+        updateStats();
+
+        return;
+    }
+
+    container.innerHTML = trash
+        .map(function (entry, index) {
+            const item =
+                entry.item || {};
+
+            const title =
+                item.title ||
+                item.message ||
+                item.id ||
+                "Untitled";
+
+            const type =
+                item.type ||
+                "unknown";
+
+            const date =
+                entry.deletedAt
+                    ? new Date(
+                        entry.deletedAt
+                    ).toLocaleString()
+                    : "";
+
+            return (
+                '<div class="trash-item">' +
+
+                '<div class="trash-info">' +
+
+                '<div class="trash-title">' +
+                escapeHtml(title) +
+                "</div>" +
+
+                '<div class="trash-meta">' +
+                escapeHtml(type) +
+                " • " +
+                escapeHtml(date) +
+                "</div>" +
+
+                "</div>" +
+
+                '<div class="trash-actions">' +
+
+                '<button class="btn btn-success btn-small" ' +
+                'onclick="restoreTrash(' +
+                index +
+                ')">' +
+                "↩️ Restore" +
+                "</button>" +
+
+                '<button class="btn btn-danger btn-small" ' +
+                'onclick="permanentDeleteTrash(' +
+                index +
+                ')">' +
+                "❌ Permanent Delete" +
+                "</button>" +
+
+                "</div>" +
+
+                "</div>"
+            );
+        })
+        .join("");
+
+    updateStats();
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+function updateStats() {
+    const items =
+        Array.isArray(cmsContent.items)
+            ? cmsContent.items
+            : [];
+
+    const enabled =
+        items.filter(function (item) {
+            return item.enabled !== false;
+        }).length;
+
+    const disabled =
+        items.length - enabled;
+
+    const trash =
+        getTrash().length;
+
+    setText(
+        "statTotal",
+        items.length
+    );
+
+    setText(
+        "statEnabled",
+        enabled
+    );
+
+    setText(
+        "statDisabled",
+        disabled
+    );
+
+    setText(
+        "statTrash",
+        trash
+    );
+}
+
+function setText(id, value) {
+    const element = $(id);
+
+    if (element) {
+        element.textContent =
+            String(value);
+    }
+}
+
+/* =========================================================
+   FILTER
+   ========================================================= */
+
+function getFilteredItems() {
+    let items =
+        Array.isArray(cmsContent.items)
+            ? cmsContent.items.slice()
+            : [];
+
+    const search =
+        $("searchItems")?.value
+            .trim()
+            .toLowerCase() || "";
+
+    const type =
+        $("filterType")?.value || "all";
 
     const status =
-        document.getElementById(
-            "orderStatus"
+        $("filterStatus")?.value || "all";
+
+    if (search) {
+        items = items.filter(
+            function (item) {
+                const text = [
+                    item.title,
+                    item.message,
+                    item.description,
+                    item.type,
+                    item.link_url,
+                    item.video_url,
+                    item.image_url
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return text.includes(search);
+            }
         );
+    }
+
+    if (type !== "all") {
+        items = items.filter(
+            function (item) {
+                return item.type === type;
+            }
+        );
+    }
+
+    if (status === "enabled") {
+        items = items.filter(
+            function (item) {
+                return item.enabled !== false;
+            }
+        );
+    }
+
+    if (status === "disabled") {
+        items = items.filter(
+            function (item) {
+                return item.enabled === false;
+            }
+        );
+    }
+
+    if (status === "scheduled") {
+        items = items.filter(
+            function (item) {
+                return hasSchedule(item);
+            }
+        );
+    }
+
+    return items;
+}
+
+/* =========================================================
+   RENDER ITEMS
+   ========================================================= */
+
+function renderItems() {
+    const container = $("itemsList");
+
+    if (!container) {
+        return;
+    }
 
     const items =
-        Array.from(
-            document.querySelectorAll(
-                "#contentList .item"
-            )
+        getFilteredItems();
+
+    if (items.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "کوئی content نہیں ملا۔" +
+            "</div>";
+
+        setupDragAndDrop();
+
+        updateStats();
+
+        return;
+    }
+
+    container.innerHTML =
+        items
+            .map(buildItemCard)
+            .join("");
+
+    setupDragAndDrop();
+
+    updateStats();
+}
+
+function buildItemCard(item) {
+    const enabled =
+        item.enabled !== false;
+
+    const schedule =
+        hasSchedule(item);
+
+    const scheduleActive =
+        isScheduleActive(item);
+
+    return (
+        '<div class="item-card" ' +
+        'draggable="true" ' +
+        'data-id="' +
+        escapeHtml(item.id) +
+        '">' +
+
+        '<div class="item-card-content">' +
+
+        '<div class="item-title">' +
+        escapeHtml(
+            item.title ||
+            item.message ||
+            "Untitled"
+        ) +
+        "</div>" +
+
+        '<div class="item-meta">' +
+        "Type: " +
+        escapeHtml(
+            item.type || "message"
+        ) +
+        " • Order: " +
+        escapeHtml(
+            item.order || 0
+        ) +
+        "</div>" +
+
+        '<div class="item-status">' +
+
+        (
+            enabled
+                ? "🟢 Enabled"
+                : "🔴 Disabled"
+        ) +
+
+        (
+            schedule
+                ? (
+                    scheduleActive
+                        ? " • ⏱️ Active"
+                        : " • ⏸️ Scheduled"
+                )
+                : ""
+        ) +
+
+        "</div>" +
+
+        "</div>" +
+
+        '<div class="item-actions">' +
+
+        '<button class="btn btn-primary btn-small" ' +
+        'onclick="editItem(\'' +
+        escapeHtml(item.id) +
+        '\')">' +
+        "✏️ Edit" +
+        "</button>" +
+
+        '<button class="btn btn-success btn-small" ' +
+        'onclick="toggleItem(\'' +
+        escapeHtml(item.id) +
+        '\')">' +
+        (
+            enabled
+                ? "🔴 Disable"
+                : "🟢 Enable"
+        ) +
+        "</button>" +
+
+        '<button class="btn btn-blue btn-small" ' +
+        'onclick="duplicateItem(\'' +
+        escapeHtml(item.id) +
+        '\')">' +
+        "📋 Duplicate" +
+        "</button>" +
+
+        '<button class="btn btn-danger btn-small" ' +
+        'onclick="moveToTrash(\'' +
+        escapeHtml(item.id) +
+        '\')">' +
+        "🗑️ Delete" +
+        "</button>" +
+
+        "</div>" +
+
+        "</div>"
+    );
+}
+
+/* =========================================================
+   DRAG AND DROP
+   ========================================================= */
+
+function setupDragAndDrop() {
+    const cards =
+        document.querySelectorAll(
+            ".item-card"
         );
 
-    if(!items.length){
+    cards.forEach(function (card) {
+        card.addEventListener(
+            "dragstart",
+            function () {
+                draggedId =
+                    card.dataset.id;
 
+                card.classList.add(
+                    "dragging"
+                );
+            }
+        );
+
+        card.addEventListener(
+            "dragend",
+            function () {
+                card.classList.remove(
+                    "dragging"
+                );
+
+                draggedId = null;
+            }
+        );
+
+        card.addEventListener(
+            "dragover",
+            function (event) {
+                event.preventDefault();
+
+                card.classList.add(
+                    "drag-over"
+                );
+            }
+        );
+
+        card.addEventListener(
+            "dragleave",
+            function () {
+                card.classList.remove(
+                    "drag-over"
+                );
+            }
+        );
+
+        card.addEventListener(
+            "drop",
+            async function (event) {
+                event.preventDefault();
+
+                card.classList.remove(
+                    "drag-over"
+                );
+
+                const targetId =
+                    card.dataset.id;
+
+                if (
+                    !draggedId ||
+                    draggedId === targetId
+                ) {
+                    return;
+                }
+
+                await reorderItems(
+                    draggedId,
+                    targetId
+                );
+            }
+        );
+    });
+}
+
+async function reorderItems(
+    draggedIdValue,
+    targetId
+) {
+    const items =
+        cmsContent.items
+            .map(deepClone);
+
+    const from =
+        items.findIndex(function (item) {
+            return String(item.id) ===
+                String(draggedIdValue);
+        });
+
+    const to =
+        items.findIndex(function (item) {
+            return String(item.id) ===
+                String(targetId);
+        });
+
+    if (
+        from < 0 ||
+        to < 0
+    ) {
+        return;
+    }
+
+    const moved =
+        items.splice(from, 1)[0];
+
+    items.splice(to, 0, moved);
+
+    items.forEach(
+        function (item, index) {
+            item.order =
+                index + 1;
+        }
+    );
+
+    try {
+        for (const item of items) {
+            await api(
+                "/api/admin/content/" +
+                encodeURIComponent(item.id),
+                {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        type: item.type,
+                        title: item.title,
+                        message: item.message,
+                        description:
+                            item.description,
+                        image_url:
+                            item.image_url,
+                        video_url:
+                            item.video_url,
+                        link_url:
+                            item.link_url,
+                        button_text:
+                            item.button_text,
+                        order: item.order,
+                        enabled:
+                            item.enabled !== false,
+                        style:
+                            item.style || {},
+                        schedule:
+                            item.schedule || {}
+                    })
+                }
+            );
+        }
+
+        cmsContent.items = items;
+
+        renderItems();
+
+        await loadHomePreview();
+
+        showToast(
+            "Order update ہو گیا۔"
+        );
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Reorder failed",
+            "error"
+        );
+
+        await loadContent();
+    }
+}
+
+/* =========================================================
+   SCHEDULE
+   ========================================================= */
+
+function hasSchedule(item) {
+    return !!(
+        item &&
+        item.schedule &&
+        (
+            item.schedule.start ||
+            item.schedule.end
+        )
+    );
+}
+
+function isScheduleActive(item) {
+    if (!hasSchedule(item)) {
+        return true;
+    }
+
+    const now =
+        new Date();
+
+    const start =
+        item.schedule.start
+            ? new Date(
+                item.schedule.start
+            )
+            : null;
+
+    const end =
+        item.schedule.end
+            ? new Date(
+                item.schedule.end
+            )
+            : null;
+
+    if (
+        start &&
+        isNaN(start.getTime())
+    ) {
+        return false;
+    }
+
+    if (
+        end &&
+        isNaN(end.getTime())
+    ) {
+        return false;
+    }
+
+    if (
+        start &&
+        now < start
+    ) {
+        return false;
+    }
+
+    if (
+        end &&
+        now > end
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+function updateScheduleStatus() {
+    const startValue =
+        $("scheduleStart")?.value || "";
+
+    const endValue =
+        $("scheduleEnd")?.value || "";
+
+    const status =
+        $("scheduleStatus");
+
+    if (!status) {
+        return;
+    }
+
+    if (!startValue && !endValue) {
         status.textContent =
-            "No content to reorder.";
+            "No schedule";
+
+        return;
+    }
+
+    const now =
+        new Date();
+
+    const start =
+        startValue
+            ? new Date(startValue)
+            : null;
+
+    const end =
+        endValue
+            ? new Date(endValue)
+            : null;
+
+    if (
+        start &&
+        isNaN(start.getTime())
+    ) {
+        status.textContent =
+            "Invalid start date";
+
+        return;
+    }
+
+    if (
+        end &&
+        isNaN(end.getTime())
+    ) {
+        status.textContent =
+            "Invalid end date";
+
+        return;
+    }
+
+    if (
+        start &&
+        now < start
+    ) {
+        status.textContent =
+            "Scheduled";
+
+        return;
+    }
+
+    if (
+        end &&
+        now > end
+    ) {
+        status.textContent =
+            "Expired";
 
         return;
     }
 
     status.textContent =
-        "Saving homepage order...";
+        "Active";
+}
 
-    try{
+/* =========================================================
+   HOME PREVIEW
+   ========================================================= */
 
-        await getSession();
+async function loadHomePreview() {
+    const container =
+        $("homePreview");
 
-        /*
-         * موجودہ screen order حاصل کریں۔
-         */
-        const orderedItems =
-            items.map(
-                (item,index)=>({
-
-                    id:
-                        Number(
-                            item.dataset.id
-                        ),
-
-                    order:
-                        index + 1
-
-                })
-            );
-
-        /*
-         * Invalid IDs روکیں۔
-         */
-        const invalid =
-            orderedItems.some(
-                item =>
-                    !Number.isFinite(item.id) ||
-                    item.id <= 0
-            );
-
-        if(invalid){
-
-            throw new Error(
-                "ایک یا زیادہ Content Items کا ID درست نہیں ہے۔"
-            );
-        }
-
-        /*
-         * Backend کے موجودہ content record کو
-         * ایک ایک کرکے update کریں۔
-         *
-         * اس طریقے میں backend سے صرف order بدلتا ہے۔
-         * باقی content محفوظ رہتا ہے۔
-         */
-        for(
-            const ordered of orderedItems
-        ){
-
-            const current =
-                await api(
-                    "/api/admin/content"
-                );
-
-            const currentItems =
-                Array.isArray(
-                    current.items
-                )
-                    ? current.items
-                    : [];
-
-            const existing =
-                currentItems.find(
-                    x =>
-                        Number(x.id) ===
-                        Number(ordered.id)
-                );
-
-            if(!existing){
-
-                throw new Error(
-                    "Content #"+
-                    ordered.id+
-                    " موجود نہیں ہے۔"
-                );
-            }
-
-            await api(
-                "/api/admin/content/update",
-                {
-                    method:"POST",
-
-                    body:
-                        JSON.stringify({
-
-                            id:
-                                Number(
-                                    existing.id
-                                ),
-
-                            type:
-                                existing.type ||
-                                "message",
-
-                            message:
-                                existing.message ||
-                                "",
-
-                            button_text:
-                                existing.button_text ||
-                                "",
-
-                            button_url:
-                                existing.button_url ||
-                                "",
-
-                            media_url:
-                                existing.media_url ||
-                                "",
-
-                            enabled:
-                                existing.enabled !== false,
-
-                            order:
-                                ordered.order
-
-                        })
-                }
-            );
-
-        }
-
-        status.textContent =
-            "✓ Homepage order saved successfully.";
-
-        /*
-         * Backend سے دوبارہ تازہ ترتیب لائیں۔
-         */
-        await loadContent();
-
-    }catch(e){
-
-        status.textContent =
-            "Order save failed: "+
-            e.message;
-
+    if (!container) {
+        return;
     }
 
+    try {
+        const data =
+            await api(
+                "/api/home-content"
+            );
+
+        renderHomePreview(data);
+
+    } catch (error) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "Home preview unavailable" +
+            "</div>";
+    }
 }
+
+function renderHomePreview(data) {
+    const container =
+        $("homePreview");
+
+    if (!container) {
+        return;
+    }
+
+    let items = [];
+
+    if (Array.isArray(data)) {
+        items = data;
+    } else if (
+        data &&
+        Array.isArray(data.items)
+    ) {
+        items = data.items;
+    }
+
+    items =
+        items
+            .filter(function (item) {
+                return item.enabled !== false;
+            })
+            .filter(function (item) {
+                return isScheduleActive(item);
+            })
+            .sort(function (a, b) {
+                return Number(a.order || 0) -
+                    Number(b.order || 0);
+            });
+
+    if (items.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "Home پر کوئی enabled content نہیں ہے۔" +
+            "</div>";
+
+        return;
+    }
+
+    container.innerHTML =
+        items
+            .map(buildPreviewCard)
+            .join("");
+}
+
+function buildPreviewCard(item) {
+    const style =
+        getPreviewBoxStyle(
+            item.style || {}
+        );
+
+    let html =
+        '<div class="preview-card" style="' +
+        style.box +
+        '">';
+
+    if (item.title) {
+        html +=
+            '<div style="font-weight:bold;' +
+            'margin-bottom:8px;">' +
+            escapeHtml(item.title) +
+            "</div>";
+    }
+
+    if (item.message) {
+        html +=
+            '<div style="margin-bottom:8px;">' +
+            escapeHtml(item.message)
+                .replace(/\n/g, "<br>") +
+            "</div>";
+    }
+
+    if (item.description) {
+        html +=
+            '<div style="opacity:.85;' +
+            'margin-bottom:8px;">' +
+            escapeHtml(
+                item.description
+            ) +
+            "</div>";
+    }
+
+    const imageUrl =
+        safePreviewUrl(
+            item.image_url
+        );
+
+    if (imageUrl) {
+        html +=
+            '<img src="' +
+            escapeHtml(imageUrl) +
+            '" style="' +
+            style.image +
+            '" alt="">';
+    }
+
+    const videoUrl =
+        safePreviewUrl(
+            item.video_url
+        );
+
+    if (videoUrl) {
+        html +=
+            '<video src="' +
+            escapeHtml(videoUrl) +
+            '" controls preload="metadata" ' +
+            (
+                style.autoplay
+                    ? "autoplay muted "
+                    : ""
+            ) +
+            (
+                style.loop
+                    ? "loop "
+                    : ""
+            ) +
+            'style="' +
+            style.video +
+            '"></video>';
+    }
+
+    const linkUrl =
+        safePreviewUrl(
+            item.link_url
+        );
+
+    if (linkUrl) {
+        html +=
+            '<a href="' +
+            escapeHtml(linkUrl) +
+            '" target="_blank" ' +
+            'rel="noopener noreferrer" ' +
+            'style="' +
+            style.link +
+            '">' +
+            escapeHtml(
+                item.button_text ||
+                item.link_url
+            ) +
+            "</a>";
+    }
+
+    html += "</div>";
+
+    return html;
+}
+
+function getPreviewBoxStyle(style) {
+    style = style || {};
+
+    const box = [
+        "text-align:" +
+            escapeHtml(
+                style.text_align ||
+                "center"
+            ),
+
+        "color:" +
+            escapeHtml(
+                style.text_color ||
+                "inherit"
+            ),
+
+        "background:" +
+            escapeHtml(
+                style.background_color ||
+                "transparent"
+            ),
+
+        style.width
+            ? "width:" +
+              escapeHtml(style.width)
+            : "",
+
+        style.height
+            ? "min-height:" +
+              escapeHtml(style.height)
+            : "",
+
+        style.padding
+            ? "padding:" +
+              escapeHtml(style.padding)
+            : "",
+
+        style.radius
+            ? "border-radius:" +
+              escapeHtml(style.radius)
+            : "",
+
+        style.shadow
+            ? "box-shadow:" +
+              escapeHtml(style.shadow)
+            : "",
+
+        style.border
+            ? "border:" +
+              escapeHtml(style.border)
+            : ""
+    ]
+        .filter(Boolean)
+        .join(";");
+
+    const image =
+        [
+            "display:block",
+            "max-width:100%",
+            "margin:8px auto",
+
+            style.image_height
+                ? "height:" +
+                  escapeHtml(
+                      style.image_height
+                  )
+                : "",
+
+            "object-fit:" +
+                escapeHtml(
+                    style.image_fit ||
+                    "cover"
+                )
+        ]
+            .filter(Boolean)
+            .join(";");
+
+    const video =
+        [
+            "display:block",
+            "width:100%",
+            "max-width:100%",
+
+            style.video_height
+                ? "height:" +
+                  escapeHtml(
+                      style.video_height
+                  )
+                : "",
+
+            "object-fit:" +
+                escapeHtml(
+                    style.video_fit ||
+                    "contain"
+                )
+        ]
+            .filter(Boolean)
+            .join(";");
+
+    const link =
+        [
+            "display:inline-block",
+            "margin-top:8px",
+            "padding:8px 14px",
+            "text-decoration:none",
+            "border-radius:8px",
+            "background:" +
+                escapeHtml(
+                    style.button_color ||
+                    "#673ab7"
+                ),
+            "color:" +
+                escapeHtml(
+                    style.button_text_color ||
+                    "#fff"
+                )
+        ].join(";");
+
+    return {
+        box: box,
+        image: image,
+        video: video,
+        link: link,
+        autoplay:
+            !!style.video_autoplay,
+        loop:
+            !!style.video_loop
+    };
+}
+
+/* =========================================================
+   LIVE PREVIEW FROM FORM
+   ========================================================= */
+
+function updatePreviewFromForm() {
+    const container =
+        $("homePreview");
+
+    if (!container) {
+        return;
+    }
+
+    const item = {
+        type:
+            $("itemType")?.value ||
+            "message",
+
+        title:
+            $("itemTitle")?.value || "",
+
+        message:
+            $("itemMessage")?.value || "",
+
+        description:
+            $("itemDescription")?.value || "",
+
+        image_url:
+            $("imageUrl")?.value || "",
+
+        video_url:
+            $("videoUrl")?.value || "",
+
+        link_url:
+            $("linkUrl")?.value || "",
+
+        button_text:
+            $("buttonText")?.value || "",
+
+        style:
+            getBoxStyleFromForm()
+    };
+
+    const current =
+        container.innerHTML;
+
+    try {
+        container.innerHTML =
+            buildPreviewCard(item);
+    } catch (error) {
+        container.innerHTML =
+            current;
+    }
+}
+
+/* =========================================================
+   MEDIA
+   ========================================================= */
+
+async function loadMedia() {
+    const container =
+        $("mediaList");
+
+    if (!container) {
+        return;
+    }
+
+    try {
+        const data =
+            await api(
+                "/api/admin/media"
+            );
+
+        const media =
+            Array.isArray(data)
+                ? data
+                : (
+                    Array.isArray(data?.media)
+                        ? data.media
+                        : []
+                );
+
+        renderMedia(media);
+
+    } catch (error) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "Media load failed" +
+            "</div>";
+    }
+}
+
+function renderMedia(media) {
+    const container =
+        $("mediaList");
+
+    if (!container) {
+        return;
+    }
+
+    if (!media.length) {
+        container.innerHTML =
+            '<div class="empty-state">' +
+            "No media found" +
+            "</div>";
+
+        return;
+    }
+
+    container.innerHTML =
+        media
+            .map(function (file) {
+                const url =
+                    file.url ||
+                    file.public_url ||
+                    file.href ||
+                    "";
+
+                const name =
+                    file.name ||
+                    file.filename ||
+                    "Media";
+
+                const id =
+                    file.id ||
+                    file.key ||
+                    file.name ||
+                    file.filename ||
+                    "";
+
+                let preview = "";
+
+                if (
+                    String(
+                        file.content_type ||
+                        ""
+                    ).startsWith("video/")
+                ) {
+                    preview =
+                        '<video src="' +
+                        escapeHtml(url) +
+                        '" controls ' +
+                        'style="max-width:100%;"></video>';
+                } else {
+                    preview =
+                        '<img src="' +
+                        escapeHtml(url) +
+                        '" alt="" ' +
+                        'style="max-width:100%;height:120px;object-fit:cover;">';
+                }
+
+                return (
+                    '<div class="media-card">' +
+
+                    preview +
+
+                    '<div class="media-name">' +
+                    escapeHtml(name) +
+                    "</div>" +
+
+                    '<div class="media-actions">' +
+
+                    '<button class="btn btn-primary btn-small" ' +
+                    'onclick="useMediaUrl(\'' +
+                    escapeHtml(url) +
+                    '\')">' +
+                    "Use" +
+                    "</button>" +
+
+                    '<button class="btn btn-danger btn-small" ' +
+                    'onclick="deleteMedia(\'' +
+                    escapeHtml(id) +
+                    '\')">' +
+                    "Delete" +
+                    "</button>" +
+
+                    "</div>" +
+
+                    "</div>"
+                );
+            })
+            .join("");
+}
+
+function useMediaUrl(url) {
+    if (!url) {
+        return;
+    }
+
+    const type =
+        $("itemType")?.value ||
+        "message";
+
+    if (
+        [
+            "video",
+            "youtube"
+        ].includes(type)
+    ) {
+        setValue(
+            "videoUrl",
+            url
+        );
+    } else {
+        setValue(
+            "imageUrl",
+            url
+        );
+    }
+
+    updateEditorFields();
+    updatePreviewFromForm();
+
+    showToast(
+        "Media URL editor میں شامل ہو گیا۔"
+    );
+}
+
+async function uploadMedia() {
+    const input =
+        $("mediaFile");
+
+    if (
+        !input ||
+        !input.files ||
+        !input.files.length
+    ) {
+        showToast(
+            "پہلے media file منتخب کریں۔",
+            "warning"
+        );
+        return;
+    }
+
+    const form =
+        new FormData();
+
+    form.append(
+        "file",
+        input.files[0]
+    );
+
+    try {
+        await api(
+            "/api/admin/media",
+            {
+                method: "POST",
+                body: form
+            }
+        );
+
+        input.value = "";
+
+        await loadMedia();
+
+        showToast(
+            "Media upload ہو گیا۔"
+        );
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Upload failed",
+            "error"
+        );
+    }
+}
+
+async function deleteMedia(id) {
+    if (!id) {
+        return;
+    }
+
+    const confirmed = confirm(
+        "کیا آپ یہ media delete کرنا چاہتے ہیں؟"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        await api(
+            "/api/admin/media/" +
+            encodeURIComponent(id),
+            {
+                method: "DELETE"
+            }
+        );
+
+        await loadMedia();
+
+        showToast(
+            "Media delete ہو گیا۔"
+        );
+
+    } catch (error) {
+        showToast(
+            error.message ||
+            "Media delete failed",
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   SYSTEM STATUS
+   ========================================================= */
+
+async function loadStatus() {
+    const container =
+        $("systemStatus");
+
+    try {
+        const data =
+            await api(
+                "/api/admin/status"
+            );
+
+        if (container) {
+            container.textContent =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
+        }
+
+    } catch (error) {
+        if (container) {
+            container.textContent =
+                error.message ||
+                "Status unavailable";
+        }
+    }
+}
+
+/* =========================================================
+   AUTO SCHEDULE UPDATE
+   ========================================================= */
+
+setInterval(
+    function () {
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+            updateScheduleStatus();
+            renderItems();
+        }
+    },
+    30000
+);
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+(function startup() {
+    const saved =
+        localStorage.getItem(
+            "mayotube_admin_token"
+        );
+
+    if (saved) {
+        const input =
+            $("tokenInput");
+
+        const remember =
+            $("rememberToken");
+
+        if (input) {
+            input.value = saved;
+        }
+
+        if (remember) {
+            remember.checked = true;
+        }
+    }
+
+    renderTrash();
+    updateStats();
+})();
+</script>
