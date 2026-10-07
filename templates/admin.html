@@ -1,4322 +1,1978 @@
-<!DOCTYPE html>
-<html lang="ur" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MAYOTUBE ADMIN</title>
-
-<style>
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    background:#121212;
-    color:#fff;
-    font-family:Arial,sans-serif;
-}
-
-button,
-input,
-textarea,
-select{
-    font-family:inherit;
-}
-
-button{
-    cursor:pointer;
-}
-
-.container{
-    width:min(1100px,94%);
-    margin:20px auto 50px;
-}
-
-.header{
-    background:#181818;
-    border-radius:14px;
-    padding:18px;
-    margin-bottom:18px;
-    border:1px solid #292929;
-}
-
-.header h1{
-    margin:0 0 6px;
-    color:#FFD600;
-    font-size:25px;
-}
-
-.header p{
-    margin:0;
-    color:#aaa;
-}
-
-.card{
-    background:#181818;
-    border:1px solid #292929;
-    border-radius:14px;
-    padding:18px;
-    margin-bottom:18px;
-}
-
-.card h2{
-    margin:0 0 15px;
-    color:#FFD600;
-    font-size:20px;
-}
-
-.status{
-    padding:12px;
-    background:#101010;
-    border-radius:10px;
-    color:#aaa;
-    white-space:pre-wrap;
-    word-break:break-word;
-}
-
-.form-group{
-    margin-bottom:14px;
-}
-
-.form-group label{
-    display:block;
-    margin-bottom:7px;
-    color:#ddd;
-    font-size:14px;
-}
-
-input,
-textarea,
-select{
-    width:100%;
-    background:#101010;
-    color:#fff;
-    border:1px solid #3a3a3a;
-    border-radius:9px;
-    padding:11px;
-    outline:none;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-    border-color:#FFD600;
-}
-
-textarea{
-    min-height:100px;
-    resize:vertical;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-}
-
-.type-buttons{
-    display:grid;
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:8px;
-    margin-bottom:18px;
-}
-
-.type-button{
-    background:#252525;
-    color:#fff;
-    border:1px solid #3a3a3a;
-    border-radius:9px;
-    padding:10px 5px;
-}
-
-.type-button.active{
-    background:#FFD600;
-    color:#000;
-    border-color:#FFD600;
-}
-
-.actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-}
-
-.btn{
-    border:0;
-    border-radius:8px;
-    padding:10px 14px;
-    color:#fff;
-}
-
-.btn-primary{
-    background:#1976d2;
-}
-
-.btn-success{
-    background:#2e7d32;
-}
-
-.btn-danger{
-    background:#c62828;
-}
-
-.btn-warning{
-    background:#ef6c00;
-}
-
-.btn-blue{
-    background:#3949ab;
-}
-
-.btn-gray{
-    background:#424242;
-}
-
-.btn-small{
-    padding:7px 10px;
-    font-size:12px;
-}
-
-.checkbox-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:10px 0;
-}
-
-.checkbox-row input{
-    width:auto;
-}
-
-#app{
-    display:none;
-}
-
-#loginScreen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.login-box{
-    width:min(430px,100%);
-    background:#181818;
-    border:1px solid #292929;
-    border-radius:16px;
-    padding:25px;
-}
-
-.login-box h1{
-    color:#FFD600;
-    margin-top:0;
-}
-
-.error{
-    display:none;
-    background:#c62828;
-    color:#fff;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:12px;
-}
-
-.connection{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-}
-
-#connectionText{
-    color:#76ff03;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-    margin-bottom:18px;
-}
-
-.stat{
-    background:#101010;
-    border-radius:10px;
-    padding:15px;
-    text-align:center;
-}
-
-.stat strong{
-    display:block;
-    font-size:24px;
-    color:#FFD600;
-}
-
-.stat span{
-    color:#aaa;
-    font-size:12px;
-}
-
-.item-card,
-.trash-item,
-.media-card{
-    background:#101010;
-    border:1px solid #303030;
-    border-radius:10px;
-    padding:12px;
-    margin-bottom:10px;
-}
-
-.item-card{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:center;
-}
-
-.item-card.dragging{
-    opacity:.4;
-}
-
-.item-card.drag-over{
-    border-color:#FFD600;
-}
-
-.item-title,
-.trash-title{
-    font-weight:bold;
-    color:#fff;
-    margin-bottom:5px;
-}
-
-.item-meta,
-.item-status,
-.trash-meta{
-    color:#999;
-    font-size:12px;
-}
-
-.item-actions,
-.trash-actions,
-.media-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-}
-
-.empty-state{
-    padding:25px;
-    text-align:center;
-    color:#888;
-    background:#101010;
-    border-radius:10px;
-}
-
-.preview{
-    background:#101010;
-    border-radius:10px;
-    padding:15px;
-    min-height:80px;
-}
-
-.media-grid{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:10px;
-}
-
-.media-card img,
-.media-card video{
-    width:100%;
-    max-height:180px;
-    object-fit:cover;
-    border-radius:7px;
-}
-
-.media-name{
-    margin:8px 0;
-    color:#ddd;
-    word-break:break-all;
-}
-
-.color-row{
-    display:grid;
-    grid-template-columns:70px 1fr;
-    gap:8px;
-}
-
-.color-row input[type=color]{
-    padding:3px;
-    height:42px;
-}
-
-.hidden{
-    display:none!important;
-}
-
-@media(max-width:700px){
-    .grid,
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-    .type-buttons{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .item-card{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .media-grid{
-        grid-template-columns:1fr;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<!-- =====================================================
-     LOGIN
-     ===================================================== -->
-
-<div id="loginScreen">
-
-    <div class="login-box">
-
-        <h1>MAYOTUBE ADMIN</h1>
-
-        <p style="color:#aaa">
-            Owner Control Panel
-        </p>
-
-        <div id="loginError" class="error"></div>
-
-        <div class="form-group">
-            <label>Admin Token</label>
-            <input
-                id="tokenInput"
-                type="password"
-                autocomplete="off"
-                placeholder="Admin token درج کریں">
-        </div>
-
-        <div class="checkbox-row">
-            <input
-                id="rememberToken"
-                type="checkbox">
-            <label for="rememberToken">
-                Token یاد رکھیں
-            </label>
-        </div>
-
-        <button
-            class="btn btn-primary"
-            style="width:100%"
-            onclick="login()">
-            Login
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     APP
-     ===================================================== -->
-
-<div id="app">
-
-<div class="container">
-
-<div class="header">
-
-    <h1>MAYOTUBE ADMIN</h1>
-
-    <p>Owner Control Panel</p>
-
-    <div
-        class="connection"
-        style="margin-top:12px">
-
-        <span>
-            System Status:
-            <b id="connectionText">
-                Checking...
-            </b>
-        </span>
-
-        <button
-            class="btn btn-danger btn-small"
-            onclick="logout()">
-            Logout
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     SYSTEM STATUS
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>System Status</h2>
-
-    <div
-        id="systemStatus"
-        class="status">
-        Checking...
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     HOME CONTROL
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>Homepage Control</h2>
-
-    <div class="checkbox-row">
-
-        <input
-            id="homeEnabled"
-            type="checkbox"
-            checked
-            onchange="toggleHome()">
-
-        <label for="homeEnabled">
-            <b id="homeStatusText">
-                HOME ON
-            </b>
-        </label>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     STATS
-     ===================================================== -->
-
-<div class="stats">
-
-    <div class="stat">
-        <strong id="statTotal">0</strong>
-        <span>Total</span>
-    </div>
-
-    <div class="stat">
-        <strong id="statEnabled">0</strong>
-        <span>Enabled</span>
-    </div>
-
-    <div class="stat">
-        <strong id="statDisabled">0</strong>
-        <span>Disabled</span>
-    </div>
-
-    <div class="stat">
-        <strong id="statTrash">0</strong>
-        <span>Recycle Bin</span>
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     CONTENT EDITOR
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>Homepage Content</h2>
-
-    <p style="color:#aaa">
-        Select what you want to add to MAYOTUBE
-    </p>
-
-    <div class="type-buttons">
-
-        <button
-            class="type-button"
-            onclick="selectType('message',this)">
-            💬 Message
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('link',this)">
-            🔗 URL
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('youtube',this)">
-            ▶️ YouTube
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('donation',this)">
-            💰 Donation
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('notification',this)">
-            🔔 Notification
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('image',this)">
-            🖼️ Image
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('video',this)">
-            🎬 Video
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('gif',this)">
-            🎞️ GIF
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('audio',this)">
-            🎵 Audio
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('music',this)">
-            🎧 Music
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('gallery_video',this)">
-            🎥 Gallery Video
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('live_channel',this)">
-            🔴 Live Channel
-        </button>
-
-        <button
-            class="type-button"
-            onclick="selectType('advertisement',this)">
-            📢 Advertisement
-        </button>
-
-    </div>
-
-
-    <input
-        id="itemId"
-        type="hidden">
-
-
-    <div class="grid">
-
-        <div class="form-group">
-
-            <label>Content Type</label>
-
-            <select id="itemType">
-                <option value="message">Message</option>
-                <option value="link">URL</option>
-                <option value="youtube">YouTube</option>
-                <option value="donation">Donation</option>
-                <option value="notification">Notification</option>
-                <option value="image">Image</option>
-                <option value="video">Video</option>
-                <option value="gif">GIF</option>
-                <option value="audio">Audio</option>
-                <option value="music">Music</option>
-                <option value="gallery_video">Gallery Video</option>
-                <option value="live_channel">Live Channel</option>
-                <option value="advertisement">Advertisement</option>
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Title</label>
-
-            <input
-                id="itemTitle"
-                type="text"
-                placeholder="Title">
-
-        </div>
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label>Message</label>
-
-        <textarea
-            id="itemMessage"
-            placeholder="Message"></textarea>
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label>Description</label>
-
-        <textarea
-            id="itemDescription"
-            placeholder="Description"></textarea>
-
-    </div>
-
-
-    <div
-        id="imageGroup"
-        class="form-group">
-
-        <label>Media URL</label>
-
-        <input
-            id="imageUrl"
-            type="url"
-            placeholder="https://...">
-
-    </div>
-
-
-    <div
-        id="videoGroup"
-        class="form-group">
-
-        <label>YouTube / Video URL</label>
-
-        <input
-            id="videoUrl"
-            type="url"
-            placeholder="https://...">
-
-    </div>
-
-
-    <div
-        id="linkGroup"
-        class="form-group">
-
-        <label>Website URL</label>
-
-        <input
-            id="linkUrl"
-            type="url"
-            placeholder="https://...">
-
-    </div>
-
-
-    <div
-        id="buttonGroup"
-        class="form-group">
-
-        <label>Button Text</label>
-
-        <input
-            id="buttonText"
-            type="text"
-            placeholder="Button Text">
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label>OR Upload Media</label>
-
-        <input
-            id="mediaFile"
-            type="file">
-
-    </div>
-
-
-    <div class="grid">
-
-        <div class="form-group">
-
-            <label>Order</label>
-
-            <input
-                id="itemOrder"
-                type="number"
-                min="1"
-                value="1">
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Status</label>
-
-            <div class="checkbox-row">
-
-                <input
-                    id="itemEnabled"
-                    type="checkbox"
-                    checked>
-
-                <label for="itemEnabled">
-                    Enabled
-                </label>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- STYLE -->
-
-    <details>
-
-        <summary
-            style="cursor:pointer;color:#FFD600;margin-bottom:15px">
-            Box Design
-        </summary>
-
-        <div class="grid">
-
-            <div class="form-group">
-                <label>Box Style</label>
-
-                <select id="boxStyle">
-                    <option value="default">
-                        Default
-                    </option>
-                    <option value="card">
-                        Card
-                    </option>
-                    <option value="flat">
-                        Flat
-                    </option>
-                </select>
-            </div>
-
-
-            <div class="form-group">
-                <label>Text Align</label>
-
-                <select id="boxTextAlign">
-                    <option value="center">
-                        Center
-                    </option>
-                    <option value="left">
-                        Left
-                    </option>
-                    <option value="right">
-                        Right
-                    </option>
-                </select>
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Background Color</label>
-
-                <div class="color-row">
-
-                    <input
-                        id="boxBackgroundColor"
-                        type="color"
-                        value="#181818">
-
-                    <input
-                        id="boxBackgroundColorValue"
-                        value="#181818">
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Text Color</label>
-
-                <div class="color-row">
-
-                    <input
-                        id="boxTextColor"
-                        type="color"
-                        value="#ffffff">
-
-                    <input
-                        id="boxTextColorValue"
-                        value="#ffffff">
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-                <label>Width</label>
-                <input id="boxWidth">
-            </div>
-
-            <div class="form-group">
-                <label>Height</label>
-                <input id="boxHeight">
-            </div>
-
-            <div class="form-group">
-                <label>Padding</label>
-                <input id="boxPadding">
-            </div>
-
-            <div class="form-group">
-                <label>Radius</label>
-                <input id="boxRadius">
-            </div>
-
-            <div class="form-group">
-                <label>Shadow</label>
-                <input id="boxShadow">
-            </div>
-
-            <div class="form-group">
-                <label>Border</label>
-                <input id="boxBorder">
-            </div>
-
-            <div class="form-group">
-                <label>Image Height</label>
-                <input id="imageHeight">
-            </div>
-
-            <div class="form-group">
-                <label>Image Fit</label>
-                <select id="boxImageFit">
-                    <option value="cover">Cover</option>
-                    <option value="contain">Contain</option>
-                    <option value="fill">Fill</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Video Height</label>
-                <input id="videoHeight">
-            </div>
-
-            <div class="form-group">
-                <label>Video Fit</label>
-                <select id="videoFit">
-                    <option value="contain">Contain</option>
-                    <option value="cover">Cover</option>
-                </select>
-            </div>
-
-        </div>
-
-
-        <div class="checkbox-row">
-
-            <input
-                id="videoAutoplay"
-                type="checkbox">
-
-            <label for="videoAutoplay">
-                Video Autoplay
-            </label>
-
-        </div>
-
-
-        <div class="checkbox-row">
-
-            <input
-                id="videoLoop"
-                type="checkbox">
-
-            <label for="videoLoop">
-                Video Loop
-            </label>
-
-        </div>
-
-
-        <div class="grid">
-
-            <div class="form-group">
-
-                <label>Button Color</label>
-
-                <div class="color-row">
-
-                    <input
-                        id="buttonColor"
-                        type="color"
-                        value="#673ab7">
-
-                    <input
-                        id="buttonColorValue"
-                        value="#673ab7">
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Button Text Color</label>
-
-                <div class="color-row">
-
-                    <input
-                        id="buttonTextColor"
-                        type="color"
-                        value="#ffffff">
-
-                    <input
-                        id="buttonTextColorValue"
-                        value="#ffffff">
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </details>
-
-
-    <!-- SCHEDULE -->
-
-    <details>
-
-        <summary
-            style="cursor:pointer;color:#FFD600;margin-bottom:15px">
-            Schedule
-        </summary>
-
-        <div class="grid">
-
-            <div class="form-group">
-
-                <label>Start</label>
-
-                <input
-                    id="scheduleStart"
-                    type="datetime-local">
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>End</label>
-
-                <input
-                    id="scheduleEnd"
-                    type="datetime-local">
-
-            </div>
-
-        </div>
-
-        <div
-            id="scheduleStatus"
-            style="color:#aaa">
-            No schedule
-        </div>
-
-    </details>
-
-
-    <div
-        id="homePreview"
-        class="preview"
-        style="margin:15px 0">
-        Live Preview
-    </div>
-
-
-    <div class="actions">
-
-        <button
-            class="btn btn-success"
-            onclick="saveItem()">
-            Save Content
-        </button>
-
-        <button
-            class="btn btn-gray"
-            onclick="clearForm()">
-            Clear
-        </button>
-
-        <button
-            class="btn btn-primary"
-            onclick="loadAll()">
-            Refresh
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     SAVED CONTENT
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>Saved Homepage Content</h2>
-
-    <p style="color:#aaa">
-        پریس کرکے Box کو Drag کر کے اوپر یا نیچے کریں۔
-        موبائل پر ▲ ▼ بٹن بھی استعمال کر سکتے ہیں۔
-    </p>
-
-
-    <div class="grid">
-
-        <div class="form-group">
-
-            <label>Search</label>
-
-            <input
-                id="searchItems"
-                placeholder="Search content">
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Type</label>
-
-            <select id="filterType">
-
-                <option value="all">
-                    All
-                </option>
-
-                <option value="message">
-                    Message
-                </option>
-
-                <option value="link">
-                    URL
-                </option>
-
-                <option value="youtube">
-                    YouTube
-                </option>
-
-                <option value="donation">
-                    Donation
-                </option>
-
-                <option value="notification">
-                    Notification
-                </option>
-
-                <option value="image">
-                    Image
-                </option>
-
-                <option value="video">
-                    Video
-                </option>
-
-                <option value="advertisement">
-                    Advertisement
-                </option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label>Status</label>
-
-        <select id="filterStatus">
-
-            <option value="all">
-                All
-            </option>
-
-            <option value="enabled">
-                Enabled
-            </option>
-
-            <option value="disabled">
-                Disabled
-            </option>
-
-            <option value="scheduled">
-                Scheduled
-            </option>
-
-        </select>
-
-    </div>
-
-
-    <div
-        id="itemsList">
-        Loading...
-    </div>
-
-
-    <div class="actions">
-
-        <button
-            class="btn btn-success"
-            onclick="saveOrder()">
-            💾 Save Homepage Order
-        </button>
-
-    </div>
-
-    <div
-        id="orderStatus"
-        style="margin-top:10px;color:#aaa">
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     RECYCLE BIN
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>🗑️ Recycle Bin</h2>
-
-    <div
-        id="trashList">
-        Recycle Bin خالی ہے
-    </div>
-
-    <div class="actions">
-
-        <button
-            class="btn btn-danger"
-            onclick="emptyTrash()">
-            Empty Recycle Bin
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     MEDIA
-     ===================================================== -->
-
-<div class="card">
-
-    <h2>Media Manager</h2>
-
-    <div class="actions"
-         style="margin-bottom:15px">
-
-        <input
-            id="mediaUploadFile"
-            type="file"
-            style="flex:1">
-
-        <button
-            class="btn btn-success"
-            onclick="uploadMedia2()">
-            Upload
-        </button>
-
-        <button
-            class="btn btn-primary"
-            onclick="loadMedia()">
-            Refresh
-        </button>
-
-    </div>
-
-    <div
-        id="mediaList"
-        class="media-grid">
-        No media found
-    </div>
-
-</div>
-
-
-</div>
-</div>
-
-
-<!-- =====================================================
-     JAVASCRIPT
-     ===================================================== -->
-
-<script>
-"use strict";
-
-let adminToken = "";
-
-let cmsContent = {
-    items: [],
-    home_enabled: true
-};
-
-let draggedId = null;
-
-const TRASH_KEY =
-    "mayotube_admin_recycle_bin_v2";
-
-function $(id){
-    return document.getElementById(id);
-}
-
-
-/* =====================================================
-   TOAST
-   ===================================================== */
-
-function showToast(message,type="success"){
-
-    let toast=$("toast");
-
-    if(!toast){
-
-        toast=document.createElement("div");
-
-        toast.id="toast";
-
-        toast.style.cssText=
-            "position:fixed;bottom:25px;left:50%;" +
-            "transform:translateX(-50%);" +
-            "z-index:99999;padding:13px 20px;" +
-            "border-radius:10px;color:#fff;" +
-            "font-size:14px;max-width:90%;" +
-            "text-align:center;";
-
-        document.body.appendChild(toast);
-    }
-
-    toast.textContent=message;
-
-    toast.style.background=
-        type==="error"
-        ? "#c62828"
-        : type==="warning"
-        ? "#ef6c00"
-        : "#2e7d32";
-
-    toast.style.display="block";
-
-    clearTimeout(toast._timer);
-
-    toast._timer=setTimeout(function(){
-        toast.style.display="none";
-    },3000);
-}
-
-
-/* =====================================================
-   HELPERS
-   ===================================================== */
-
-function escapeHtml(value){
-
-    if(value===null || value===undefined)
-        return "";
-
-    return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-
-function safePreviewUrl(url){
-
-    if(!url) return "";
-
-    const value=String(url).trim();
-
-    if(
-        value.startsWith("https://") ||
-        value.startsWith("http://") ||
-        value.startsWith("/") ||
-        value.startsWith("blob:")
-    ){
-        return value;
-    }
-
-    return "";
-}
-
-
-function deepClone(value){
-
-    try{
-        return JSON.parse(
-            JSON.stringify(value)
-        );
-    }catch(e){
-        return value;
-    }
-}
-
-
-function setValue(id,value){
-
-    const el=$(id);
-
-    if(el)
-        el.value=value;
-}
-
-
-function setChecked(id,value){
-
-    const el=$(id);
-
-    if(el)
-        el.checked=!!value;
-}
-
-
-function setText(id,value){
-
-    const el=$(id);
-
-    if(el)
-        el.textContent=String(value);
-}
-
-
-/* =====================================================
-   API
-   ===================================================== */
-
-async function api(path,options={}){
-
-    const headers=
-        new Headers(
-            options.headers || {}
-        );
-
-    if(adminToken){
-
-        headers.set(
-            "Authorization",
-            "Bearer "+adminToken
-        );
-    }
-
-    if(!(options.body instanceof FormData)){
-
-        headers.set(
-            "Content-Type",
-            "application/json"
-        );
-    }
-
-    options.headers=headers;
-
-    const response=
-        await fetch(path,options);
-
-    const contentType=
-        response.headers.get(
-            "content-type"
-        ) || "";
-
-    let data;
-
-    if(contentType.includes("application/json")){
-
-        data=await response.json();
-
-    }else{
-
-        const text=await response.text();
-
-        try{
-            data=JSON.parse(text);
-        }catch(e){
-            data=text;
-        }
-    }
-
-    if(!response.ok){
-
-        let message="Request failed";
-
-        if(data && typeof data==="object"){
-
-            message=
-                data.error ||
-                data.message ||
-                data.detail ||
-                message;
-
-        }else if(
-            typeof data==="string" &&
-            data.trim()
-        ){
-
-            message=data;
-        }
-
-        throw new Error(message);
-    }
-
-    return data;
-}
-
-
-/* =====================================================
-   LOGIN
-   ===================================================== */
-
-async function login(){
-
-    const input=$("tokenInput");
-
-    if(!input) return;
-
-    const token=input.value.trim();
-
-    if(!token){
-
-        showLoginError(
-            "Admin token درج کریں۔"
-        );
-
-        return;
-    }
-
-    adminToken=token;
-
-    const remember=
-        $("rememberToken") &&
-        $("rememberToken").checked;
-
-    try{
-
-        await api(
-            "/api/admin/status"
-        );
-
-        if(remember){
-
-            localStorage.setItem(
-                "mayotube_admin_token",
-                token
-            );
-
-        }else{
-
-            localStorage.removeItem(
-                "mayotube_admin_token"
-            );
-        }
-
-        $("loginScreen").style.display="none";
-        $("app").style.display="block";
-
-        await initialize();
-
-    }catch(error){
-
-        adminToken="";
-
-        showLoginError(
-            error.message ||
-            "Invalid admin token"
-        );
-    }
-}
-
-
-function showLoginError(message){
-
-    const box=$("loginError");
-
-    if(box){
-
-        box.textContent=message;
-        box.style.display="block";
-
-    }else{
-
-        showToast(
-            message,
-            "error"
-        );
-    }
-}
-
-
-function logout(){
-
-    adminToken="";
-
-    localStorage.removeItem(
-        "mayotube_admin_token"
-    );
-
-    $("app").style.display="none";
-    $("loginScreen").style.display="flex";
-
-    if($("tokenInput"))
-        $("tokenInput").value="";
-}
-
-
-/* =====================================================
-   INITIALIZE
-   ===================================================== */
-
-async function initialize(){
-
-    addEventListeners();
-
-    clearForm();
-
-    await loadAll();
-}
-
-
-function addEventListeners(){
-
-    const pairs=[
-        ["boxBackgroundColor",
-         "boxBackgroundColorValue"],
-
-        ["boxTextColor",
-         "boxTextColorValue"],
-
-        ["buttonColor",
-         "buttonColorValue"],
-
-        ["buttonTextColor",
-         "buttonTextColorValue"]
-    ];
-
-    pairs.forEach(function(pair){
-
-        const color=$(pair[0]);
-        const value=$(pair[1]);
-
-        if(!color || !value)
-            return;
-
-        color.oninput=function(){
-
-            value.value=color.value;
-
-            updatePreviewFromForm();
-        };
-
-        value.oninput=function(){
-
-            color.value=
-                value.value;
-
-            updatePreviewFromForm();
-        };
-    });
-
-
-    if($("scheduleStart"))
-        $("scheduleStart")
-            .addEventListener(
-                "change",
-                updateScheduleStatus
-            );
-
-
-    if($("scheduleEnd"))
-        $("scheduleEnd")
-            .addEventListener(
-                "change",
-                updateScheduleStatus
-            );
-
-
-    if($("itemType"))
-        $("itemType")
-            .addEventListener(
-                "change",
-                updateEditorFields
-            );
-
-
-    if($("searchItems"))
-        $("searchItems")
-            .addEventListener(
-                "input",
-                renderItems
-            );
-
-
-    if($("filterType"))
-        $("filterType")
-            .addEventListener(
-                "change",
-                renderItems
-            );
-
-
-    if($("filterStatus"))
-        $("filterStatus")
-            .addEventListener(
-                "change",
-                renderItems
-            );
-}
-
-
-/* =====================================================
-   LOAD
-   ===================================================== */
-
-async function loadAll(){
-
-    try{
-
-        await loadContent();
-        await loadHomePreview();
-        await loadMedia();
-        await loadStatus();
-
-        setConnectionStatus(true);
-
-    }catch(error){
-
-        console.error(error);
-
-        setConnectionStatus(false);
-
-        showToast(
-            error.message ||
-            "Server connection failed",
-            "error"
-        );
-    }
-}
-
-
-function setConnectionStatus(connected){
-
-    setText(
-        "connectionText",
-        connected
-        ? "Connected"
-        : "Disconnected"
-    );
-}
-
-
-/* =====================================================
-   CONTENT
-   ===================================================== */
-
-async function loadContent(){
-
-    const data=
-        await api(
-            "/api/admin/content"
-        );
-
-    if(Array.isArray(data)){
-
-        cmsContent={
-            items:data,
-            home_enabled:true
-        };
-
-    }else{
-
-        cmsContent=data || {};
-
-        if(!Array.isArray(cmsContent.items))
-            cmsContent.items=[];
-    }
-
-
-    cmsContent.items.forEach(
-        function(item,index){
-
-            if(item.order===undefined)
-                item.order=index+1;
-
-            if(item.enabled===undefined)
-                item.enabled=true;
-
-            if(!item.style)
-                item.style={};
-
-            if(!item.schedule)
-                item.schedule={};
-        }
-    );
-
-
-    cmsContent.items.sort(
-        function(a,b){
-
-            return Number(a.order||0) -
-                   Number(b.order||0);
-        }
-    );
-
-
-    const enabled=
-        cmsContent.home_enabled !== false;
-
-    setChecked(
-        "homeEnabled",
-        enabled
-    );
-
-    updateHomeStatus(enabled);
-
-    updateStats();
-
-    renderItems();
-
-    renderTrash();
-}
-
-
-function updateHomeStatus(enabled){
-
-    setText(
-        "homeStatusText",
-        enabled
-        ? "HOME ON"
-        : "HOME OFF"
-    );
-}
-
-
-/* =====================================================
-   HOME TOGGLE
-   ===================================================== */
-
-async function toggleHome(){
-
-    const checkbox=$("homeEnabled");
-
-    if(!checkbox) return;
-
-    const enabled=checkbox.checked;
-
-    checkbox.disabled=true;
-
-    try{
-
-        const result=
-            await api(
-                "/api/admin/home/toggle",
-                {
-                    method:"PATCH",
-                    body:JSON.stringify({
-                        enabled:enabled
-                    })
-                }
-            );
-
-        cmsContent.home_enabled=
-            result &&
-            typeof result.home_enabled!=="undefined"
-            ? result.home_enabled
-            : enabled;
-
-        updateHomeStatus(
-            cmsContent.home_enabled!==false
-        );
-
-        await loadHomePreview();
-
-        showToast(
-            enabled
-            ? "Home ON کر دیا گیا۔"
-            : "Home OFF کر دیا گیا۔"
-        );
-
-    }catch(error){
-
-        checkbox.checked=!enabled;
-
-        updateHomeStatus(!enabled);
-
-        showToast(
-            error.message ||
-            "Home toggle failed",
-            "error"
-        );
-
-    }finally{
-
-        checkbox.disabled=false;
-    }
-}
-
-
-/* =====================================================
-   TYPE
-   ===================================================== */
-
-function selectType(type,button){
-
-    setValue(
-        "itemType",
-        type
-    );
-
-    document
-        .querySelectorAll(".type-button")
-        .forEach(function(btn){
-            btn.classList.remove("active");
-        });
-
-    if(button)
-        button.classList.add("active");
-
-    updateEditorFields();
-}
-
-
-function updateEditorFields(){
-
-    const type=
-        $("itemType")?.value ||
-        "message";
-
-    const imageTypes=[
-        "image",
-        "gif",
-        "donation",
-        "advertisement"
-    ];
-
-    const videoTypes=[
-        "video",
-        "youtube",
-        "gallery_video",
-        "live_channel"
-    ];
-
-    const linkTypes=[
-        "link",
-        "button",
-        "website",
-        "channel",
-        "donation",
-        "advertisement"
-    ];
-
-    if($("imageGroup"))
-        $("imageGroup").style.display=
-            imageTypes.includes(type)
-            ? "block"
-            : "none";
-
-    if($("videoGroup"))
-        $("videoGroup").style.display=
-            videoTypes.includes(type)
-            ? "block"
-            : "none";
-
-    if($("linkGroup"))
-        $("linkGroup").style.display=
-            linkTypes.includes(type)
-            ? "block"
-            : "none";
-
-    if($("buttonGroup"))
-        $("buttonGroup").style.display=
-            (
-                type==="donation" ||
-                type==="advertisement" ||
-                type==="link"
-            )
-            ? "block"
-            : "none";
-
-    updatePreviewFromForm();
-}
-
-
-/* =====================================================
-   STYLE
-   ===================================================== */
-
-function getBoxStyleFromForm(){
-
-    return {
-
-        box_style:
-            $("boxStyle")?.value ||
-            "default",
-
-        text_align:
-            $("boxTextAlign")?.value ||
-            "center",
-
-        background_color:
-            $("boxBackgroundColor")?.value ||
-            "",
-
-        text_color:
-            $("boxTextColor")?.value ||
-            "",
-
-        width:
-            $("boxWidth")?.value ||
-            "",
-
-        height:
-            $("boxHeight")?.value ||
-            "",
-
-        padding:
-            $("boxPadding")?.value ||
-            "",
-
-        radius:
-            $("boxRadius")?.value ||
-            "",
-
-        shadow:
-            $("boxShadow")?.value ||
-            "",
-
-        border:
-            $("boxBorder")?.value ||
-            "",
-
-        image_height:
-            $("imageHeight")?.value ||
-            "",
-
-        image_fit:
-            $("boxImageFit")?.value ||
-            "cover",
-
-        video_height:
-            $("videoHeight")?.value ||
-            "",
-
-        video_fit:
-            $("videoFit")?.value ||
-            "contain",
-
-        video_autoplay:
-            $("videoAutoplay")?.checked ||
-            false,
-
-        video_loop:
-            $("videoLoop")?.checked ||
-            false,
-
-        button_color:
-            $("buttonColor")?.value ||
-            "",
-
-        button_text_color:
-            $("buttonTextColor")?.value ||
-            ""
-    };
-}
-
-
-function applyBoxStyle(style){
-
-    style=style||{};
-
-    setValue(
-        "boxStyle",
-        style.box_style||"default"
-    );
-
-    setValue(
-        "boxTextAlign",
-        style.text_align||"center"
-    );
-
-    setValue(
-        "boxBackgroundColor",
-        style.background_color||"#181818"
-    );
-
-    setValue(
-        "boxBackgroundColorValue",
-        style.background_color||"#181818"
-    );
-
-    setValue(
-        "boxTextColor",
-        style.text_color||"#ffffff"
-    );
-
-    setValue(
-        "boxTextColorValue",
-        style.text_color||"#ffffff"
-    );
-
-    setValue("boxWidth",style.width||"");
-    setValue("boxHeight",style.height||"");
-    setValue("boxPadding",style.padding||"");
-    setValue("boxRadius",style.radius||"");
-    setValue("boxShadow",style.shadow||"");
-    setValue("boxBorder",style.border||"");
-
-    setValue(
-        "imageHeight",
-        style.image_height||""
-    );
-
-    setValue(
-        "boxImageFit",
-        style.image_fit||"cover"
-    );
-
-    setValue(
-        "videoHeight",
-        style.video_height||""
-    );
-
-    setValue(
-        "videoFit",
-        style.video_fit||"contain"
-    );
-
-    setChecked(
-        "videoAutoplay",
-        !!style.video_autoplay
-    );
-
-    setChecked(
-        "videoLoop",
-        !!style.video_loop
-    );
-
-    setValue(
-        "buttonColor",
-        style.button_color||"#673ab7"
-    );
-
-    setValue(
-        "buttonColorValue",
-        style.button_color||"#673ab7"
-    );
-
-    setValue(
-        "buttonTextColor",
-        style.button_text_color||"#ffffff"
-    );
-
-    setValue(
-        "buttonTextColorValue",
-        style.button_text_color||"#ffffff"
-    );
-}
-
-
-/* =====================================================
-   FORM
-   ===================================================== */
-
-function clearForm(){
-
-    [
-        "itemId",
-        "itemTitle",
-        "itemMessage",
-        "itemDescription",
-        "imageUrl",
-        "videoUrl",
-        "linkUrl",
-        "buttonText",
-        "scheduleStart",
-        "scheduleEnd"
-    ].forEach(function(id){
-
-        const el=$(id);
-
-        if(el)
-            el.value="";
-    });
-
-
-    setValue(
-        "itemType",
-        "message"
-    );
-
-    setValue(
-        "itemOrder",
-        getNextOrder()
-    );
-
-    setChecked(
-        "itemEnabled",
-        true
-    );
-
-    applyBoxStyle({});
-
-    updateEditorFields();
-
-    updateScheduleStatus();
-
-    updatePreviewFromForm();
-}
-
-
-function getNextOrder(){
-
-    if(
-        !cmsContent ||
-        !Array.isArray(cmsContent.items) ||
-        !cmsContent.items.length
-    )
-        return 1;
-
-    return Math.max.apply(
-        null,
-        cmsContent.items.map(
-            function(item){
-                return Number(
-                    item.order||0
-                );
-            }
-        )
-    )+1;
-}
-
-
-/* =====================================================
-   SAVE
-   ===================================================== */
-
-async function saveItem(){
-
-    const id=
-        $("itemId")?.value.trim()||"";
-
-    const item={
-
-        type:
-            $("itemType")?.value||
-            "message",
-
-        title:
-            $("itemTitle")?.value.trim()||
-            "",
-
-        message:
-            $("itemMessage")?.value||
-            "",
-
-        description:
-            $("itemDescription")?.value||
-            "",
-
-        image_url:
-            $("imageUrl")?.value.trim()||
-            "",
-
-        video_url:
-            $("videoUrl")?.value.trim()||
-            "",
-
-        link_url:
-            $("linkUrl")?.value.trim()||
-            "",
-
-        button_text:
-            $("buttonText")?.value.trim()||
-            "",
-
-        order:
-            Number(
-                $("itemOrder")?.value||1
-            ),
-
-        enabled:
-            $("itemEnabled")?.checked!==false,
-
-        style:
-            getBoxStyleFromForm(),
-
-        schedule:{
-            start:
-                $("scheduleStart")?.value||"",
-
-            end:
-                $("scheduleEnd")?.value||""
-        }
-    };
-
-
-    try{
-
-        if(id){
-
-            await api(
-                "/api/admin/content/"+
-                encodeURIComponent(id),
-                {
-                    method:"PUT",
-                    body:JSON.stringify(item)
-                }
-            );
-
-            showToast(
-                "Content update ہو گیا۔"
-            );
-
-        }else{
-
-            await api(
-                "/api/admin/content",
-                {
-                    method:"POST",
-                    body:JSON.stringify(item)
-                }
-            );
-
-            showToast(
-                "نیا content بن گیا۔"
-            );
-        }
-
-        clearForm();
-
-        await loadContent();
-
-        await loadHomePreview();
-
-    }catch(error){
-
-        showToast(
-            error.message||
-            "Save failed",
-            "error"
-        );
-    }
-}
-
-
-/* =====================================================
-   EDIT
-   ===================================================== */
-
-function editItem(id){
-
-    const item=
-        cmsContent.items.find(
-            function(x){
-                return String(x.id)===
-                       String(id);
-            }
-        );
-
-    if(!item){
-
-        showToast(
-            "Item نہیں ملا۔",
-            "error"
-        );
-
-        return;
-    }
-
-
-    setValue("itemId",item.id||"");
-    setValue("itemType",item.type||"message");
-    setValue("itemOrder",item.order||1);
-    setValue("itemTitle",item.title||"");
-    setValue("itemMessage",item.message||"");
-    setValue("itemDescription",item.description||"");
-    setValue("imageUrl",item.image_url||"");
-    setValue("videoUrl",item.video_url||"");
-    setValue("linkUrl",item.link_url||"");
-    setValue("buttonText",item.button_text||"");
-
-    setChecked(
-        "itemEnabled",
-        item.enabled!==false
-    );
-
-    applyBoxStyle(
-        item.style||{}
-    );
-
-    setValue(
-        "scheduleStart",
-        item.schedule?.start||""
-    );
-
-    setValue(
-        "scheduleEnd",
-        item.schedule?.end||""
-    );
-
-    updateEditorFields();
-    updateScheduleStatus();
-    updatePreviewFromForm();
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
-}
-
-
-/* =====================================================
-   TOGGLE
-   ===================================================== */
-
-async function toggleItem(id){
-
-    const item=
-        cmsContent.items.find(
-            function(x){
-                return String(x.id)===
-                       String(id);
-            }
-        );
-
-    if(!item) return;
-
-    const enabled=
-        item.enabled===false;
-
-    try{
-
-        await api(
-            "/api/admin/content/"+
-            encodeURIComponent(id)+
-            "/toggle",
-            {
-                method:"PATCH",
-                body:JSON.stringify({
-                    enabled:enabled
-                })
-            }
-        );
-
-        await loadContent();
-        await loadHomePreview();
-
-        showToast(
-            enabled
-            ? "Content enabled."
-            : "Content disabled."
-        );
-
-    }catch(error){
-
-        showToast(
-            error.message||
-            "Toggle failed",
-            "error"
-        );
-    }
-}
-
-
-/* =====================================================
-   DUPLICATE
-   ===================================================== */
-
-async function duplicateItem(id){
-
-    const item=
-        cmsContent.items.find(
-            function(x){
-                return String(x.id)===
-                       String(id);
-            }
-        );
-
-    if(!item) return;
-
-    const copy=deepClone(item);
-
-    delete copy.id;
-
-    copy.title=
-        (copy.title||"Content")+
-        " Copy";
-
-    copy.order=getNextOrder();
-
-    try{
-
-        await api(
-            "/api/admin/content",
-            {
-                method:"POST",
-                body:JSON.stringify(copy)
-            }
-        );
-
-        await loadContent();
-        await loadHomePreview();
-
-        showToast(
-            "Content duplicate ہو گیا۔"
-        );
-
-    }catch(error){
-
-        showToast(
-            error.message||
-            "Duplicate failed",
-            "error"
-        );
-    }
-}
-
-
-/* =====================================================
-   RECYCLE BIN
-   ===================================================== */
-
-function getTrash(){
-
-    try{
-
-        const raw=
-            localStorage.getItem(
-                TRASH_KEY
-            );
-
-        if(!raw) return [];
-
-        const data=
-            JSON.parse(raw);
-
-        return Array.isArray(data)
-            ? data
-            : [];
-
-    }catch(e){
-
-        return [];
-    }
-}
-
-
-function setTrash(items){
-
-    localStorage.setItem(
-        TRASH_KEY,
-        JSON.stringify(items)
-    );
-
-    updateStats();
-    renderTrash();
-}
-
-
-async function moveToTrash(id){
-
-    const item=
-        cmsContent.items.find(
-            function(x){
-                return String(x.id)===
-                       String(id);
-            }
-        );
-
-    if(!item){
-
-        showToast(
-            "Item نہیں ملا۔",
-            "error"
-        );
-
-        return;
-    }
-
-    if(!confirm(
-        "کیا آپ اس content کو Recycle Bin میں بھیجنا چاہتے ہیں؟"
-    ))
-        return;
-
-
-    const backup={
-        deletedAt:
-            new Date().toISOString(),
-
-        item:
-            deepClone(item)
-    };
-
-
-    try{
-
-        await api(
-            "/api/admin/content/"+
-            encodeURIComponent(id),
-            {
-                method:"DELETE"
-            }
-        );
-
-        const trash=getTrash();
-
-        if(
-            !trash.some(
-                function(entry){
-                    return String(
-                        entry.item?.id
-                    )===String(id);
-                }
-            )
-        ){
-            trash.unshift(backup);
-        }
-
-        setTrash(trash);
-
-        await loadContent();
-        await loadHomePreview();
-
-        showToast(
-            "Content Recycle Bin میں منتقل ہو گیا۔"
-        );
-
-    }catch(error){
-
-        showToast(
-            "Delete failed: "+
-            (error.message||"Server error"),
-            "error"
-        );
-    }
-}
-
-
-async function restoreTrash(index){
-
-    const trash=getTrash();
-
-    if(
-        index<0 ||
-        index>=trash.length
-    )
-        return;
-
-    const entry=trash[index];
-
-    if(!entry?.item)
-        return;
-
-    const item=deepClone(
-        entry.item
-    );
-
-    try{
-
-        /*
-         * ID restore کرنے کی کوشش نہیں کی جاتی۔
-         * Backend کو item دوبارہ create کرنے دیا جاتا ہے۔
-         */
-
-        delete item.id;
-
-        await api(
-            "/api/admin/content",
-            {
-                method:"POST",
-                body:JSON.stringify(item)
-            }
-        );
-
-        trash.splice(index,1);
-
-        setTrash(trash);
-
-        await loadContent();
-        await loadHomePreview();
-
-        showToast(
-            "Content restore ہو گیا۔"
-        );
-
-    }catch(error){
-
-        showToast(
-            "Restore failed: "+
-            (error.message||"Server error"),
-            "error"
-        );
-    }
-}
-
-
-function permanentDeleteTrash(index){
-
-    const trash=getTrash();
-
-    if(
-        index<0 ||
-        index>=trash.length
-    )
-        return;
-
-    const name=
-        trash[index]?.item?.title||
-        trash[index]?.item?.id||
-        "this item";
-
-    if(!confirm(
-        "یہ item Recycle Bin سے مستقل طور پر حذف ہو جائے گا۔\n\n"+
-        name+
-        "\n\nکیا آپ واقعی Delete کرنا چاہتے ہیں؟"
-    ))
-        return;
-
-    trash.splice(index,1);
-
-    setTrash(trash);
-
-    showToast(
-        "Recycle Bin item مستقل طور پر حذف ہو گیا۔"
-    );
-}
-
-
-function emptyTrash(){
-
-    const trash=getTrash();
-
-    if(!trash.length){
-
-        showToast(
-            "Recycle Bin پہلے ہی خالی ہے۔",
-            "warning"
-        );
-
-        return;
-    }
-
-    if(!confirm(
-        "Recycle Bin کے تمام items مستقل طور پر حذف ہو جائیں گے۔\n\nکیا آپ واقعی Empty Recycle Bin کرنا چاہتے ہیں؟"
-    ))
-        return;
-
-    localStorage.removeItem(
-        TRASH_KEY
-    );
-
-    updateStats();
-    renderTrash();
-
-    showToast(
-        "Recycle Bin مکمل طور پر خالی کر دیا گیا۔"
-    );
-}
-
-
-function renderTrash(){
-
-    const container=$("trashList");
-
-    if(!container)
-        return;
-
-    const trash=getTrash();
-
-    if(!trash.length){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "🗑️ Recycle Bin خالی ہے"+
-            "</div>";
-
-        updateStats();
-
-        return;
-    }
-
-
-    container.innerHTML=
-        trash.map(
-            function(entry,index){
-
-                const item=
-                    entry.item||{};
-
-                const title=
-                    item.title||
-                    item.message||
-                    item.id||
-                    "Untitled";
-
-                const type=
-                    item.type||
-                    "unknown";
-
-                const date=
-                    entry.deletedAt
-                    ? new Date(
-                        entry.deletedAt
-                    ).toLocaleString()
-                    : "";
-
-                return `
-                <div class="trash-item">
-
-                    <div class="trash-title">
-                        ${escapeHtml(title)}
-                    </div>
-
-                    <div class="trash-meta">
-                        ${escapeHtml(type)}
-                        •
-                        ${escapeHtml(date)}
-                    </div>
-
-                    <div class="trash-actions"
-                         style="margin-top:8px">
-
-                        <button
-                            class="btn btn-success btn-small"
-                            onclick="restoreTrash(${index})">
-                            ↩️ Restore
-                        </button>
-
-                        <button
-                            class="btn btn-danger btn-small"
-                            onclick="permanentDeleteTrash(${index})">
-                            ❌ Permanent Delete
-                        </button>
-
-                    </div>
-
-                </div>`;
-            }
-        ).join("");
-
-    updateStats();
-}
-
-
-/* =====================================================
-   STATS
-   ===================================================== */
-
-function updateStats(){
-
-    const items=
-        Array.isArray(cmsContent.items)
-        ? cmsContent.items
-        : [];
-
-    const enabled=
-        items.filter(
-            function(item){
-                return item.enabled!==false;
-            }
-        ).length;
-
-    setText(
-        "statTotal",
-        items.length
-    );
-
-    setText(
-        "statEnabled",
-        enabled
-    );
-
-    setText(
-        "statDisabled",
-        items.length-enabled
-    );
-
-    setText(
-        "statTrash",
-        getTrash().length
-    );
-}
-
-
-/* =====================================================
-   FILTER
-   ===================================================== */
-
-function getFilteredItems(){
-
-    let items=
-        Array.isArray(cmsContent.items)
-        ? cmsContent.items.slice()
-        : [];
-
-    const search=
-        $("searchItems")?.value
-        .trim()
-        .toLowerCase()||
-        "";
-
-    const type=
-        $("filterType")?.value||
-        "all";
-
-    const status=
-        $("filterStatus")?.value||
-        "all";
-
-
-    if(search){
-
-        items=items.filter(
-            function(item){
-
-                const text=[
-                    item.title,
-                    item.message,
-                    item.description,
-                    item.type,
-                    item.link_url,
-                    item.video_url,
-                    item.image_url
-                ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-                return text.includes(search);
-            }
-        );
-    }
-
-
-    if(type!=="all"){
-
-        items=items.filter(
-            function(item){
-                return item.type===type;
-            }
-        );
-    }
-
-
-    if(status==="enabled"){
-
-        items=items.filter(
-            function(item){
-                return item.enabled!==false;
-            }
-        );
-    }
-
-
-    if(status==="disabled"){
-
-        items=items.filter(
-            function(item){
-                return item.enabled===false;
-            }
-        );
-    }
-
-
-    if(status==="scheduled"){
-
-        items=items.filter(
-            function(item){
-                return hasSchedule(item);
-            }
-        );
-    }
-
-    return items;
-}
-
-
-/* =====================================================
-   RENDER ITEMS
-   ===================================================== */
-
-function renderItems(){
-
-    const container=$("itemsList");
-
-    if(!container)
-        return;
-
-    const items=getFilteredItems();
-
-    if(!items.length){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "کوئی content نہیں ملا۔"+
-            "</div>";
-
-        return;
-    }
-
-
-    container.innerHTML=
-        items.map(buildItemCard).join("");
-
-    setupDragAndDrop();
-
-    updateStats();
-}
-
-
-function buildItemCard(item){
-
-    const enabled=
-        item.enabled!==false;
-
-    return `
-    <div class="item-card"
-         draggable="true"
-         data-id="${escapeHtml(item.id)}">
-
-        <div>
-
-            <div class="item-title">
-                ${escapeHtml(
-                    item.title||
-                    item.message||
-                    "Untitled"
-                )}
-            </div>
-
-            <div class="item-meta">
-                Type:
-                ${escapeHtml(
-                    item.type||"message"
-                )}
-                • Order:
-                ${escapeHtml(
-                    item.order||0
-                )}
-            </div>
-
-            <div class="item-status">
-                ${
-                    enabled
-                    ? "🟢 Enabled"
-                    : "🔴 Disabled"
-                }
-            </div>
-
-        </div>
-
-        <div class="item-actions">
-
-            <button
-                class="btn btn-primary btn-small"
-                onclick="editItem('${escapeHtml(item.id)}')">
-                ✏️ Edit
-            </button>
-
-            <button
-                class="btn btn-success btn-small"
-                onclick="toggleItem('${escapeHtml(item.id)}')">
-                ${
-                    enabled
-                    ? "🔴 Disable"
-                    : "🟢 Enable"
-                }
-            </button>
-
-            <button
-                class="btn btn-blue btn-small"
-                onclick="duplicateItem('${escapeHtml(item.id)}')">
-                📋 Duplicate
-            </button>
-
-            <button
-                class="btn btn-danger btn-small"
-                onclick="moveToTrash('${escapeHtml(item.id)}')">
-                🗑️ Delete
-            </button>
-
-        </div>
-
-    </div>`;
-}
-
-
-/* =====================================================
-   DRAG DROP
-   ===================================================== */
-
-function setupDragAndDrop(){
-
-    document
-        .querySelectorAll(".item-card")
-        .forEach(function(card){
-
-            card.addEventListener(
-                "dragstart",
-                function(){
-
-                    draggedId=
-                        card.dataset.id;
-
-                    card.classList.add(
-                        "dragging"
-                    );
-                }
-            );
-
-
-            card.addEventListener(
-                "dragend",
-                function(){
-
-                    card.classList.remove(
-                        "dragging"
-                    );
-
-                    draggedId=null;
-                }
-            );
-
-
-            card.addEventListener(
-                "dragover",
-                function(event){
-
-                    event.preventDefault();
-
-                    card.classList.add(
-                        "drag-over"
-                    );
-                }
-            );
-
-
-            card.addEventListener(
-                "dragleave",
-                function(){
-
-                    card.classList.remove(
-                        "drag-over"
-                    );
-                }
-            );
-
-
-            card.addEventListener(
-                "drop",
-                async function(event){
-
-                    event.preventDefault();
-
-                    card.classList.remove(
-                        "drag-over"
-                    );
-
-                    const targetId=
-                        card.dataset.id;
-
-                    if(
-                        !draggedId||
-                        draggedId===targetId
-                    )
-                        return;
-
-                    await reorderItems(
-                        draggedId,
-                        targetId
-                    );
-                }
-            );
-        });
-}
-
-
-/* =====================================================
-   REORDER
-   ===================================================== */
-
-async function reorderItems(
-    draggedIdValue,
-    targetId
-){
-
-    const items=
-        cmsContent.items.map(
-            deepClone
-        );
-
-    const from=
-        items.findIndex(
-            function(item){
-                return String(item.id)===
-                       String(draggedIdValue);
-            }
-        );
-
-    const to=
-        items.findIndex(
-            function(item){
-                return String(item.id)===
-                       String(targetId);
-            }
-        );
-
-    if(from<0||to<0)
-        return;
-
-    const moved=
-        items.splice(from,1)[0];
-
-    items.splice(to,0,moved);
-
-    items.forEach(
-        function(item,index){
-            item.order=index+1;
-        }
-    );
-
-
-    cmsContent.items=items;
-
-    renderItems();
-
-    setText(
-        "orderStatus",
-        "Order تیار ہے۔ Save Homepage Order دبائیں۔"
-    );
-}
-
-
-/* =====================================================
-   SAVE ORDER
-   ===================================================== */
-
-async function saveOrder(){
-
-    const status=$("orderStatus");
-
-    const items=
-        Array.from(
-            document.querySelectorAll(
-                "#itemsList .item-card"
-            )
-        )
-        .map(function(card){
-
-            return card.dataset.id;
-        });
-
-
-    if(!items.length){
-
-        if(status)
-            status.textContent=
-                "Save کرنے کے لیے کوئی content نہیں۔";
-
-        return;
-    }
-
-
-    const orderedItems=[];
-
-    items.forEach(
-        function(id,index){
-
-            const item=
-                cmsContent.items.find(
-                    function(x){
-                        return String(x.id)===
-                               String(id);
-                    }
-                );
-
-            if(item){
-
-                const copy=
-                    deepClone(item);
-
-                copy.order=index+1;
-
-                orderedItems.push(copy);
-            }
-        }
-    );
-
-
-    /*
-     * Filter کے بعد صرف visible items آ سکتے ہیں۔
-     * اس لیے backend کو duplicate/missing order دینے
-     * سے بچانے کے لیے اصل مکمل list استعمال کریں۔
-     */
-
-    const allItems=
-        cmsContent.items
-            .slice()
-            .sort(
-                function(a,b){
-                    return Number(a.order||0)-
-                           Number(b.order||0);
-                }
-            );
-
-
-    const visibleSet=
-        new Set(items.map(String));
-
-    const finalItems=[];
-
-    orderedItems.forEach(
-        function(item){
-            finalItems.push(item);
-        }
-    );
-
-
-    allItems.forEach(
-        function(item){
-
-            if(
-                !visibleSet.has(
-                    String(item.id)
-                )
-            ){
-
-                finalItems.push(
-                    deepClone(item)
-                );
-            }
-        }
-    );
-
-
-    finalItems.forEach(
-        function(item,index){
-            item.order=index+1;
-        }
-    );
-
-
-    try{
-
-        if(status)
-            status.textContent=
-                "Order save ہو رہا ہے...";
-
-
-        for(
-            const item
-            of finalItems
-        ){
-
-            await api(
-                "/api/admin/content/"+
-                encodeURIComponent(item.id),
-                {
-                    method:"PUT",
-                    body:JSON.stringify({
-                        type:item.type,
-                        title:item.title,
-                        message:item.message,
-                        description:item.description,
-                        image_url:item.image_url,
-                        video_url:item.video_url,
-                        link_url:item.link_url,
-                        button_text:item.button_text,
-                        order:item.order,
-                        enabled:item.enabled!==false,
-                        style:item.style||{},
-                        schedule:item.schedule||{}
-                    })
-                }
-            );
-        }
-
-
-        cmsContent.items=
-            finalItems;
-
-
-        renderItems();
-
-        await loadHomePreview();
-
-
-        if(status)
-            status.textContent=
-                "Homepage Order کامیابی سے محفوظ ہو گیا۔";
-
-
-        showToast(
-            "Homepage Order save ہو گیا۔"
-        );
-
-    }catch(error){
-
-        console.error(error);
-
-        if(status)
-            status.textContent=
-                "Order save failed: "+
-                error.message;
-
-        showToast(
-            "Order save failed: "+
-            error.message,
-            "error"
-        );
-
-        await loadContent();
-    }
-}
-
-
-/* =====================================================
-   SCHEDULE
-   ===================================================== */
-
-function hasSchedule(item){
-
-    return !!(
-        item &&
-        item.schedule &&
-        (
-            item.schedule.start||
-            item.schedule.end
-        )
-    );
-}
-
-
-function isScheduleActive(item){
-
-    if(!hasSchedule(item))
-        return true;
-
-    const now=new Date();
-
-    const start=
-        item.schedule.start
-        ? new Date(
-            item.schedule.start
-        )
-        : null;
-
-    const end=
-        item.schedule.end
-        ? new Date(
-            item.schedule.end
-        )
-        : null;
-
-    if(
-        start &&
-        isNaN(start.getTime())
-    )
-        return false;
-
-    if(
-        end &&
-        isNaN(end.getTime())
-    )
-        return false;
-
-    if(start&&now<start)
-        return false;
-
-    if(end&&now>end)
-        return false;
-
-    return true;
-}
-
-
-function updateScheduleStatus(){
-
-    const startValue=
-        $("scheduleStart")?.value||"";
-
-    const endValue=
-        $("scheduleEnd")?.value||"";
-
-    const status=
-        $("scheduleStatus");
-
-    if(!status)
-        return;
-
-    if(!startValue&&!endValue){
-
-        status.textContent=
-            "No schedule";
-
-        return;
-    }
-
-    const now=new Date();
-
-    const start=
-        startValue
-        ? new Date(startValue)
-        : null;
-
-    const end=
-        endValue
-        ? new Date(endValue)
-        : null;
-
-    if(
-        start &&
-        isNaN(start.getTime())
-    ){
-
-        status.textContent=
-            "Invalid start date";
-
-        return;
-    }
-
-    if(
-        end &&
-        isNaN(end.getTime())
-    ){
-
-        status.textContent=
-            "Invalid end date";
-
-        return;
-    }
-
-    if(start&&now<start){
-
-        status.textContent=
-            "Scheduled";
-
-        return;
-    }
-
-    if(end&&now>end){
-
-        status.textContent=
-            "Expired";
-
-        return;
-    }
-
-    status.textContent="Active";
-}
-
-
-/* =====================================================
-   PREVIEW
-   ===================================================== */
-
-async function loadHomePreview(){
-
-    const container=
-        $("homePreview");
-
-    if(!container)
-        return;
-
-    try{
-
-        const data=
-            await api(
-                "/api/home-content"
-            );
-
-        renderHomePreview(data);
-
-    }catch(error){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "Home preview unavailable"+
-            "</div>";
-    }
-}
-
-
-function renderHomePreview(data){
-
-    const container=
-        $("homePreview");
-
-    if(!container)
-        return;
-
-    let items=[];
-
-    if(Array.isArray(data))
-        items=data;
-
-    else if(
-        data &&
-        Array.isArray(data.items)
-    )
-        items=data.items;
-
-
-    items=
-        items
-        .filter(
-            function(item){
-                return item.enabled!==false;
-            }
-        )
-        .filter(isScheduleActive)
-        .sort(
-            function(a,b){
-                return Number(a.order||0)-
-                       Number(b.order||0);
-            }
-        );
-
-
-    if(!items.length){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "Home پر کوئی enabled content نہیں ہے۔"+
-            "</div>";
-
-        return;
-    }
-
-
-    container.innerHTML=
-        items.map(
-            buildPreviewCard
-        ).join("");
-}
-
-
-function buildPreviewCard(item){
-
-    const style=
-        getPreviewBoxStyle(
-            item.style||{}
-        );
-
-    let html=
-        '<div style="'+
-        style.box+
-        '">';
-
-
-    if(item.title){
-
-        html+=
-            '<div style="font-weight:bold;margin-bottom:8px">'+
-            escapeHtml(item.title)+
-            "</div>";
-    }
-
-
-    if(item.message){
-
-        html+=
-            '<div style="margin-bottom:8px">'+
-            escapeHtml(item.message)
-                .replace(/\n/g,"<br>")+
-            "</div>";
-    }
-
-
-    if(item.description){
-
-        html+=
-            '<div style="opacity:.85;margin-bottom:8px">'+
-            escapeHtml(item.description)+
-            "</div>";
-    }
-
-
-    const imageUrl=
-        safePreviewUrl(
-            item.image_url
-        );
-
-    if(imageUrl){
-
-        html+=
-            '<img src="'+
-            escapeHtml(imageUrl)+
-            '" alt="" style="'+
-            style.image+
-            '">';
-    }
-
-
-    const videoUrl=
-        safePreviewUrl(
-            item.video_url
-        );
-
-    if(videoUrl){
-
-        html+=
-            '<video src="'+
-            escapeHtml(videoUrl)+
-            '" controls preload="metadata" '+
-            (
-                style.autoplay
-                ? "autoplay muted "
-                : ""
-            )+
-            (
-                style.loop
-                ? "loop "
-                : ""
-            )+
-            'style="'+
-            style.video+
-            '"></video>';
-    }
-
-
-    const linkUrl=
-        safePreviewUrl(
-            item.link_url
-        );
-
-    if(linkUrl){
-
-        html+=
-            '<a href="'+
-            escapeHtml(linkUrl)+
-            '" target="_blank" rel="noopener noreferrer" '+
-            'style="'+
-            style.link+
-            '">'+
-            escapeHtml(
-                item.button_text||
-                item.link_url
-            )+
-            "</a>";
-    }
-
-
-    html+="</div>";
-
-    return html;
-}
-
-
-function getPreviewBoxStyle(style){
-
-    style=style||{};
-
-    const box=[
-        "text-align:"+
-            escapeHtml(
-                style.text_align||
-                "center"
-            ),
-
-        "color:"+
-            escapeHtml(
-                style.text_color||
-                "inherit"
-            ),
-
-        "background:"+
-            escapeHtml(
-                style.background_color||
-                "transparent"
-            ),
-
-        style.width
-            ? "width:"+
-              escapeHtml(style.width)
-            : "",
-
-        style.height
-            ? "min-height:"+
-              escapeHtml(style.height)
-            : "",
-
-        style.padding
-            ? "padding:"+
-              escapeHtml(style.padding)
-            : "",
-
-        style.radius
-            ? "border-radius:"+
-              escapeHtml(style.radius)
-            : "",
-
-        style.shadow
-            ? "box-shadow:"+
-              escapeHtml(style.shadow)
-            : "",
-
-        style.border
-            ? "border:"+
-              escapeHtml(style.border)
-            : ""
-    ]
-    .filter(Boolean)
-    .join(";");
-
-
-    return {
-
-        box:box,
-
-        image:[
-            "display:block",
-            "max-width:100%",
-            "margin:8px auto",
-            style.image_height
-                ? "height:"+
-                  escapeHtml(
-                      style.image_height
-                  )
-                : "",
-            "object-fit:"+
-                escapeHtml(
-                    style.image_fit||
-                    "cover"
-                )
-        ]
-        .filter(Boolean)
-        .join(";"),
-
-        video:[
-            "display:block",
-            "width:100%",
-            "max-width:100%",
-            style.video_height
-                ? "height:"+
-                  escapeHtml(
-                      style.video_height
-                  )
-                : "",
-            "object-fit:"+
-                escapeHtml(
-                    style.video_fit||
-                    "contain"
-                )
-        ]
-        .filter(Boolean)
-        .join(";"),
-
-        link:[
-            "display:inline-block",
-            "margin-top:8px",
-            "padding:8px 14px",
-            "text-decoration:none",
-            "border-radius:8px",
-            "background:"+
-                escapeHtml(
-                    style.button_color||
-                    "#673ab7"
-                ),
-            "color:"+
-                escapeHtml(
-                    style.button_text_color||
-                    "#fff"
-                )
-        ].join(";"),
-
-        autoplay:
-            !!style.video_autoplay,
-
-        loop:
-            !!style.video_loop
-    };
-}
-
-
-function updatePreviewFromForm(){
-
-    const container=
-        $("homePreview");
-
-    if(!container)
-        return;
-
-    const item={
-
-        title:
-            $("itemTitle")?.value||"",
-
-        message:
-            $("itemMessage")?.value||"",
-
-        description:
-            $("itemDescription")?.value||"",
-
-        image_url:
-            $("imageUrl")?.value||"",
-
-        video_url:
-            $("videoUrl")?.value||"",
-
-        link_url:
-            $("linkUrl")?.value||"",
-
-        button_text:
-            $("buttonText")?.value||"",
-
-        style:
-            getBoxStyleFromForm()
-    };
-
-    try{
-
-        container.innerHTML=
-            buildPreviewCard(item);
-
-    }catch(error){}
-}
-
-
-/* =====================================================
-   MEDIA
-   ===================================================== */
-
-async function loadMedia(){
-
-    const container=
-        $("mediaList");
-
-    if(!container)
-        return;
-
-    try{
-
-        const data=
-            await api(
-                "/api/admin/media"
-            );
-
-        const media=
-            Array.isArray(data)
-            ? data
-            : Array.isArray(data?.media)
-            ? data.media
-            : [];
-
-        renderMedia(media);
-
-    }catch(error){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "Media load failed"+
-            "</div>";
-    }
-}
-
-
-function renderMedia(media){
-
-    const container=
-        $("mediaList");
-
-    if(!container)
-        return;
-
-    if(!media.length){
-
-        container.innerHTML=
-            '<div class="empty-state">'+
-            "No media found"+
-            "</div>";
-
-        return;
-    }
-
-
-    container.innerHTML=
-        media.map(
-            function(file){
-
-                const url=
-                    file.url||
-                    file.public_url||
-                    file.href||
-                    "";
-
-                const name=
-                    file.name||
-                    file.filename||
-                    "Media";
-
-                const id=
-                    file.id||
-                    file.key||
-                    file.name||
-                    file.filename||
-                    "";
-
-                const isVideo=
-                    String(
-                        file.content_type||""
-                    )
-                    .startsWith("video/");
-
-                const preview=
-                    isVideo
-                    ?
-                    '<video src="'+
-                    escapeHtml(url)+
-                    '" controls></video>'
-                    :
-                    '<img src="'+
-                    escapeHtml(url)+
-                    '" alt="">';
-
-                return `
-                <div class="media-card">
-
-                    ${preview}
-
-                    <div class="media-name">
-                        ${escapeHtml(name)}
-                    </div>
-
-                    <div class="media-actions">
-
-                        <button
-                            class="btn btn-primary btn-small"
-                            onclick="useMediaUrl('${escapeHtml(url)}')">
-                            Use
-                        </button>
-
-                        <button
-                            class="btn btn-danger btn-small"
-                            onclick="deleteMedia('${escapeHtml(id)}')">
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>`;
-            }
-        ).join("");
-}
-
-
-function useMediaUrl(url){
-
-    if(!url)
-        return;
-
-    const type=
-        $("itemType")?.value||
-        "message";
-
-    if(
-        [
-            "video",
-            "youtube",
-            "gallery_video",
-            "live_channel"
-        ].includes(type)
-    ){
-
-        setValue(
-            "videoUrl",
-            url
-        );
-
-    }else{
-
-        setValue(
-            "imageUrl",
-            url
-        );
-    }
-
-    updateEditorFields();
-    updatePreviewFromForm();
-
-    showToast(
-        "Media URL editor میں شامل ہو گیا۔"
-    );
-}
-
-
-async function uploadMedia2(){
-
-    const input=
-        $("mediaUploadFile");
-
-    if(
-        !input||
-        !input.files||
-        !input.files.length
-    ){
-
-        showToast(
-            "پہلے media file منتخب کریں۔",
-            "warning"
-        );
-
-        return;
-    }
-
-
-    const form=
-        new FormData();
-
-    form.append(
-        "file",
-        input.files[0]
-    );
-
-
-    try{
-
-        await api(
-            "/api/admin/media",
-            {
-                method:"POST",
-                body:form
-            }
-        );
-
-        input.value="";
-
-        await loadMedia();
-
-        showToast(
-            "Media upload ہو گیا۔"
-        );
-
-    }catch(error){
-
-        showToast(
-            error.message||
-            "Upload failed",
-            "error"
-        );
-    }
-}
-
-
-async function deleteMedia(id){
-
-    if(!id)
-        return;
-
-    if(!confirm(
-        "کیا آپ یہ media delete کرنا چاہتے ہیں؟"
-    ))
-        return;
-
-
-    try{
-
-        await api(
-            "/api/admin/media/"+
-            encodeURIComponent(id),
-            {
-                method:"DELETE"
-            }
-        );
-
-        await loadMedia();
-
-        showToast(
-            "Media delete ہو گیا۔"
-        );
-
-    }catch(error){
-
-        showToast(
-            error.message||
-            "Media delete failed",
-            "error"
-        );
-    }
-}
-
-
-/* =====================================================
-   STATUS
-   ===================================================== */
-
-async function loadStatus(){
-
-    const container=
-        $("systemStatus");
-
-    try{
-
-        const data=
-            await api(
-                "/api/admin/status"
-            );
-
-        if(container){
-
-            container.textContent=
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                );
-        }
-
-    }catch(error){
-
-        if(container){
-
-            container.textContent=
-                error.message||
-                "Status unavailable";
-        }
-    }
-}
-
-
-/* =====================================================
-   STARTUP
-   ===================================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async function(){
-
-        try{
-
-            const saved=
-                localStorage.getItem(
-                    "mayotube_admin_token"
-                );
-
-            if(saved){
-
-                $("tokenInput").value=
-                    saved;
-
-                $("rememberToken").checked=
-                    true;
-
-                adminToken=saved;
-
-                try{
-
-                    await api(
-                        "/api/admin/status"
-                    );
-
-                    $("loginScreen")
-                        .style.display="none";
-
-                    $("app")
-                        .style.display="block";
-
-                    await initialize();
-
-                    return;
-
-                }catch(error){
-
-                    adminToken="";
-
-                    localStorage.removeItem(
-                        "mayotube_admin_token"
-                    );
-
-                    $("tokenInput").value="";
-                    $("rememberToken").checked=false;
-                }
-            }
-
-            renderTrash();
-            updateStats();
-
-        }catch(error){
-
-            console.error(
-                "Admin startup error:",
-                error
-            );
-
-            showToast(
-                error.message||
-                "Admin Panel startup failed",
-                "error"
-            );
-        }
-    }
-);
-
-
-setInterval(
-    function(){
-
-        if(
-            document.visibilityState===
-            "visible"
-        ){
-
-            updateScheduleStatus();
-        }
-
-    },
-    30000
-);
-
-</script>
-
-</body>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width,initial-scale=1">  
+<title>MAYOTUBE ADMIN</title>  <style>  
+*{box-sizing:border-box}  
+  
+body{  
+margin:0;  
+background:linear-gradient(135deg,#08070c,#151020,#0b1018);  
+color:#fff;  
+font-family:Arial,sans-serif;  
+min-height:100vh  
+}  
+  
+header{  
+padding:22px 16px;  
+text-align:center;  
+background:rgba(20,18,30,.92);  
+border-bottom:1px solid #302a40  
+}  
+  
+h1{  
+margin:0;  
+font-size:25px;  
+letter-spacing:1px  
+}  
+  
+h2{  
+font-size:18px;  
+margin:0 0 15px  
+}  
+  
+main{  
+width:100%;  
+max-width:900px;  
+margin:auto;  
+padding:18px  
+}  
+  
+.card{  
+background:rgba(22,20,31,.96);  
+border:1px solid #332d43;  
+border-radius:18px;  
+padding:18px;  
+margin-bottom:18px;  
+box-shadow:0 10px 35px rgba(0,0,0,.28)  
+}  
+  
+.status{  
+padding:12px;  
+border-radius:10px;  
+background:#0d291d;  
+color:#7dffad;  
+text-align:center  
+}  
+  
+.error{  
+background:#35151b!important;  
+color:#ff9ca8!important  
+}  
+  
+/* TYPE SELECTOR */  
+  
+.type-card{  
+max-width:620px;  
+margin:5px auto 20px;  
+text-align:center;  
+padding:24px;  
+background:linear-gradient(145deg,#211638,#111a2c);  
+border:1px solid #6040a0;  
+box-shadow:0 12px 40px rgba(80,40,160,.25)  
+}  
+  
+.type-title{  
+font-size:14px;  
+color:#bda9ff;  
+margin-bottom:8px;  
+text-transform:uppercase;  
+letter-spacing:1.5px  
+}  
+  
+.type-subtitle{  
+font-size:13px;  
+color:#999;  
+margin-bottom:15px  
+}  
+  
+.type-select{  
+appearance:none;  
+-webkit-appearance:none;  
+width:100%;  
+padding:16px 45px 16px 16px;  
+border-radius:13px;  
+border:1px solid #7651c9;  
+background:linear-gradient(135deg,#30204e,#171a2c);  
+color:#fff;  
+font-size:16px;  
+font-weight:bold;  
+outline:none;  
+text-align:center;  
+cursor:pointer  
+}  
+  
+.type-select:focus{  
+border-color:#9c75ff;  
+box-shadow:0 0 0 3px rgba(130,80,255,.15)  
+}  
+  
+/* FORM */  
+  
+.field{  
+display:none;  
+margin-top:14px  
+}  
+  
+.field.show{  
+display:block  
+}  
+  
+label{  
+display:block;  
+font-size:13px;  
+color:#bdb7c9;  
+margin-bottom:6px  
+}  
+  
+input,  
+textarea{  
+width:100%;  
+padding:13px;  
+background:#0c0b11;  
+color:#fff;  
+border:1px solid #393342;  
+border-radius:10px;  
+outline:none  
+}  
+  
+input:focus,  
+textarea:focus{  
+border-color:#7954d7;  
+box-shadow:0 0 0 2px rgba(121,84,215,.12)  
+}  
+  
+textarea{  
+min-height:105px;  
+resize:vertical  
+}  
+  
+.media-box{  
+padding:14px;  
+border:1px dashed #51486a;  
+border-radius:12px;  
+background:#100e17;  
+margin-top:14px  
+}  
+  
+.media-title{  
+font-size:13px;  
+color:#c8bce4;  
+margin-bottom:8px  
+}  
+  
+.preview{  
+margin-top:12px;  
+padding:10px;  
+border-radius:10px;  
+background:#09080d;  
+border:1px solid #302b3b  
+}  
+  
+.preview img,  
+.preview video{  
+display:block;  
+max-width:100%;  
+max-height:280px;  
+margin:auto;  
+border-radius:8px  
+}  
+  
+.preview audio{  
+width:100%  
+}  
+  
+.hidden{  
+display:none!important  
+}  
+  
+.row{  
+display:flex;  
+gap:7px;  
+flex-wrap:wrap;  
+margin-top:16px  
+}  
+  
+button{  
+border:0;  
+border-radius:10px;  
+padding:11px 15px;  
+background:#302b3c;  
+color:#fff;  
+cursor:pointer  
+}  
+  
+button.primary{  
+background:linear-gradient(135deg,#7447ed,#a54cff)  
+}  
+  
+button.ok{  
+background:#177b49  
+}  
+  
+button.danger{  
+background:#b82d42  
+}  
+  
+button:hover{  
+filter:brightness(1.15)  
+}  
+  
+.small{  
+font-size:13px;  
+color:#aaa;  
+word-break:break-word  
+}  
+  
+.item{  
+border:1px solid #332e3d;  
+border-radius:13px;  
+padding:14px;  
+margin:11px 0;  
+background:#100f15;  
+transition:.18s  
+}  
+  
+.item.dragging{  
+opacity:.45;  
+transform:scale(.99)  
+}  
+  
+.item.drop-target{  
+border-color:#8b5cf6;  
+box-shadow:0 0 0 2px rgba(139,92,246,.18)  
+}  
+  
+.item img,  
+.item video{  
+display:block;  
+max-width:100%;  
+max-height:260px;  
+border-radius:9px;  
+margin-top:10px  
+}  
+  
+.item audio{  
+width:100%;  
+margin-top:10px  
+}  
+  
+/* ORDER */  
+  
+.order-bar{  
+display:flex;  
+align-items:center;  
+gap:8px;  
+margin-bottom:10px;  
+padding-bottom:10px;  
+border-bottom:1px solid #292533  
+}  
+  
+.drag-handle{  
+flex:1;  
+padding:10px 12px;  
+border-radius:9px;  
+background:#191622;  
+border:1px dashed #554b6b;  
+color:#cbbdf0;  
+font-size:13px;  
+text-align:center;  
+cursor:grab;  
+touch-action:none;  
+user-select:none  
+}  
+  
+.drag-handle:active{  
+cursor:grabbing  
+}  
+  
+.order-buttons{  
+display:flex;  
+gap:5px  
+}  
+  
+.order-buttons button{  
+padding:8px 11px;  
+font-size:16px  
+}  
+  
+.order-save{  
+margin-top:15px;  
+padding:12px;  
+border-radius:10px;  
+background:#171322;  
+border:1px solid #39304d  
+}  
+  
+#orderStatus{  
+margin-top:8px  
+}  
+  
+#uploadProgress{  
+height:7px;  
+background:#292532;  
+border-radius:10px;  
+overflow:hidden;  
+margin-top:10px;  
+display:none  
+}  
+  
+#uploadBar{  
+height:100%;  
+width:0;  
+background:linear-gradient(90deg,#7042ef,#b44cff)  
+}  
+  
+@media(max-width:600px){  
+  
+main{padding:12px}  
+  
+.card{padding:15px}  
+  
+.type-card{padding:20px 15px}  
+  
+.order-bar{  
+align-items:stretch  
+}  
+  
+.drag-handle{  
+min-height:42px;  
+display:flex;  
+align-items:center;  
+justify-content:center  
+}  
+  
+.order-buttons button{  
+min-width:42px  
+}  
+  
+}  
+</style>  </head>  <body>  <header>  
+<h1>MAYOTUBE ADMIN</h1>  
+<div class="small">Owner Control Panel</div>  
+</header>  <main>  <div class="card">  
+<h2>System Status</h2>  
+<div id="systemStatus">Checking...</div>  
+</div>  <div class="card type-card">  <div class="type-title">  
+Homepage Content  
+</div>  <div class="type-subtitle">  
+Select what you want to add to MAYOTUBE  
+</div>  <select  
+id="type"  
+class="type-select"  
+onchange="typeChanged()">
+
+<option value="message">💬 Message</option>  
+<option value="url">🔗 URL</option>  
+<option value="youtube">▶️ YouTube</option>  
+<option value="donation">💰 Donation</option>  
+<option value="notification">🔔 Notification</option>  
+<option value="image">🖼️ Image</option>  
+<option value="video">🎬 Video</option>  
+<option value="gif">🎞️ GIF</option>  
+<option value="audio">🎵 Audio</option>  
+<option value="music">🎧 Music</option>  
+<option value="gallery">🎥 Gallery Video</option>  
+<option value="live">🔴 Live Channel</option>  
+<option value="ad">📢 Advertisement</option>  </select>  </div>  <div class="card">  <div id="fieldMessage" class="field show">  <label>Message</label>
+
+<textarea  
+id="message"  
+placeholder="اپنا پیغام یہاں لکھیں..."></textarea>  </div>  <div id="fieldUrl" class="field">  <label>Website URL</label>
+
+<input  
+id="buttonUrl"  
+placeholder="https://example.com">
+
+<label style="margin-top:12px">  
+Button Text  
+</label>  <input  
+id="buttonText"  
+placeholder="Open Website">
+
+</div>  <div id="fieldYoutube" class="field">  <label>YouTube Video URL</label>
+
+<input  
+id="mediaUrlYoutube"  
+placeholder="https://youtube.com/watch?v=...">
+
+<label style="margin-top:12px">  
+Video Title  
+</label>  <input  
+id="messageYoutube"  
+placeholder="YouTube video title">
+
+</div>  <div id="fieldDonation" class="field">  <label>Donation URL</label>
+
+<input  
+id="buttonUrlDonation"  
+placeholder="https://...">
+
+<label style="margin-top:12px">  
+Donation Message  
+</label>  <textarea  
+id="messageDonation"  
+placeholder="Support MAYOTUBE..."></textarea>  <label>Button Text</label>
+
+<input  
+id="buttonTextDonation"  
+placeholder="Donate Now">
+
+</div>  <div id="fieldNotification" class="field">  <label>Notification Message</label>
+
+<textarea  
+id="messageNotification"  
+placeholder="Notification text..."></textarea>  </div>  <div id="fieldMedia" class="field">  <div class="media-box">  <div class="media-title">  
+Media URL  
+</div>  <input  
+id="mediaUrl"  
+placeholder="https://...">
+
+<div class="media-title"  
+style="margin-top:14px">  
+OR Upload Media  
+</div>  <input  
+id="file"  
+type="file"  
+accept="image/*,video/*,audio/*">
+
+<div id="preview"  
+class="preview hidden">  
+</div>  <div id="uploadProgress">  
+<div id="uploadBar"></div>  
+</div>  </div>  </div>  <div id="fieldButton" class="field">  <label>Button Text</label>
+
+<input  
+id="commonButtonText"  
+placeholder="Watch Now">
+
+<label style="margin-top:12px">  
+Button URL  
+</label>  <input  
+id="commonButtonUrl"  
+placeholder="https://...">
+
+</div>  <div class="row">  <button  
+class="primary"  
+onclick="saveContent()">
+Save Content
+</button>
+
+<button onclick="clearForm()">  
+Clear  
+</button>  <button onclick="loadContent()">  
+Refresh  
+</button>  </div>  <div  
+id="saveStatus"  
+class="small"  
+style="margin-top:10px">  
+</div>  </div>  <div class="card">  <h2>Saved Homepage Content</h2>  <div class="small" style="margin-bottom:12px">  
+پریس کرکے Box کو Drag کر کے اوپر یا نیچے کریں۔  
+موبائل پر ▲ ▼ بٹن بھی استعمال کر سکتے ہیں۔  
+</div>  <div id="contentList">  
+Loading...  
+</div>  <div class="order-save">  <button  
+class="primary"  
+style="width:100%"  
+onclick="saveOrder()">
+💾 Save Homepage Order
+</button>
+
+<div  
+id="orderStatus"  
+class="small">  
+</div>  </div>  </div>  </main>  <script>  
+  
+let editId=null;  
+let apiToken="";  
+let draggedItem=null;  
+  
+const fields=[  
+"fieldMessage",  
+"fieldUrl",  
+"fieldYoutube",  
+"fieldDonation",  
+"fieldNotification",  
+"fieldMedia",  
+"fieldButton"  
+];  
+  
+function hideAll(){  
+  
+fields.forEach(id=>{  
+document.getElementById(id)  
+.classList.remove("show");  
+});  
+  
+}  
+  
+function show(id){  
+  
+document.getElementById(id)  
+.classList.add("show");  
+  
+}  
+  
+function typeChanged(){  
+  
+const type=  
+document.getElementById("type").value;  
+  
+hideAll();  
+  
+if(type==="message")  
+show("fieldMessage");  
+  
+else if(type==="url")  
+show("fieldUrl");  
+  
+else if(type==="youtube")  
+show("fieldYoutube");  
+  
+else if(type==="donation")  
+show("fieldDonation");  
+  
+else if(type==="notification")  
+show("fieldNotification");  
+  
+else if(  
+type==="image"||  
+type==="video"||  
+type==="gif"||  
+type==="audio"||  
+type==="music"||  
+type==="gallery"||  
+type==="live"  
+)  
+show("fieldMedia");  
+  
+else if(type==="ad"){  
+  
+show("fieldMessage");  
+show("fieldMedia");  
+show("fieldButton");  
+  
+}  
+  
+}  
+  
+  
+/* SESSION */  
+  
+async function getSession(){  
+  
+const r=await fetch(  
+"/api/admin/session",  
+{  
+credentials:"same-origin",  
+cache:"no-store"  
+}  
+);  
+  
+if(!r.ok)  
+throw new Error(  
+"Admin session not authenticated"  
+);  
+  
+const d=await r.json();  
+  
+if(!d.authenticated)  
+throw new Error(  
+"Admin session expired"  
+);  
+  
+apiToken=d.api_token||"";  
+  
+return d;  
+}  
+  
+  
+/* API */  
+  
+async function api(url,options={}){  
+  
+options.credentials="same-origin";  
+options.cache="no-store";  
+  
+options.headers=  
+options.headers||{};  
+  
+options.headers[  
+"X-MAYOTUBE-ADMIN"  
+]=apiToken;  
+  
+if(  
+options.body &&  
+!(options.body instanceof FormData)  
+){  
+  
+options.headers[  
+"Content-Type"  
+]="application/json";  
+  
+}  
+  
+const r=await fetch(url,options);  
+  
+const text=await r.text();  
+  
+let data={};  
+  
+try{  
+data=JSON.parse(text);  
+}catch(e){}  
+  
+if(!r.ok){  
+  
+throw new Error(  
+data.error||  
+text||  
+("HTTP "+r.status)  
+);  
+  
+}  
+  
+return data;  
+  
+}  
+  
+  
+/* STATUS */  
+  
+async function checkStatus(){  
+  
+const box=  
+document.getElementById(  
+"systemStatus"  
+);  
+  
+try{  
+  
+const r=await fetch(  
+"/api/health",  
+{  
+credentials:"same-origin",  
+cache:"no-store"  
+}  
+);  
+  
+const d=await r.json();  
+  
+if(r.ok&&d.status==="ok"){  
+  
+box.className="status";  
+  
+box.textContent=  
+"Online • Blob: "+  
+(  
+d.blob_configured  
+?"Configured"  
+:"Not Configured"  
+);  
+  
+}else{  
+  
+throw new Error(  
+"Health check failed"  
+);  
+  
+}  
+  
+}catch(e){  
+  
+box.className=  
+"status error";  
+  
+box.textContent=  
+"System Error: "+e.message;  
+  
+}  
+  
+}  
+  
+  
+/* LOAD */  
+  
+async function loadContent(){  
+  
+const box=  
+document.getElementById(  
+"contentList"  
+);  
+  
+box.textContent="Loading...";  
+  
+try{  
+  
+await getSession();  
+  
+const d=  
+await api(  
+"/api/admin/content"  
+);  
+  
+const items=  
+Array.isArray(d.items)  
+?d.items:[];  
+  
+if(!items.length){  
+  
+box.innerHTML=  
+'<div class="small">'+  
+'No homepage content saved.'+  
+'</div>';  
+  
+return;  
+  
+}  
+  
+box.innerHTML=  
+items.map(renderItem).join("");  
+  
+enableDragDrop();  
+  
+}catch(e){  
+  
+box.innerHTML=  
+'<div class="error" '+  
+'style="padding:10px;border-radius:8px">'+  
+esc(e.message)+  
+'</div>';  
+  
+}  
+  
+}  
+  
+  
+/* RENDER */  
+  
+function renderItem(item,index){  
+  
+const id=  
+Number(item.id)||0;  
+  
+const enabled=  
+item.enabled!==false;  
+  
+const type=  
+item.type||"message";  
+  
+const media=  
+item.media_url||"";  
+  
+let preview="";  
+  
+if(media){  
+  
+if(type==="image"||  
+type==="gif"){  
+  
+preview=  
+'<img src="'+  
+esc(media)+  
+'" loading="lazy">';  
+  
+}  
+  
+else if(  
+type==="video"||  
+type==="gallery"||  
+type==="live"  
+){  
+  
+preview=  
+'<video src="'+  
+esc(media)+  
+'" controls preload="metadata"></video>';  
+  
+}  
+  
+else if(  
+type==="audio"||  
+type==="music"  
+){  
+  
+preview=  
+'<audio src="'+  
+esc(media)+  
+'" controls></audio>';  
+  
+}  
+  
+}  
+  
+return `  
+  
+<div  
+class="item"  
+data-id="${id}">  
+  
+<div class="order-bar">  
+  
+<div  
+class="drag-handle"  
+title="Press and drag">  
+☰ &nbsp; Press & Drag to Move  
+</div>  
+  
+<div class="order-buttons">  
+  
+<button  
+title="Move Up"  
+onclick="moveItem(${id},-1)">  
+▲  
+</button>  
+  
+<button  
+title="Move Down"  
+onclick="moveItem(${id},1)">  
+▼  
+</button>  
+  
+</div>  
+  
+</div>  
+  
+<b>  
+#${id} • ${esc(type)}  
+</b>  
+  
+<div class="small">  
+Order Position: ${index+1}  
+</div>  
+  
+<div class="small">  
+Status:  
+${enabled?"Enabled":"Disabled"}  
+</div>  
+  
+${  
+item.message  
+?  
+'<div style="margin-top:8px">'+  
+esc(item.message)+  
+'</div>'  
+:""  
+}  
+  
+${  
+item.button_text  
+?  
+'<div class="small">'+  
+'Button: '+  
+esc(item.button_text)+  
+'</div>'  
+:""  
+}  
+  
+${  
+item.button_url  
+?  
+'<div class="small">'+  
+'URL: '+  
+esc(item.button_url)+  
+'</div>'  
+:""  
+}  
+  
+${  
+media  
+?  
+'<div class="small">'+  
+'Media: '+  
+esc(media)+  
+'</div>'  
+:""  
+}  
+  
+${preview}  
+  
+<div class="row">  
+  
+<button  
+onclick="editItem(${id})">  
+Edit  
+</button>  
+  
+<button  
+class="${enabled?'':'ok'}"  
+onclick="toggleItem(${id})">  
+${enabled?"Disable":"Enable"}  
+</button>  
+  
+<button  
+class="danger"  
+onclick="deleteItem(${id})">  
+Delete  
+</button>  
+  
+</div>  
+  
+</div>  
+  
+`;  
+  
+}  
+  
+  
+/* DRAG */  
+  
+function enableDragDrop(){  
+  
+const items=  
+document.querySelectorAll(  
+"#contentList .item"  
+);  
+  
+items.forEach(item=>{  
+  
+const handle=  
+item.querySelector(".drag-handle");  
+  
+if(!handle)return;  
+  
+handle.onpointerdown=  
+function(){  
+  
+item.setPointerCapture?.(  
+event.pointerId  
+);  
+  
+};  
+  
+item.draggable=true;  
+  
+item.ondragstart=  
+function(){  
+  
+draggedItem=item;  
+  
+item.classList.add(  
+"dragging"  
+);  
+  
+};  
+  
+item.ondragend=  
+function(){  
+  
+item.classList.remove(  
+"dragging"  
+);  
+  
+document.querySelectorAll(  
+".drop-target"  
+).forEach(x=>  
+x.classList.remove(  
+"drop-target"  
+)  
+);  
+  
+draggedItem=null;  
+  
+};  
+  
+item.ondragover=  
+function(e){  
+  
+e.preventDefault();  
+  
+if(  
+draggedItem &&  
+draggedItem!==item  
+){  
+  
+item.classList.add(  
+"drop-target"  
+);  
+  
+}  
+  
+};  
+  
+item.ondragleave=  
+function(){  
+  
+item.classList.remove(  
+"drop-target"  
+);  
+  
+};  
+  
+item.ondrop=  
+function(e){  
+  
+e.preventDefault();  
+  
+item.classList.remove(  
+"drop-target"  
+);  
+  
+if(  
+!draggedItem ||  
+draggedItem===item  
+)return;  
+  
+const parent=  
+item.parentNode;  
+  
+const rect=  
+item.getBoundingClientRect();  
+  
+if(  
+e.clientY<  
+rect.top+  
+rect.height/2  
+){  
+  
+parent.insertBefore(  
+draggedItem,  
+item  
+);  
+  
+}else{  
+  
+parent.insertBefore(  
+draggedItem,  
+item.nextSibling  
+);  
+  
+}  
+  
+updatePositions();  
+  
+};  
+  
+});  
+  
+}  
+  
+  
+/* POSITION */  
+  
+function updatePositions(){  
+  
+document.querySelectorAll(  
+"#contentList .item"  
+).forEach(  
+(item,index)=>{  
+  
+const smalls=  
+item.querySelectorAll(  
+".small"  
+);  
+  
+if(smalls.length>1){  
+  
+smalls[0].textContent=  
+"Order Position: "+(index+1);  
+  
+}  
+  
+}  
+);  
+  
+}  
+  
+  
+/* MOVE UP / DOWN */  
+  
+function moveItem(id,direction){  
+  
+const list=  
+document.getElementById(  
+"contentList"  
+);  
+  
+const item=  
+list.querySelector(  
+'.item[data-id="'+id+'"]'  
+);  
+  
+if(!item)return;  
+  
+if(direction<0){  
+  
+const previous=  
+item.previousElementSibling;  
+  
+if(previous)  
+list.insertBefore(  
+item,  
+previous  
+);  
+  
+}else{  
+  
+const next=  
+item.nextElementSibling;  
+  
+if(next)  
+list.insertBefore(  
+item,  
+next.nextSibling  
+);  
+  
+}  
+  
+updatePositions();  
+  
+}  
+  
+  
+/* SAVE ORDER */  
+  
+async function saveOrder(){  
+  
+const status=  
+document.getElementById(  
+"orderStatus"  
+);  
+  
+const items=  
+Array.from(  
+document.querySelectorAll(  
+"#contentList .item"  
+)  
+);  
+  
+if(!items.length){  
+  
+status.textContent=  
+"No content to reorder.";  
+  
+return;  
+  
+}  
+  
+const order=  
+items.map(  
+item=>Number(  
+item.dataset.id  
+)  
+);  
+  
+status.textContent=  
+"Saving homepage order...";  
+  
+try{  
+  
+await getSession();  
+  
+await api(  
+"/api/admin/content/reorder",  
+{  
+method:"POST",  
+body:JSON.stringify({  
+order:order  
+})  
+}  
+);  
+  
+status.textContent=  
+"✓ Homepage order saved successfully.";  
+  
+await loadContent();  
+  
+}catch(e){  
+  
+status.textContent=  
+"Order save failed: "+  
+e.message;  
+  
+}  
+  
+}  
+  
+  
+/* SAVE */  
+  
+async function saveContent(){  
+  
+const status=  
+document.getElementById(  
+"saveStatus"  
+);  
+  
+status.textContent="Saving...";  
+  
+try{  
+  
+await getSession();  
+  
+const type=  
+document.getElementById(  
+"type"  
+).value;  
+  
+let item={  
+type:type,  
+message:"",  
+button_text:"",  
+button_url:"",  
+media_url:"",  
+enabled:true  
+};  
+  
+if(type==="message"){  
+  
+item.message=  
+document.getElementById(  
+"message"  
+).value.trim();  
+  
+}  
+  
+else if(type==="url"){  
+  
+item.button_url=  
+document.getElementById(  
+"buttonUrl"  
+).value.trim();  
+  
+item.button_text=  
+document.getElementById(  
+"buttonText"  
+).value.trim();  
+  
+}  
+  
+else if(type==="youtube"){  
+  
+item.media_url=  
+document.getElementById(  
+"mediaUrlYoutube"  
+).value.trim();  
+  
+item.message=  
+document.getElementById(  
+"messageYoutube"  
+).value.trim();  
+  
+}  
+  
+else if(type==="donation"){  
+  
+item.button_url=  
+document.getElementById(  
+"buttonUrlDonation"  
+).value.trim();  
+  
+item.message=  
+document.getElementById(  
+"messageDonation"  
+).value.trim();  
+  
+item.button_text=  
+document.getElementById(  
+"buttonTextDonation"  
+).value.trim();  
+  
+}  
+  
+else if(type==="notification"){  
+  
+item.message=  
+document.getElementById(  
+"messageNotification"  
+).value.trim();  
+  
+}  
+  
+else if(  
+type==="image"||  
+type==="video"||  
+type==="gif"||  
+type==="audio"||  
+type==="music"||  
+type==="gallery"||  
+type==="live"  
+){  
+  
+item.media_url=  
+document.getElementById(  
+"mediaUrl"  
+).value.trim();  
+  
+const file=  
+document.getElementById(  
+"file"  
+).files[0];  
+  
+if(file){  
+  
+status.textContent=  
+"Uploading media...";  
+  
+const fd=  
+new FormData();  
+  
+fd.append("file",file);  
+  
+showProgress(true,30);  
+  
+const upload=  
+await api(  
+"/api/admin/media/upload",  
+{  
+method:"POST",  
+body:fd  
+}  
+);  
+  
+showProgress(true,100);  
+  
+item.media_url=  
+upload.url||  
+upload.media_url||  
+"";  
+  
+if(!item.media_url)  
+throw new Error(  
+"Upload succeeded but no media URL returned"  
+);  
+  
+}  
+  
+}  
+  
+else if(type==="ad"){  
+  
+item.message=  
+document.getElementById(  
+"message"  
+).value.trim();  
+  
+item.media_url=  
+document.getElementById(  
+"mediaUrl"  
+).value.trim();  
+  
+item.button_text=  
+document.getElementById(  
+"commonButtonText"  
+).value.trim();  
+  
+item.button_url=  
+document.getElementById(  
+"commonButtonUrl"  
+).value.trim();  
+  
+const file=  
+document.getElementById(  
+"file"  
+).files[0];  
+  
+if(file){  
+  
+const fd=  
+new FormData();  
+  
+fd.append("file",file);  
+  
+status.textContent=  
+"Uploading advertisement...";  
+  
+const upload=  
+await api(  
+"/api/admin/media/upload",  
+{  
+method:"POST",  
+body:fd  
+}  
+);  
+  
+item.media_url=  
+upload.url||  
+upload.media_url||  
+"";  
+  
+}  
+  
+}  
+  
+if(editId!==null){  
+  
+item.id=editId;  
+  
+await api(  
+"/api/admin/content/update",  
+{  
+method:"POST",  
+body:JSON.stringify(item)  
+}  
+);  
+  
+status.textContent=  
+"Content updated successfully.";  
+  
+}else{  
+  
+await api(  
+"/api/admin/content/save",  
+{  
+method:"POST",  
+body:JSON.stringify(item)  
+}  
+);  
+  
+status.textContent=  
+"Content saved successfully.";  
+  
+}  
+  
+editId=null;  
+  
+clearForm();  
+  
+await loadContent();  
+  
+}catch(e){  
+  
+status.textContent=  
+"Save failed: "+e.message;  
+  
+}finally{  
+  
+setTimeout(  
+()=>showProgress(false),  
+500  
+);  
+  
+}  
+  
+}  
+  
+  
+/* DELETE */  
+  
+async function deleteItem(id){  
+  
+if(!confirm(  
+"Delete this content?"  
+))return;  
+  
+try{  
+  
+await getSession();  
+  
+await api(  
+"/api/admin/content/delete",  
+{  
+method:"POST",  
+body:JSON.stringify({  
+id:id  
+})  
+}  
+);  
+  
+await loadContent();  
+  
+}catch(e){  
+  
+alert(  
+"Delete failed: "+  
+e.message  
+);  
+  
+}  
+  
+}  
+  
+  
+/* TOGGLE */  
+  
+async function toggleItem(id){  
+  
+try{  
+  
+await getSession();  
+  
+await api(  
+"/api/admin/content/toggle",  
+{  
+method:"POST",  
+body:JSON.stringify({  
+id:id  
+})  
+}  
+);  
+  
+await loadContent();  
+  
+}catch(e){  
+  
+alert(  
+"Toggle failed: "+e.message  
+);  
+  
+}  
+  
+}  
+  
+  
+/* EDIT */  
+  
+async function editItem(id){  
+  
+try{  
+  
+await getSession();  
+  
+const d=  
+await api(  
+"/api/admin/content"  
+);  
+  
+const item=  
+(d.items||[]).find(  
+x=>Number(x.id)===Number(id)  
+);  
+  
+if(!item)  
+throw new Error(  
+"Content item not found"  
+);  
+  
+editId=  
+Number(item.id);  
+  
+document.getElementById(  
+"type"  
+).value=  
+item.type||"message";  
+  
+clearDynamicFields();  
+  
+const type=  
+item.type||"message";  
+  
+if(type==="message"){  
+  
+document.getElementById(  
+"message"  
+).value=  
+item.message||"";  
+  
+}  
+  
+else if(type==="url"){  
+  
+document.getElementById(  
+"buttonUrl"  
+).value=  
+item.button_url||"";  
+  
+document.getElementById(  
+"buttonText"  
+).value=  
+item.button_text||"";  
+  
+}  
+  
+else if(type==="youtube"){  
+  
+document.getElementById(  
+"mediaUrlYoutube"  
+).value=  
+item.media_url||"";  
+  
+document.getElementById(  
+"messageYoutube"  
+).value=  
+item.message||"";  
+  
+}  
+  
+else if(type==="donation"){  
+  
+document.getElementById(  
+"buttonUrlDonation"  
+).value=  
+item.button_url||"";  
+  
+document.getElementById(  
+"messageDonation"  
+).value=  
+item.message||"";  
+  
+document.getElementById(  
+"buttonTextDonation"  
+).value=  
+item.button_text||"";  
+  
+}  
+  
+else if(type==="notification"){  
+  
+document.getElementById(  
+"messageNotification"  
+).value=  
+item.message||"";  
+  
+}  
+  
+else if(  
+type==="image"||  
+type==="video"||  
+type==="gif"||  
+type==="audio"||  
+type==="music"||  
+type==="gallery"||  
+type==="live"  
+){  
+  
+document.getElementById(  
+"mediaUrl"  
+).value=  
+item.media_url||"";  
+  
+showPreview(  
+type,  
+item.media_url||""  
+);  
+  
+}  
+  
+else if(type==="ad"){  
+  
+document.getElementById(  
+"message"  
+).value=  
+item.message||"";  
+  
+document.getElementById(  
+"mediaUrl"  
+).value=  
+item.media_url||"";  
+  
+document.getElementById(  
+"commonButtonText"  
+).value=  
+item.button_text||"";  
+  
+document.getElementById(  
+"commonButtonUrl"  
+).value=  
+item.button_url||"";  
+  
+showPreview(  
+type,  
+item.media_url||""  
+);  
+  
+}  
+  
+typeChanged();  
+  
+document.getElementById(  
+"saveStatus"  
+).textContent=  
+"Editing item #"+editId;  
+  
+window.scrollTo({  
+top:0,  
+behavior:"smooth"  
+});  
+  
+}catch(e){  
+  
+alert(  
+"Edit failed: "+e.message  
+);  
+  
+}  
+  
+}  
+  
+  
+/* CLEAR */  
+  
+function clearDynamicFields(){  
+  
+const ids=[  
+"message",  
+"buttonText",  
+"buttonUrl",  
+"mediaUrl",  
+"mediaUrlYoutube",  
+"messageYoutube",  
+"buttonUrlDonation",  
+"messageDonation",  
+"buttonTextDonation",  
+"messageNotification",  
+"commonButtonText",  
+"commonButtonUrl"  
+];  
+  
+ids.forEach(id=>{  
+  
+const el=  
+document.getElementById(id);  
+  
+if(el)el.value="";  
+  
+});  
+  
+document.getElementById(  
+"file"  
+).value="";  
+  
+showPreview("","");  
+  
+}  
+  
+function clearForm(){  
+  
+editId=null;  
+  
+clearDynamicFields();  
+  
+document.getElementById(  
+"saveStatus"  
+).textContent="";  
+  
+document.getElementById(  
+"type"  
+).value="message";  
+  
+typeChanged();  
+  
+}  
+  
+  
+/* PREVIEW */  
+  
+function showPreview(type,url){  
+  
+const box=  
+document.getElementById(  
+"preview"  
+);  
+  
+if(!url){  
+  
+box.classList.add(  
+"hidden"  
+);  
+  
+box.innerHTML="";  
+  
+return;  
+  
+}  
+  
+let html="";  
+  
+if(  
+type==="image"||  
+type==="gif"  
+){  
+  
+html=  
+'<img src="'+  
+esc(url)+  
+'" onerror="previewError()">';  
+  
+}  
+  
+else if(  
+type==="video"||  
+type==="gallery"||  
+type==="live"  
+){  
+  
+html=  
+'<video src="'+  
+esc(url)+  
+'" controls></video>';  
+  
+}  
+  
+else if(  
+type==="audio"||  
+type==="music"  
+){  
+  
+html=  
+'<audio src="'+  
+esc(url)+  
+'" controls></audio>';  
+  
+}  
+  
+else if(type==="ad"){  
+  
+html=  
+'<img src="'+  
+esc(url)+  
+'" onerror="previewError()">';  
+  
+}  
+  
+else{  
+  
+box.classList.add(  
+"hidden"  
+);  
+  
+return;  
+  
+}  
+  
+box.innerHTML=html;  
+  
+box.classList.remove(  
+"hidden"  
+);  
+  
+}  
+  
+function previewError(){  
+  
+document.getElementById(  
+"preview"  
+).innerHTML=  
+'<div class="small">'+  
+'Media preview could not be loaded.'+  
+'</div>';  
+  
+}  
+  
+  
+/* PROGRESS */  
+  
+function showProgress(show,value){  
+  
+const box=  
+document.getElementById(  
+"uploadProgress"  
+);  
+  
+const bar=  
+document.getElementById(  
+"uploadBar"  
+);  
+  
+if(!show){  
+  
+box.style.display="none";  
+  
+bar.style.width="0%";  
+  
+return;  
+  
+}  
+  
+box.style.display="block";  
+  
+bar.style.width=  
+Math.max(  
+0,  
+Math.min(100,value||0)  
+)+"%";  
+  
+}  
+  
+  
+/* FILE PREVIEW */  
+  
+document.getElementById(  
+"file"  
+).addEventListener(  
+"change",  
+function(){  
+  
+const file=this.files[0];  
+  
+if(!file)return;  
+  
+const type=  
+document.getElementById(  
+"type"  
+).value;  
+  
+showPreview(  
+type,  
+URL.createObjectURL(file)  
+);  
+  
+}  
+);  
+  
+  
+/* MEDIA URL PREVIEW */  
+  
+document.getElementById(  
+"mediaUrl"  
+).addEventListener(  
+"input",  
+function(){  
+  
+showPreview(  
+document.getElementById(  
+"type"  
+).value,  
+this.value.trim()  
+);  
+  
+}  
+);  
+  
+  
+/* ESCAPE */  
+  
+function esc(v){  
+  
+return String(v??"")  
+.replace(/&/g,"&amp;")  
+.replace(/</g,"&lt;")  
+.replace(/>/g,"&gt;")  
+.replace(/"/g,"&quot;")  
+.replace(/'/g,"&#039;");  
+  
+}  
+  
+  
+/* INIT */  
+  
+async function init(){  
+  
+try{  
+  
+await getSession();  
+  
+await checkStatus();  
+  
+typeChanged();  
+  
+await loadContent();  
+  
+}catch(e){  
+  
+document.getElementById(  
+"systemStatus"  
+).className=  
+"status error";  
+  
+document.getElementById(  
+"systemStatus"  
+).textContent=  
+e.message;  
+  
+document.getElementById(  
+"contentList"  
+).innerHTML=  
+'<div class="error" '+  
+'style="padding:10px;border-radius:8px">'+  
+esc(e.message)+  
+'</div>';  
+  
+}  
+  
+}  
+  
+init();  
+  
+</script>  </body>  
 </html>
