@@ -1,73 +1,91 @@
-
 <section id="dynamicEditor" class="admin-editor">
+
   <div class="editor-head">
     <h3>Content Editor</h3>
     <button type="button" onclick="newItem()">＋ New</button>
   </div>
 
+  <!-- CONTENT TYPE -->
+  <div class="compact-field">
+    <label>Content Type</label>
+    <select id="itemType" onchange="updateEditorFields(); refreshPreviewFromForm();">
+      <option value="message">Message</option>
+      <option value="image">Image</option>
+      <option value="url">URL</option>
+      <option value="video">Video</option>
+      <option value="youtube">YouTube</option>
+      <option value="audio">Audio</option>
+      <option value="donation">Donation</option>
+      <option value="button">Button</option>
+      <option value="link">Link</option>
+      <option value="live">Live</option>
+      <option value="gif">GIF</option>
+      <option value="gallery">Gallery</option>
+      <option value="advertisement">Advertisement</option>
+      <option value="format">Format</option>
+    </select>
+  </div>
+
   <input id="itemId" type="hidden">
 
-  <label>Content Type</label>
-  <select id="itemType" onchange="updateEditorFields()">
-    <option value="message">Message</option>
-    <option value="format">Format</option>
-    <option value="url">URL</option>
-    <option value="video">Video</option>
-    <option value="youtube">YouTube</option>
-    <option value="audio">Audio</option>
-    <option value="image">Image</option>
-    <option value="gif">GIF</option>
-    <option value="gallery">Gallery</option>
-    <option value="donation">Donation</option>
-    <option value="button">Button</option>
-    <option value="link">Link</option>
-    <option value="live">Live</option>
-    <option value="advertisement">Advertisement</option>
-  </select>
-
-  <div id="fieldTitle">
+  <!-- COMMON -->
+  <div id="fieldTitle" class="editor-field">
     <label>Title</label>
-    <input id="itemTitle" type="text">
+    <input id="itemTitle" type="text" oninput="refreshPreviewFromForm()">
   </div>
 
-  <div id="fieldMessage">
+  <!-- MESSAGE -->
+  <div id="fieldMessage" class="editor-field">
     <label>Message</label>
-    <textarea id="itemMessage" rows="3"></textarea>
+    <textarea id="itemMessage" rows="3"
+      oninput="refreshPreviewFromForm()"></textarea>
   </div>
 
-  <div id="fieldDescription">
+  <!-- DESCRIPTION -->
+  <div id="fieldDescription" class="editor-field">
     <label>Description</label>
-    <textarea id="itemDescription" rows="2"></textarea>
+    <textarea id="itemDescription" rows="2"
+      oninput="refreshPreviewFromForm()"></textarea>
   </div>
 
-  <div id="fieldImageUrl">
+  <!-- IMAGE -->
+  <div id="fieldImageUrl" class="editor-field">
     <label>Image URL</label>
-    <input id="imageUrl" type="url">
+    <input id="imageUrl" type="url"
+      oninput="refreshPreviewFromForm()">
   </div>
 
-  <div id="fieldVideoUrl">
+  <!-- VIDEO -->
+  <div id="fieldVideoUrl" class="editor-field">
     <label>Video URL</label>
-    <input id="videoUrl" type="url">
+    <input id="videoUrl" type="url"
+      oninput="refreshPreviewFromForm()">
   </div>
 
-  <div id="fieldAudioUrl">
+  <!-- AUDIO -->
+  <div id="fieldAudioUrl" class="editor-field">
     <label>Audio URL</label>
     <input id="audioUrl" type="url">
   </div>
 
-  <div id="fieldLinkUrl">
+  <!-- LINK -->
+  <div id="fieldLinkUrl" class="editor-field">
     <label>URL / Link</label>
-    <input id="linkUrl" type="url">
+    <input id="linkUrl" type="url"
+      oninput="refreshPreviewFromForm()">
   </div>
 
-  <div id="fieldButtonText">
+  <!-- BUTTON -->
+  <div id="fieldButtonText" class="editor-field">
     <label>Button Text</label>
-    <input id="buttonText" type="text">
+    <input id="buttonText" type="text"
+      oninput="refreshPreviewFromForm()">
   </div>
 
-  <div id="fieldFormat">
+  <!-- FORMAT -->
+  <div id="fieldFormat" class="editor-field">
     <label>Format</label>
-    <select id="contentFormat">
+    <select id="contentFormat" onchange="refreshPreviewFromForm()">
       <option value="plain">Plain Text</option>
       <option value="bold">Bold</option>
       <option value="center">Center</option>
@@ -75,51 +93,63 @@
     </select>
   </div>
 
-  <div id="fieldDonation">
+  <!-- DONATION -->
+  <div id="fieldDonation" class="editor-field">
     <label>Donation Link</label>
     <input id="donationUrl" type="url">
   </div>
 
-  <div id="fieldLive">
+  <!-- LIVE -->
+  <div id="fieldLive" class="editor-field">
     <label>Live Stream URL</label>
     <input id="liveUrl" type="url">
   </div>
 
+  <!-- ORDER / ENABLE -->
   <div class="editor-row">
     <div>
       <label>Order</label>
       <input id="itemOrder" type="number" value="0">
     </div>
+
     <label class="check">
       <input id="itemEnabled" type="checkbox" checked>
       Enabled
     </label>
   </div>
 
-  <button type="button" onclick="saveItem()">Save Content</button>
+  <!-- SCHEDULE -->
+  <details class="compact-group">
+    <summary>🕒 Schedule</summary>
+
+    <div class="compact-grid">
+
+      <label class="check">
+        <input id="scheduleEnabled" type="checkbox"
+          onchange="toggleScheduleFields()">
+        Show / Hide by Schedule
+      </label>
+
+      <div id="scheduleFields" class="schedule-fields">
+        <label>
+          Start
+          <input id="scheduleStart" type="datetime-local">
+        </label>
+
+        <label>
+          End
+          <input id="scheduleEnd" type="datetime-local">
+        </label>
+      </div>
+
+    </div>
+  </details>
+
+  <button
+    type="button"
+    class="save-content-button"
+    onclick="saveItem()">
+    Save Content
+  </button>
+
 </section>
-
-<script>
-function updateEditorFields(){
-  const t=document.getElementById("itemType").value;
-  const show={
-    fieldMessage:["message","format"].includes(t),
-    fieldDescription:["message","format","donation","advertisement"].includes(t),
-    fieldImageUrl:["image","gif","gallery","donation","advertisement"].includes(t),
-    fieldVideoUrl:["video","youtube","live"].includes(t),
-    fieldAudioUrl:["audio"].includes(t),
-    fieldLinkUrl:["url","youtube","button","link","advertisement"].includes(t),
-    fieldButtonText:["button","donation","advertisement"].includes(t),
-    fieldFormat:t==="format",
-    fieldDonation:t==="donation",
-    fieldLive:t==="live"
-  };
-
-  Object.keys(show).forEach(id=>{
-    const e=document.getElementById(id);
-    if(e)e.style.display=show[id]?"":"none";
-  });
-}
-
-document.addEventListener("DOMContentLoaded",updateEditorFields);
-</script>
