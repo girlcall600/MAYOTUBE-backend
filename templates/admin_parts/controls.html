@@ -1,1 +1,124 @@
 
+<section id="styleControls" class="admin-controls">
+
+  <details open>
+    <summary>🎨 Colors</summary>
+    <div class="control-grid">
+      <label>Background
+        <input id="bgColor" type="color" value="#181818">
+      </label>
+      <label>Text
+        <input id="textColor" type="color" value="#ffffff">
+      </label>
+      <label>Accent
+        <input id="accentColor" type="color" value="#FFD600">
+      </label>
+    </div>
+  </details>
+
+  <details>
+    <summary>📦 Box</summary>
+    <div class="control-grid">
+      <label>Width
+        <input id="boxWidth" type="text" placeholder="100%">
+      </label>
+      <label>Height
+        <input id="boxHeight" type="text" placeholder="auto">
+      </label>
+      <label>Padding
+        <input id="boxPadding" type="text" placeholder="12px">
+      </label>
+      <label>Radius
+        <input id="boxRadius" type="text" placeholder="8px">
+      </label>
+    </div>
+  </details>
+
+  <details>
+    <summary>🖼️ Border / Shadow</summary>
+    <div class="control-grid">
+      <label>Border Width
+        <input id="borderWidth" type="text" placeholder="0">
+      </label>
+      <label>Border Color
+        <input id="borderColor" type="color" value="#333333">
+      </label>
+      <label>Shadow
+        <select id="boxShadow">
+          <option value="none">None</option>
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </label>
+    </div>
+  </details>
+
+  <details>
+    <summary>🖼️ Image Controls</summary>
+    <div class="control-grid">
+      <label>Width
+        <input id="imageWidth" type="text" placeholder="100%">
+      </label>
+      <label>Height
+        <input id="imageHeight" type="text" placeholder="auto">
+      </label>
+      <label>Fit
+        <select id="imageFit">
+          <option value="cover">Cover</option>
+          <option value="contain">Contain</option>
+          <option value="fill">Fill</option>
+        </select>
+      </label>
+      <label>Radius
+        <input id="imageRadius" type="text" placeholder="8px">
+      </label>
+    </div>
+  </details>
+
+  <details>
+    <summary>🎬 Video Controls</summary>
+    <div class="control-grid">
+      <label>Width
+        <input id="videoWidth" type="text" placeholder="100%">
+      </label>
+      <label>Height
+        <input id="videoHeight" type="text" placeholder="auto">
+      </label>
+      <label>Autoplay
+        <input id="videoAutoplay" type="checkbox">
+      </label>
+      <label>Muted
+        <input id="videoMuted" type="checkbox">
+      </label>
+      <label>Loop
+        <input id="videoLoop" type="checkbox">
+      </label>
+      <label>Controls
+        <input id="videoControls" type="checkbox" checked>
+      </label>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔗 Button / Link</summary>
+    <div class="control-grid">
+      <label>Button Color
+        <input id="buttonColor" type="color" value="#FFD600">
+      </label>
+      <label>Text Color
+        <input id="buttonTextColor" type="color" value="#000000">
+      </label>
+      <label>Radius
+        <input id="buttonRadius" type="text" placeholder="8px">
+      </label>
+      <label>Target
+        <select id="linkTarget">
+          <option value="_self">Same Window</option>
+          <option value="_blank">New Window</option>
+        </select>
+      </label>
+    </div>
+  </details>
+
+</section>
