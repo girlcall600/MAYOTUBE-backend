@@ -1206,15 +1206,15 @@
      <div class="input-group">
       <input id="mediaFile" type="file" accept="image/*,video/*,audio/*" onchange="updateMediaMessageLabel()">
      </div>
-     <div class="button-row">
-      <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
-      <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
-     </div>
      <div class="input-group">
       <label for="mediaMessage" id="mediaMessageLabel"> 📝 Media Message </label> <textarea id="mediaMessage" placeholder="اس تصویر، ویڈیو یا آڈیو کے ساتھ دکھایا جانے والا Message لکھیں..."></textarea>
       <div class="muted">Upload کے ساتھ یہ Message اسی media کے Content Item میں محفوظ ہوگا۔</div>
      </div>
      <label style="display:flex;align-items:center;gap:8px;background:#0d0d0d;padding:12px;border-radius:10px;border:1px solid #292929;margin-top:8px;"> <input id="createMediaContent" type="checkbox" checked style="width:auto"> 🏠 Upload کے ساتھ Homepage Content بھی بنائیں </label>
+     <div class="button-row">
+      <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
+      <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
+     </div>
      <div id="mediaList" class="media-grid" style="margin-top:13px"></div>
     </div>
     <!-- =================================================  
@@ -3983,12 +3983,15 @@ async function loadMedia() {
   
         renderMedia(media);  
   
-    } catch (error) {
-
-        // Error کو page کے اندر raw HTML/text کی صورت میں نہ دکھائیں۔
-        container.innerHTML = "";
-        showToast("Media load failed: " + error.message);
-
+    } catch (error) {  
+  
+        container.innerHTML =  
+            '<div class="loading">' +  
+                escapeHtml(  
+                    error.message  
+                ) +  
+            '</div>';  
+  
     }  
   
 }  
