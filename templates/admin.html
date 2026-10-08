@@ -4320,48 +4320,54 @@ function updateMediaMessageLabel() {
    DELETE MEDIA  
    ========================================================= */  
   
-async function deleteMedia(id) {  
-  
-    if (!id) {  
-        return;  
-    }  
-  
-    if (  
-        !confirm(  
-            "کیا یہ media delete کرنا ہے؟"  
-        )  
-    ) {  
-        return;  
-    }  
-  
-    try {  
-  
-        await api(  
-            "/api/admin/media/" +  
-            encodeURIComponent(id),  
-            {  
-                method: "DELETE"  
-            }  
-        );  
-  
-        showToast(  
-            "Media delete ہو گیا۔"  
-        );  
-  
-        await loadMedia();  
-  
-    } catch (error) {  
-  
-        showToast(  
-            "Delete failed: " +  
-            error.message  
-        );  
-  
-    }  
-  
-}  
-  
-  
+async function deleteMedia(id) {
+
+    if (!id) return;
+
+    if (!confirm(
+        "کیا یہ media delete کرنا ہے؟ اگر یہ Homepage Content میں استعمال ہو رہا ہے تو وہ Recycle Bin میں منتقل ہو جائے گا۔"
+    )) return;
+
+    try {
+        const result = await api(
+            "/api/admin/media/" + encodeURIComponent(id),
+            { method: "DELETE" }
+        );
+
+        const recycledItems = Array.isArray(result.recycled_items)
+            ? result.recycled_items
+            : [];
+
+        if (recycledItems.length) {
+            const trash = getTrash();
+            for (const item of recycledItems) {
+                if (!item || !item.id) continue;
+                if (!trash.some(x => String(x.item?.id) === String(item.id))) {
+                    trash.push({
+                        deletedAt: new Date().toISOString(),
+                        item: JSON.parse(JSON.stringify(item))
+                    });
+                }
+            }
+            setTrash(trash);
+            showToast("Media delete ہو گیا اور متعلقہ Content Recycle Bin میں منتقل ہو گیا۔");
+        } else {
+            showToast("Media delete ہو گیا۔");
+        }
+
+        await loadMedia();
+        await loadContent();
+        await loadHomePreview();
+        renderTrash();
+
+    } catch (error) {
+        console.error(error);
+        showToast("Delete failed: " + error.message);
+    }
+
+}
+
+
 /* =========================================================  
    SYSTEM STATUS  
    ========================================================= */  
