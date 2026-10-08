@@ -331,31 +331,27 @@
 
     .stats-grid {  
         display: grid;  
-        grid-template-columns: repeat(4, minmax(0, 1fr));  
-        gap: 6px;  
+        grid-template-columns: repeat(4, 1fr);  
+        gap: 10px;  
     }  
 
     .stat {  
         background: #0e0e0e;  
         border: 1px solid #292929;  
-        border-radius: 9px;  
-        padding: 8px 4px;  
+        border-radius: 12px;  
+        padding: 13px;  
         text-align: center;  
-        min-width: 0;  
     }  
 
     .stat-number {  
-        font-size: 17px;  
+        font-size: 22px;  
         font-weight: 900;  
-        margin-bottom: 2px;  
+        margin-bottom: 4px;  
     }  
 
     .stat-label {  
         color: #888;  
-        font-size: 9px;  
-        white-space: nowrap;  
-        overflow: hidden;  
-        text-overflow: ellipsis;  
+        font-size: 11px;  
     }  
 
     /* =====================================================  
@@ -765,8 +761,7 @@
         }  
 
         .stats-grid {  
-            grid-template-columns: repeat(4, minmax(0, 1fr));  
-            gap: 5px;  
+            grid-template-columns: repeat(2, 1fr);  
         }  
 
         .media-grid {  
@@ -1270,7 +1265,8 @@ async function api(path, options = {}) {
   
     const headers = {  
         ...(options.headers || {}),  
-        "Authorization": "Bearer " + adminToken  
+        "Authorization": "Bearer " + adminToken,  
+        "X-MAYOTUBE-ADMIN": adminToken  
     };  
   
     if (  
@@ -2269,18 +2265,17 @@ async function saveItem() {
         if (id) {  
   
             result = await api(  
-                "/api/admin/content/" +  
-                encodeURIComponent(id),  
+                "/api/admin/content/update",  
                 {  
-                    method: "PUT",  
-                    body: JSON.stringify(item)  
+                    method: "POST",  
+                    body: JSON.stringify({ id: id, ...item })  
                 }  
             );  
   
         } else {  
   
             result = await api(  
-                "/api/admin/content",  
+                "/api/admin/content/save",  
                 {  
                     method: "POST",  
                     body: JSON.stringify(item)  
@@ -2324,11 +2319,9 @@ async function toggleItem(id) {
     try {  
   
         await api(  
-            "/api/admin/content/" +  
-            encodeURIComponent(id) +  
-            "/toggle",  
+            "/api/admin/content/toggle",  
             {  
-                method: "PATCH"  
+                method: "POST", body: JSON.stringify({ id: id })  
             }  
         );  
   
@@ -2422,7 +2415,7 @@ async function duplicateItem(id) {
     try {  
   
         await api(  
-            "/api/admin/content",  
+            "/api/admin/content/save",  
             {  
                 method: "POST",  
                 body: JSON.stringify(copy)  
@@ -2521,10 +2514,10 @@ async function moveToTrash(id) {
 
     try {
         await api(
-            "/api/admin/content/" + encodeURIComponent(id),
+            "/api/admin/content/update",
             {
-                method: "PUT",
-                body: JSON.stringify(disabledItem)
+                method: "POST",
+                body: JSON.stringify({ id: id, ...disabledItem })
             }
         );
 
@@ -2578,10 +2571,10 @@ async function restoreTrash(index) {
 
     try {
         await api(
-            "/api/admin/content/" + encodeURIComponent(item.id),
+            "/api/admin/content/update",
             {
-                method: "PUT",
-                body: JSON.stringify(restored)
+                method: "POST",
+                body: JSON.stringify({ id: item.id, ...restored })
             }
         );
 
@@ -2626,8 +2619,8 @@ async function permanentDeleteTrash(index) {
 
     try {
         await api(
-            "/api/admin/content/" + encodeURIComponent(id),
-            { method: "DELETE" }
+            "/api/admin/content/delete",
+            { method: "POST", body: JSON.stringify({ id: id }) }
         );
 
         trash.splice(index, 1);
@@ -2674,8 +2667,8 @@ async function emptyTrash() {
 
         try {
             await api(
-                "/api/admin/content/" + encodeURIComponent(item.id),
-                { method: "DELETE" }
+                "/api/admin/content/delete",
+                { method: "POST", body: JSON.stringify({ id: item.id }) }
             );
         } catch (error) {
             console.error("Permanent delete failed for " + item.id, error);
@@ -3151,10 +3144,10 @@ async function reorderItems(
     try {  
         for (const item of items) {  
             await api(  
-                "/api/admin/content/" + encodeURIComponent(item.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
+                "/api/admin/content/update",
+                {
+                    method: "POST",
+                    body: JSON.stringify({ id: item.id,
                         type: item.type || "message",  
                         title: item.title || "",  
                         message: item.message || "",  
@@ -3218,10 +3211,11 @@ async function saveOrder() {
         for (let index = 0; index < ids.length; index++) {  
             const original = serverMap.get(ids[index]);  
             await api(  
-                "/api/admin/content/" + encodeURIComponent(original.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
+                "/api/admin/content/update",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        id: original.id,
                         type: original.type || "message",  
                         title: original.title || "",  
                         message: original.message || "",  
@@ -4117,7 +4111,7 @@ async function uploadMedia() {
     try {  
   
         const result = await api(  
-            "/api/admin/media",  
+            "/api/admin/media/upload",
             { method: "POST", body: form }  
         );  
   
