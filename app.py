@@ -44,19 +44,30 @@ def admin_required():
         ""
     )
 
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    bearer_token = ""
+    if authorization.startswith("Bearer "):
+        bearer_token = authorization[7:].strip()
+
     session_token = session.get(
         "admin_api_token",
         ""
     )
 
-    return bool(
-        api_token
-        and session_token
-        and hmac.compare_digest(
-            api_token,
-            session_token
-        )
-    )
+    if api_token and session_token and hmac.compare_digest(api_token, session_token):
+        return True
+
+    if bearer_token and ADMIN_TOKEN and hmac.compare_digest(bearer_token, ADMIN_TOKEN):
+        return True
+
+    if bearer_token and session_token and hmac.compare_digest(bearer_token, session_token):
+        return True
+
+    return False
 
 
 def empty_content():
@@ -64,6 +75,7 @@ def empty_content():
         "app": "MAYOTUBE",
         "count": 0,
         "enabled": True,
+        "home_enabled": True,
         "items": []
     }
 
@@ -159,6 +171,9 @@ def load_content(blob_url=None):
         list
     ):
         data["items"] = []
+
+    if "home_enabled" not in data:
+        data["home_enabled"] = data.get("enabled", True) is not False
 
     data["count"] = len(
         data["items"]
@@ -305,6 +320,8 @@ def public_home_content():
         ):
             items = []
 
+        home_enabled = data.get("home_enabled", True) is not False
+
         enabled_items = [
             item
             for item in items
@@ -313,12 +330,12 @@ def public_home_content():
                 "enabled",
                 True
             ) is True
-        ]
+        ] if home_enabled else []
 
         return jsonify({
             "app": "MAYOTUBE",
             "count": len(enabled_items),
-            "enabled": True,
+            "enabled": home_enabled,
             "items": enabled_items
         })
 
@@ -757,6 +774,266 @@ def admin_content_toggle():
             "Content status update failed",
             e
         )
+
+
+
+# -----------------------------------------------------------------------------
+# ADMIN API COMPATIBILITY ROUTES
+# admin.html uses these REST-style endpoints.  The original /save, /update,
+# /delete and /toggle endpoints are kept above for backward compatibility.
+# -----------------------------------------------------------------------------
+
+
+@app.post("/api/admin/content")
+def admin_content_create_compat():
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        item = request.get_json(silent=True)
+        if not isinstance(item, dict):
+            return jsonify({"error": "Invalid content data"}), 400
+
+        content_type = str(item.get("type", "")).strip()
+        if not content_type:
+            return jsonify({"error": "Content type is required"}), 400
+
+        data = load_content()
+        items = data.get("items", [])
+        if not isinstance(items, list):
+            items = []
+
+        numeric_ids = []
+        for existing in items:
+            if not isinstance(existing, dict):
+                continue
+            try:
+                numeric_ids.append(int(existing.get("id", 0)))
+            except Exception:
+                pass
+
+        item["id"] = max(numeric_ids or [0]) + 1
+        item["enabled"] = item.get("enabled", True) is not False
+        items.append(item)
+        data["items"] = items
+        data["count"] = len(items)
+
+        save_and_verify(data)
+        return jsonify({
+            "success": True,
+            "message": "Content saved and verified successfully",
+            "data": data
+        })
+    except Exception as e:
+        return error_response("Content save failed", e)
+
+
+@app.put("/api/admin/content/<item_id>")
+def admin_content_update_compat(item_id):
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        item = request.get_json(silent=True)
+        if not isinstance(item, dict):
+            return jsonify({"error": "Invalid content data"}), 400
+
+        data = load_content()
+        items = data.get("items", [])
+        if not isinstance(items, list):
+            items = []
+
+        found = False
+        for index, old_item in enumerate(items):
+            if not isinstance(old_item, dict):
+                continue
+            if str(old_item.get("id")) == str(item_id):
+                item["id"] = old_item.get("id")
+                item["enabled"] = item.get("enabled", old_item.get("enabled", True)) is not False
+                items[index] = item
+                found = True
+                break
+
+        if not found:
+            return jsonify({"error": "Content not found"}), 404
+
+        data["items"] = items
+        data["count"] = len(items)
+        save_and_verify(data)
+        return jsonify({
+            "success": True,
+            "message": "Content updated and verified successfully",
+            "data": data
+        })
+    except Exception as e:
+        return error_response("Content update failed", e)
+
+
+@app.delete("/api/admin/content/<item_id>")
+def admin_content_delete_compat(item_id):
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        data = load_content()
+        items = data.get("items", [])
+        if not isinstance(items, list):
+            items = []
+
+        new_items = [
+            item for item in items
+            if not isinstance(item, dict)
+            or str(item.get("id")) != str(item_id)
+        ]
+
+        if len(new_items) == len(items):
+            return jsonify({"error": "Content not found"}), 404
+
+        for index, item in enumerate(new_items, 1):
+            if isinstance(item, dict):
+                item["id"] = index
+
+        data["items"] = new_items
+        data["count"] = len(new_items)
+        save_and_verify(data)
+        return jsonify({
+            "success": True,
+            "message": "Content deleted and verified successfully",
+            "data": data
+        })
+    except Exception as e:
+        return error_response("Content delete failed", e)
+
+
+@app.patch("/api/admin/content/<item_id>/toggle")
+def admin_content_toggle_compat(item_id):
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        data = load_content()
+        items = data.get("items", [])
+        if not isinstance(items, list):
+            items = []
+
+        for item in items:
+            if isinstance(item, dict) and str(item.get("id")) == str(item_id):
+                item["enabled"] = not bool(item.get("enabled", True))
+                data["items"] = items
+                data["count"] = len(items)
+                save_and_verify(data)
+                return jsonify({
+                    "success": True,
+                    "enabled": item["enabled"],
+                    "data": data
+                })
+
+        return jsonify({"error": "Content not found"}), 404
+    except Exception as e:
+        return error_response("Content status update failed", e)
+
+
+@app.patch("/api/admin/home/toggle")
+def admin_home_toggle_compat():
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        body = request.get_json(silent=True) or {}
+        enabled = bool(body.get("enabled", True))
+        data = load_content()
+        data["home_enabled"] = enabled
+        data["enabled"] = enabled
+        data["count"] = len(data.get("items", []))
+        save_and_verify(data)
+        return jsonify({
+            "success": True,
+            "enabled": enabled,
+            "data": data
+        })
+    except Exception as e:
+        return error_response("Home status update failed", e)
+
+
+@app.get("/api/admin/media")
+def admin_media_list_compat():
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        client = blob_client()
+        listing = client.list_objects(prefix="media/")
+        media = []
+
+        for blob in getattr(listing, "blobs", []) or []:
+            pathname = getattr(blob, "pathname", "") or ""
+            if not pathname or pathname == "media/":
+                continue
+
+            url = getattr(blob, "url", None)
+            filename = pathname.rsplit("/", 1)[-1]
+            content_type = getattr(blob, "content_type", None) or getattr(blob, "contentType", None) or ""
+
+            media.append({
+                "id": pathname,
+                "key": pathname,
+                "pathname": pathname,
+                "name": filename,
+                "filename": filename,
+                "url": url,
+                "public_url": url,
+                "content_type": content_type
+            })
+
+        return jsonify({"media": media, "count": len(media)})
+    except Exception as e:
+        return error_response("Media list failed", e)
+
+
+@app.delete("/api/admin/media/<path:media_id>")
+def admin_media_delete_compat(media_id):
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        pathname = media_id
+        if not pathname.startswith("media/"):
+            pathname = "media/" + pathname
+
+        client = blob_client()
+        delete_method = getattr(client, "delete", None)
+        if not callable(delete_method):
+            raise RuntimeError("Installed Vercel Blob SDK does not provide delete()")
+
+        delete_method(pathname)
+        return jsonify({
+            "success": True,
+            "message": "Media deleted successfully",
+            "pathname": pathname
+        })
+    except Exception as e:
+        return error_response("Media delete failed", e)
+
+
+@app.get("/api/admin/status")
+def admin_status_compat():
+    if not admin_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        data = load_content()
+        items = data.get("items", []) if isinstance(data, dict) else []
+        return jsonify({
+            "success": True,
+            "app": "MAYOTUBE",
+            "status": "online",
+            "content_count": len(items) if isinstance(items, list) else 0,
+            "home_enabled": data.get("home_enabled", True) is not False,
+            "blob_configured": bool(BLOB_TOKEN),
+            "admin_token_configured": bool(ADMIN_TOKEN)
+        })
+    except Exception as e:
+        return error_response("Status unavailable", e)
 
 
 @app.post("/api/admin/media/upload")
