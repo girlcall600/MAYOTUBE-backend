@@ -336,6 +336,7 @@ def health():
     })
 
 
+@app.get("/api/home-content")
 @app.get("/api/home/content")
 def public_home_content():
     try:
