@@ -2625,6 +2625,7 @@ async function moveToTrash(id) {
         description: item.description || "",
         image_url: item.image_url || "",
         video_url: item.video_url || "",
+        audio_url: item.audio_url || "",
         link_url: item.link_url || "",
         button_text: item.button_text || "",
         order: item.order || 0,
@@ -2682,6 +2683,7 @@ async function restoreTrash(index) {
         description: item.description || "",
         image_url: item.image_url || "",
         video_url: item.video_url || "",
+        audio_url: item.audio_url || "",
         link_url: item.link_url || "",
         button_text: item.button_text || "",
         order: item.order || 0,
@@ -2744,11 +2746,22 @@ async function permanentDeleteTrash(index) {
             { method: "DELETE" }
         );
 
+        const latest = await api("/api/admin/content");
+        const stillExists = Array.isArray(latest.items) &&
+            latest.items.some(x => String(x.id) === String(id));
+
+        if (stillExists) {
+            throw new Error("Server نے Content کو delete نہیں کیا۔");
+        }
+
         trash.splice(index, 1);
         setTrash(trash);
 
-        showToast("Content مستقل طور پر Delete ہو گیا۔");
-        await loadContent();
+        cmsContent = latest || {};
+        if (!Array.isArray(cmsContent.items)) cmsContent.items = [];
+
+        showToast("Content مستقل طور پر واقعی Delete ہو گیا۔");
+        renderItems();
         await loadHomePreview();
         renderTrash();
 
@@ -2864,8 +2877,15 @@ function renderTrash() {
   
 function getFilteredItems() {  
   
-    let items =  
-        [...(cmsContent.items || [])];  
+    const trashIds = new Set(
+        getTrash()
+            .map(record => record && record.item ? String(record.item.id) : "")
+            .filter(Boolean)
+    );
+
+    let items =
+        [...(cmsContent.items || [])]
+            .filter(item => !trashIds.has(String(item.id)));  
   
     const search =  
         (  
