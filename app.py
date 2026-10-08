@@ -4,6 +4,7 @@ import hmac
 import urllib.request
 import time
 import secrets
+from urllib.parse import unquote
 
 from flask import (
     Flask,
@@ -1026,7 +1027,11 @@ def admin_media_delete_compat(media_id):
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        pathname = media_id or ""
+        # encodeURIComponent() on the Admin page turns the slash in
+        # "media/<filename>" into "%2F". Decode it before resolving the
+        # Blob pathname, otherwise we would incorrectly create
+        # "media/media%2F<filename>".
+        pathname = unquote(media_id or "")
         if not pathname.startswith("media/"):
             pathname = "media/" + pathname
 
