@@ -1026,70 +1026,83 @@ def admin_media_delete_compat(media_id):
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        pathname = media_id
+        pathname = media_id or ""
         if not pathname.startswith("media/"):
             pathname = "media/" + pathname
 
         client = blob_client()
 
-        # Find the public URL for this media before deleting it.
+        # Resolve the Blob directly by pathname first.  The previous version
+        # used list_objects(prefix=<exact pathname>), which can fail to return
+        # an exact object even when that Blob exists.
         media_url = None
-        listing = client.list_objects(prefix=pathname)
-        for blob in getattr(listing, "blobs", []) or []:
-            blob_path = getattr(blob, "pathname", "") or ""
-            if blob_path == pathname:
-                media_url = getattr(blob, "url", None)
-                break
+        blob_info = None
+
+        try:
+            blob_info = client.head(pathname)
+        except Exception:
+            blob_info = None
+
+        if blob_info is not None:
+            media_url = getattr(blob_info, "url", None)
+
+        # Fallback: list the media directory and compare normalized pathnames.
+        if not media_url:
+            listing = client.list_objects(prefix="media/")
+            for blob in getattr(listing, "blobs", []) or []:
+                blob_path = str(getattr(blob, "pathname", "") or "").strip()
+                if blob_path == pathname:
+                    blob_info = blob
+                    media_url = getattr(blob, "url", None)
+                    break
+
+        if not media_url:
+            raise RuntimeError(
+                "Media blob was not found for pathname: " + pathname
+            )
 
         # If this media is used by Homepage Content, disable it and return
         # the original records so the Admin UI can place them in Recycle Bin.
         recycled_items = []
-        if media_url:
-            data = load_content()
-            items = data.get("items", [])
-            if not isinstance(items, list):
-                items = []
+        data = load_content()
+        items = data.get("items", [])
+        if not isinstance(items, list):
+            items = []
 
-            changed = False
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
+        changed = False
+        for item in items:
+            if not isinstance(item, dict):
+                continue
 
-                references_media = any(
-                    str(item.get(field) or "") == str(media_url)
-                    for field in ("image_url", "video_url", "audio_url")
-                )
-
-                if references_media:
-                    original = json.loads(json.dumps(item, ensure_ascii=False))
-                    recycled_items.append(original)
-                    item["enabled"] = False
-                    changed = True
-
-            if changed:
-                data["items"] = items
-                data["count"] = len(items)
-                save_and_verify(data)
-
-        # Delete the exact Blob URL we found. Vercel Blob accepts either a
-        # pathname or a URL, but using the exact URL prevents a false-success
-        # when a pathname does not match the stored object.
-        delete_method = getattr(client, "delete", None)
-        if not callable(delete_method):
-            raise RuntimeError("Installed Vercel Blob SDK does not provide delete()")
-
-        if not media_url:
-            raise RuntimeError(
-                "Media blob was not found before delete; nothing was deleted"
+            references_media = any(
+                str(item.get(field) or "") == str(media_url)
+                for field in ("image_url", "video_url", "audio_url")
             )
 
-        delete_method(media_url)
+            if references_media:
+                original = json.loads(json.dumps(item, ensure_ascii=False))
+                recycled_items.append(original)
+                item["enabled"] = False
+                changed = True
 
-        # Do not tell the Admin UI that deletion succeeded unless the Blob is
-        # actually gone. Vercel Blob's delete operation can otherwise return
-        # without an error when the target does not exist.
+        if changed:
+            data["items"] = items
+            data["count"] = len(items)
+            save_and_verify(data)
+
+        # Delete using the exact pathname.  Vercel Blob's Python SDK accepts
+        # either a pathname or a public URL.
+        delete_method = getattr(client, "delete", None)
+        if not callable(delete_method):
+            raise RuntimeError(
+                "Installed Vercel Blob SDK does not provide delete()"
+            )
+
+        delete_method(pathname)
+
+        # Verify the exact pathname is really gone.
         try:
-            client.head(media_url)
+            client.head(pathname)
         except Exception as verify_error:
             verify_text = str(verify_error).lower()
             not_found_markers = (
@@ -1118,7 +1131,6 @@ def admin_media_delete_compat(media_id):
 
     except Exception as e:
         return error_response("Media delete failed", e)
-
 
 
 @app.get("/api/admin/status")
