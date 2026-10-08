@@ -119,75 +119,7 @@
         padding: 12px;  
         outline: none;  
         font-size: 14px;  
-    }
-
-    /* Compact Content Type selector */
-    #itemType.compact-type-select {
-        width: 100%;
-        max-width: 100%;
-        padding: 9px 10px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .selected-feature-panel {
-        background: #101010;
-        border: 1px solid #292929;
-        border-radius: 12px;
-        padding: 10px;
-        margin-bottom: 4px;
-    }
-
-    .selected-feature-title {
-        color: #aaa;
-        font-size: 11px;
-        font-weight: 800;
-        margin-bottom: 8px;
-    }
-
-    .selected-feature-panel .input-group {
-        margin-bottom: 9px;
-    }
-
-    .selected-feature-panel .input-group:last-child {
-        margin-bottom: 0;
-    }
-
-    .editor-collapse {
-        background: #101010;
-        border: 1px solid #292929;
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .editor-collapse summary {
-        list-style: none;
-        cursor: pointer;
-        padding: 12px 14px;
-        font-size: 13px;
-        font-weight: 800;
-        color: #ddd;
-    }
-
-    .editor-collapse summary::-webkit-details-marker {
-        display: none;
-    }
-
-    .editor-collapse summary span {
-        color: #777;
-        font-size: 10px;
-        font-weight: 500;
-        margin-right: 6px;
-    }
-
-    .editor-collapse[open] summary {
-        border-bottom: 1px solid #292929;
-    }
-
-    .editor-collapse .design-controls {
-        border: 0;
-        border-radius: 0;
-    }
+    }  
 
     input:focus,  
     select:focus,  
@@ -406,24 +338,20 @@
     .stat {  
         background: #0e0e0e;  
         border: 1px solid #292929;  
-        border-radius: 9px;  
-        padding: 7px 5px;  
-        min-height: 54px;  
-        display: flex;  
-        flex-direction: column;  
-        justify-content: center;  
+        border-radius: 12px;  
+        padding: 13px;  
         text-align: center;  
     }  
 
     .stat-number {  
-        font-size: 16px;  
+        font-size: 22px;  
         font-weight: 900;  
-        margin-bottom: 2px;  
+        margin-bottom: 4px;  
     }  
 
     .stat-label {  
         color: #888;  
-        font-size: 9px;  
+        font-size: 11px;  
     }  
 
     /* =====================================================  
@@ -582,22 +510,17 @@
     }  
 
     .item-title {  
-        font-size: 12px;  
-        font-weight: 800;  
-        word-break: break-word;  
-        line-height: 1.35;  
-    }  
-
-    .item-message {  
-        margin-top: 3px;  
-        color: #999;  
-        font-size: 11px;  
-        line-height: 1.4;  
-        white-space: pre-wrap;  
+        font-size: 14px;  
+        font-weight: 900;  
         word-break: break-word;  
     }  
 
-    .item-meta { display: none; }  
+    .item-meta {  
+        display: flex;  
+        flex-wrap: wrap;  
+        gap: 5px;  
+        margin-top: 6px;  
+    }  
 
     .badge {  
         display: inline-flex;  
@@ -632,8 +555,12 @@
         word-break: break-word;  
     }  
 
-    .item-actions { display: flex; gap: 6px; margin-top: 10px; }  
-    .item-actions .item-action-btn { flex: 1 1 0; min-width: 0; height: 34px; padding: 5px 6px; font-size: 11px; white-space: nowrap; }  
+    .item-actions {  
+        display: flex;  
+        flex-wrap: wrap;  
+        gap: 6px;  
+        margin-top: 10px;  
+    }  
 
     /* =====================================================  
        LIVE PREVIEW  
@@ -770,17 +697,13 @@
        RECYCLE BIN  
        ===================================================== */  
 
-    .trash-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; overflow-x:auto; padding:2px 0 9px; margin:0; scrollbar-width:thin; direction:ltr; }
-    .trash-content-btn, .trash-empty-btn { flex:0 0 92px; width:92px; height:38px; box-sizing:border-box; padding:5px 7px; border-radius:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; font-size:10px; font-weight:700; }
-    .trash-content-btn { border:1px solid #452020; background:#130b0b; color:#ddd; direction:rtl; }
-    .trash-content-btn:hover { border-color:#ef4444; }
-    .trash-empty-btn { border:1px solid #7f1d1d; }
-    #trashActionModal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.72); }
-    #trashActionModal.show { display:flex; }
-    .trash-modal-box { width:min(360px,100%); background:#171717; border:1px solid #383838; border-radius:14px; padding:16px; box-shadow:0 18px 50px rgba(0,0,0,.55); }
-    .trash-modal-title { font-size:14px; font-weight:800; margin-bottom:12px; word-break:break-word; }
-    .trash-modal-actions { display:flex; gap:8px; }
-    .trash-modal-actions .btn { flex:1 1 0; }  
+    .trash-card {  
+        background: #130b0b;  
+        border: 1px solid #452020;  
+        border-radius: 12px;  
+        padding: 11px;  
+        margin-bottom: 8px;  
+    }  
 
     /* =====================================================  
        TOAST  
@@ -949,42 +872,43 @@
      <div class="editor-grid">
       <!-- TYPE -->
       <div class="input-group">
-       <label for="itemType"> Content Type </label> <select id="itemType" class="compact-type-select" onchange="updateEditorFields()"> <option value="" selected> Content Type </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image / Photo </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> URL / Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
+       <label for="itemType"> Content Type </label> <select id="itemType" onchange="updateEditorFields()"> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select>
       </div>
-      <!-- SELECTED FEATURE FIELDS -->
-      <div id="selectedFeaturePanel" class="selected-feature-panel full" style="display:none">
-       <div class="selected-feature-title">✨ Selected Feature Fields</div>
-       <!-- TITLE -->
-       <div id="fieldTitle" class="input-group">
-        <label for="itemTitle"> Title </label> <input id="itemTitle" type="text" placeholder="Content title">
-       </div>
-       <!-- MESSAGE -->
-       <div id="fieldMessage" class="input-group full">
-        <label for="itemMessage"> Message </label> <textarea id="itemMessage" placeholder="Message..."></textarea>
-       </div>
-       <!-- DESCRIPTION -->
-       <div id="fieldDescription" class="input-group full">
-        <label for="itemDescription"> Description </label> <textarea id="itemDescription" placeholder="Description..."></textarea>
-       </div>
-       <!-- IMAGE -->
-       <div id="fieldImageUrl" class="input-group full">
-        <label for="imageUrl"> 🖼️ Image URL </label> <input id="imageUrl" type="url" placeholder="https://...">
-       </div>
-       <!-- VIDEO -->
-       <div id="fieldVideoUrl" class="input-group full">
-        <label for="videoUrl"> 🎬 Video URL </label> <input id="videoUrl" type="url" placeholder="https://...">
-       </div>
-       <!-- LINK -->
-       <div id="fieldAudioUrl" class="input-group full">
-        <label for="audioUrl"> 🎵 Audio URL </label> <input id="audioUrl" type="url" placeholder="https://...">
-       </div>
-       <div id="fieldLinkUrl" class="input-group full">
-        <label for="linkUrl"> 🔗 Link URL </label> <input id="linkUrl" type="url" placeholder="https://...">
-       </div>
-       <!-- BUTTON TEXT -->
-       <div id="fieldButtonText" class="input-group">
-        <label for="buttonText"> Button Text </label> <input id="buttonText" type="text" placeholder="Open">
-       </div>
+      <!-- ORDER -->
+      <div class="input-group">
+       <label for="itemOrder"> Order </label> <input id="itemOrder" type="number" value="0">
+       <div class="muted">Drag &amp; Drop سے بھی ترتیب تبدیل کر سکتے ہیں۔</div>
+      </div>
+      <!-- TITLE -->
+      <div class="input-group full">
+       <label for="itemTitle"> Title </label> <input id="itemTitle" type="text" placeholder="Content title">
+      </div>
+      <!-- MESSAGE -->
+      <div id="fieldMessage" class="input-group full">
+       <label for="itemMessage"> Message </label> <textarea id="itemMessage" placeholder="Message..."></textarea>
+      </div>
+      <!-- DESCRIPTION -->
+      <div id="fieldDescription" class="input-group full">
+       <label for="itemDescription"> Description </label> <textarea id="itemDescription" placeholder="Description..."></textarea>
+      </div>
+      <!-- IMAGE -->
+      <div id="fieldImageUrl" class="input-group full">
+       <label for="imageUrl"> 🖼️ Image URL </label> <input id="imageUrl" type="url" placeholder="https://...">
+      </div>
+      <!-- VIDEO -->
+      <div id="fieldVideoUrl" class="input-group full">
+       <label for="videoUrl"> 🎬 Video URL </label> <input id="videoUrl" type="url" placeholder="https://...">
+      </div>
+      <!-- LINK -->
+      <div id="fieldAudioUrl" class="input-group full">
+       <label for="audioUrl"> 🎵 Audio URL </label> <input id="audioUrl" type="url" placeholder="https://...">
+      </div>
+      <div id="fieldLinkUrl" class="input-group full">
+       <label for="linkUrl"> 🔗 Link URL </label> <input id="linkUrl" type="url" placeholder="https://...">
+      </div>
+      <!-- BUTTON TEXT -->
+      <div id="fieldButtonText" class="input-group">
+       <label for="buttonText"> Button Text </label> <input id="buttonText" type="text" placeholder="Open">
       </div>
       <!-- ENABLE -->
       <div class="input-group">
@@ -1002,103 +926,101 @@
                  BOX DESIGN  
                  ================================================= -->
       <div class="input-group full">
-       <details class="editor-collapse">
-        <summary>⚙️ Box Design &amp; Schedule <span>اختیاری</span></summary>
-        <div class="design-controls">
-         <div class="design-controls-title">📦 Box Design Controls</div>
-         <!-- BOX STYLE -->
-         <div class="design-section">
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="boxStyle"> Box Style </label> <select id="boxStyle"> <option value="card"> Card </option> <option value="flat"> Flat </option> <option value="transparent"> Transparent </option> </select>
+       <div class="design-controls">
+        <div class="design-controls-title">📦 Box Design Controls</div>
+        <!-- BOX STYLE -->
+        <div class="design-section">
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="boxStyle"> Box Style </label> <select id="boxStyle"> <option value="card"> Card </option> <option value="flat"> Flat </option> <option value="transparent"> Transparent </option> </select>
+          </div>
+          <div class="input-group">
+           <label for="boxTextAlign"> Text Alignment </label> <select id="boxTextAlign"> <option value="right"> Right </option> <option value="center"> Center </option> <option value="left"> Left </option> </select>
+          </div>
+         </div>
+        </div>
+        <!-- COLORS -->
+        <div class="design-section">
+         <div class="form-grid">
+          <div class="input-group">
+           <label> Background Color </label>
+           <div class="color-row">
+            <input id="boxBackgroundColor" type="color" value="#181818"> <span id="boxBackgroundColorValue" class="range-value"> #181818 </span>
            </div>
-           <div class="input-group">
-            <label for="boxTextAlign"> Text Alignment </label> <select id="boxTextAlign"> <option value="right"> Right </option> <option value="center"> Center </option> <option value="left"> Left </option> </select>
+          </div>
+          <div class="input-group">
+           <label> Text Color </label>
+           <div class="color-row">
+            <input id="boxTextColor" type="color" value="#ffffff"> <span id="boxTextColorValue" class="range-value"> #ffffff </span>
            </div>
           </div>
          </div>
-         <!-- COLORS -->
-         <div class="design-section">
-          <div class="form-grid">
-           <div class="input-group">
-            <label> Background Color </label>
-            <div class="color-row">
-             <input id="boxBackgroundColor" type="color" value="#181818"> <span id="boxBackgroundColorValue" class="range-value"> #181818 </span>
-            </div>
-           </div>
-           <div class="input-group">
-            <label> Text Color </label>
-            <div class="color-row">
-             <input id="boxTextColor" type="color" value="#ffffff"> <span id="boxTextColorValue" class="range-value"> #ffffff </span>
-            </div>
-           </div>
+        </div>
+        <!-- SIZE -->
+        <div class="design-section">
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="boxWidth"> Box Width </label> <input id="boxWidth" type="number" min="10" max="100" value="100">
+           <div class="muted">Percentage</div>
+          </div>
+          <div class="input-group">
+           <label for="boxHeight"> Box Height </label> <input id="boxHeight" type="number" min="0" max="2000" value="0">
+           <div class="muted">0 = Auto</div>
+          </div>
+          <div class="input-group">
+           <label for="boxPadding"> Padding </label> <input id="boxPadding" type="number" min="0" max="100" value="11">
+           <div class="muted">px</div>
+          </div>
+          <div class="input-group">
+           <label for="boxRadius"> Border Radius </label> <input id="boxRadius" type="number" min="0" max="100" value="13">
+           <div class="muted">px</div>
           </div>
          </div>
-         <!-- SIZE -->
-         <div class="design-section">
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="boxWidth"> Box Width </label> <input id="boxWidth" type="number" min="10" max="100" value="100">
-            <div class="muted">Percentage</div>
-           </div>
-           <div class="input-group">
-            <label for="boxHeight"> Box Height </label> <input id="boxHeight" type="number" min="0" max="2000" value="0">
-            <div class="muted">0 = Auto</div>
-           </div>
-           <div class="input-group">
-            <label for="boxPadding"> Padding </label> <input id="boxPadding" type="number" min="0" max="100" value="11">
-            <div class="muted">px</div>
-           </div>
-           <div class="input-group">
-            <label for="boxRadius"> Border Radius </label> <input id="boxRadius" type="number" min="0" max="100" value="13">
-            <div class="muted">px</div>
-           </div>
+        </div>
+        <!-- SHADOW -->
+        <div class="design-section">
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="boxShadow"> Shadow </label> <select id="boxShadow"> <option value="none"> None </option> <option value="small"> Small </option> <option value="medium" selected> Medium </option> <option value="large"> Large </option> </select>
+          </div>
+          <div class="input-group">
+           <label for="boxBorder"> Border </label> <select id="boxBorder"> <option value="none"> None </option> <option value="subtle" selected> Subtle </option> <option value="strong"> Strong </option> </select>
           </div>
          </div>
-         <!-- SHADOW -->
-         <div class="design-section">
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="boxShadow"> Shadow </label> <select id="boxShadow"> <option value="none"> None </option> <option value="small"> Small </option> <option value="medium" selected> Medium </option> <option value="large"> Large </option> </select>
-           </div>
-           <div class="input-group">
-            <label for="boxBorder"> Border </label> <select id="boxBorder"> <option value="none"> None </option> <option value="subtle" selected> Subtle </option> <option value="strong"> Strong </option> </select>
-           </div>
-          </div>
-         </div>
-         <!-- IMAGE CONTROLS -->
-         <div class="design-section">
-          <div style="  
+        </div>
+        <!-- IMAGE CONTROLS -->
+        <div class="design-section">
+         <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🖼️ Image Controls</div>
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="imageHeight"> Image Height </label> <input id="imageHeight" type="number" min="0" max="1500" value="230">
-            <div class="muted">px</div>
-           </div>
-           <div class="input-group">
-            <label for="boxImageFit"> Image Fit </label> <select id="boxImageFit"> <option value="cover"> Cover </option> <option value="contain"> Contain </option> <option value="fill"> Fill </option> </select>
-           </div>
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="imageHeight"> Image Height </label> <input id="imageHeight" type="number" min="0" max="1500" value="230">
+           <div class="muted">px</div>
+          </div>
+          <div class="input-group">
+           <label for="boxImageFit"> Image Fit </label> <select id="boxImageFit"> <option value="cover"> Cover </option> <option value="contain"> Contain </option> <option value="fill"> Fill </option> </select>
           </div>
          </div>
-         <!-- VIDEO CONTROLS -->
-         <div class="design-section">
-          <div style="  
+        </div>
+        <!-- VIDEO CONTROLS -->
+        <div class="design-section">
+         <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🎬 Video Controls</div>
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="videoHeight"> Video Height </label> <input id="videoHeight" type="number" min="0" max="1500" value="240">
-           </div>
-           <div class="input-group">
-            <label for="videoFit"> Video Fit </label> <select id="videoFit"> <option value="contain"> Contain </option> <option value="cover"> Cover </option> </select>
-           </div>
-           <div class="input-group">
-            <label> Autoplay </label> <label style="  
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="videoHeight"> Video Height </label> <input id="videoHeight" type="number" min="0" max="1500" value="240">
+          </div>
+          <div class="input-group">
+           <label for="videoFit"> Video Fit </label> <select id="videoFit"> <option value="contain"> Contain </option> <option value="cover"> Cover </option> </select>
+          </div>
+          <div class="input-group">
+           <label> Autoplay </label> <label style="  
                                         display:flex;  
                                         gap:8px;  
                                         align-items:center;  
@@ -1106,9 +1028,9 @@
                                         background:#0d0d0d;  
                                         border-radius:9px;  
                                     "> <input id="videoAutoplay" type="checkbox" style="width:auto"> Autoplay </label>
-           </div>
-           <div class="input-group">
-            <label> Loop </label> <label style="  
+          </div>
+          <div class="input-group">
+           <label> Loop </label> <label style="  
                                         display:flex;  
                                         gap:8px;  
                                         align-items:center;  
@@ -1116,52 +1038,51 @@
                                         background:#0d0d0d;  
                                         border-radius:9px;  
                                     "> <input id="videoLoop" type="checkbox" style="width:auto"> Loop </label>
-           </div>
           </div>
          </div>
-         <!-- BUTTON LINK -->
-         <div class="design-section">
-          <div style="  
+        </div>
+        <!-- BUTTON LINK -->
+        <div class="design-section">
+         <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">🔗 Button / Link Controls</div>
-          <div class="form-grid">
-           <div class="input-group">
-            <label for="buttonColor"> Button Color </label>
-            <div class="color-row">
-             <input id="buttonColor" type="color" value="#6d28d9"> <span id="buttonColorValue" class="range-value"> #6d28d9 </span>
-            </div>
+         <div class="form-grid">
+          <div class="input-group">
+           <label for="buttonColor"> Button Color </label>
+           <div class="color-row">
+            <input id="buttonColor" type="color" value="#6d28d9"> <span id="buttonColorValue" class="range-value"> #6d28d9 </span>
            </div>
-           <div class="input-group">
-            <label for="buttonTextColor"> Button Text Color </label>
-            <div class="color-row">
-             <input id="buttonTextColor" type="color" value="#ffffff"> <span id="buttonTextColorValue" class="range-value"> #ffffff </span>
-            </div>
+          </div>
+          <div class="input-group">
+           <label for="buttonTextColor"> Button Text Color </label>
+           <div class="color-row">
+            <input id="buttonTextColor" type="color" value="#ffffff"> <span id="buttonTextColorValue" class="range-value"> #ffffff </span>
            </div>
           </div>
          </div>
-         <!-- SCHEDULE -->
-         <div class="design-section">
-          <div style="  
+        </div>
+        <!-- SCHEDULE -->
+        <div class="design-section">
+         <div style="  
                                 font-weight:800;  
                                 margin-bottom:10px;  
                                 font-size:13px;  
                             ">📅 Scheduled Show / Hide</div>
-          <div class="schedule-box">
-           <div class="form-grid">
-            <div class="input-group">
-             <label for="scheduleStart"> Show From </label> <input id="scheduleStart" type="datetime-local">
-            </div>
-            <div class="input-group">
-             <label for="scheduleEnd"> Hide After </label> <input id="scheduleEnd" type="datetime-local">
-            </div>
+         <div class="schedule-box">
+          <div class="form-grid">
+           <div class="input-group">
+            <label for="scheduleStart"> Show From </label> <input id="scheduleStart" type="datetime-local">
            </div>
-           <div id="scheduleStatus" class="schedule-status">No schedule</div>
+           <div class="input-group">
+            <label for="scheduleEnd"> Hide After </label> <input id="scheduleEnd" type="datetime-local">
+           </div>
           </div>
+          <div id="scheduleStatus" class="schedule-status">No schedule</div>
          </div>
         </div>
-       </details>
+       </div>
       </div>
       <!-- SAVE -->
       <div class="input-group full">
@@ -1188,11 +1109,24 @@
     <!-- =================================================  
          CONTENT LIST  
          ================================================= -->
-    <div id="itemsList" class="items-list"></div>
+    <div class="admin-card">
+     <div class="card-title">📦 Home Content</div>
+     <div class="card-subtitle">Drag &amp; Drop کر کے Content کی ترتیب تبدیل کریں۔</div>
+     <!-- SEARCH -->
+     <div class="toolbar">
+      <input id="searchItems" type="search" placeholder="🔍 Search content..." oninput="renderItems()"> <select id="filterType" onchange="renderItems()"> <option value="all"> All Types </option> <option value="message"> Message </option> <option value="announcement"> Announcement </option> <option value="notification"> Notification </option> <option value="image"> Image </option> <option value="video"> Video </option> <option value="youtube"> YouTube </option> <option value="audio"> Audio </option> <option value="button"> Button </option> <option value="link"> Link </option> <option value="donation"> Donation </option> <option value="advertisement"> Advertisement </option> <option value="website"> Website </option> <option value="channel"> Channel </option> </select> <select id="filterStatus" onchange="renderItems()"> <option value="all"> All Status </option> <option value="enabled"> Enabled </option> <option value="disabled"> Disabled </option> <option value="scheduled"> Scheduled </option> </select>
+     </div>
+     <div id="itemsList" class="items-list"></div>
+    </div>
     <!-- =================================================  
          RECYCLE BIN  
          ================================================= -->
-    <div id="trashList"></div>
+    <div class="admin-card">
+     <div class="card-title">🗑️ Recycle Bin</div>
+     <div class="card-subtitle">Deleted content یہاں سے Restore کیا جا سکتا ہے۔</div>
+     <div id="trashList"></div>
+     <button class="btn btn-danger btn-small" onclick="emptyTrash()">Empty Recycle Bin</button>
+    </div>
     <!-- =================================================  
          MEDIA MANAGER  
          ================================================= -->
@@ -1202,34 +1136,33 @@
      <div class="input-group">
       <input id="mediaFile" type="file" accept="image/*,video/*,audio/*" onchange="updateMediaMessageLabel()">
      </div>
-     <div class="button-row">
-      <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
-      <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
-     </div>
      <div class="input-group">
       <label for="mediaMessage" id="mediaMessageLabel"> 📝 Media Message </label> <textarea id="mediaMessage" placeholder="اس تصویر، ویڈیو یا آڈیو کے ساتھ دکھایا جانے والا Message لکھیں..."></textarea>
       <div class="muted">Upload کے ساتھ یہ Message اسی media کے Content Item میں محفوظ ہوگا۔</div>
      </div>
      <label style="display:flex;align-items:center;gap:8px;background:#0d0d0d;padding:12px;border-radius:10px;border:1px solid #292929;margin-top:8px;"> <input id="createMediaContent" type="checkbox" checked style="width:auto"> 🏠 Upload کے ساتھ Homepage Content بھی بنائیں </label>
+     <div class="button-row">
+      <button class="btn btn-primary" onclick="uploadMedia()">⬆️ Upload</button>
+      <button class="btn" onclick="loadMedia()">🔄 Refresh</button>
+     </div>
      <div id="mediaList" class="media-grid" style="margin-top:13px"></div>
     </div>
     <!-- =================================================  
          SYSTEM STATUS  
          ================================================= -->
     <div class="admin-card">
-     <div class="card-title" onclick="showSystemStatus()" style="cursor:pointer">
-      ⚙️ System Status <span style="font-size:10px;color:#777">(Click to view for 5 seconds)</span>
-     </div>
-     <pre id="systemStatus" style="display:none;background:#080808;border:1px solid #292929;border-radius:10px;padding:12px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#aaa;font-size:11px;margin-top:10px"></pre>
-    </div>
-    <div id="trashActionModal" onclick="closeTrashAction(event)">
-     <div class="trash-modal-box" onclick="event.stopPropagation()">
-      <div id="trashModalTitle" class="trash-modal-title"></div>
-      <div class="trash-modal-actions">
-       <button class="btn btn-danger btn-small" onclick="confirmPermanentDeleteTrash()">🗑️ Permanent Delete</button>
-       <button class="btn btn-success btn-small" onclick="confirmRestoreTrash()">↩️ Restore</button>
-      </div>
-     </div>
+     <div class="card-title">⚙️ System Status</div>
+     <pre id="systemStatus" style="  
+                background:#080808;  
+                border:1px solid #292929;  
+                border-radius:10px;  
+                padding:12px;  
+                overflow:auto;  
+                white-space:pre-wrap;  
+                word-break:break-word;  
+                color:#aaa;  
+                font-size:11px;  
+            ">Loading...</pre>
     </div>
    </div>
   </div>
@@ -1332,7 +1265,8 @@ async function api(path, options = {}) {
   
     const headers = {  
         ...(options.headers || {}),  
-        "Authorization": "Bearer " + adminToken  
+        "Authorization": "Bearer " + adminToken,
+        "X-MAYOTUBE-ADMIN": adminToken  
     };  
   
     if (  
@@ -1592,171 +1526,81 @@ function updateStats() {
    HOME TOGGLE  
    ========================================================= */  
   
-async function toggleHome() {  
-  
-    const enabled =  
-        $("homeEnabled").checked;  
-  
-    try {  
-  
-        await api(  
-            "/api/admin/home/toggle",  
-            {  
-                method: "PATCH",  
-                body: JSON.stringify({  
-                    enabled  
-                })  
-            }  
-        );  
-  
-        $("homeStatusText").textContent =  
-            enabled  
-                ? "Home content is ON"  
-                : "Home content is OFF";  
-  
-        showToast(  
-            enabled  
-                ? "Home ON کر دیا گیا۔"  
-                : "Home OFF کر دیا گیا۔"  
-        );  
-  
-        await loadHomePreview();  
-  
-    } catch (error) {  
-  
-        $("homeEnabled").checked =  
-            !enabled;  
-  
-        showToast(  
-            "Home toggle failed: " +  
-            error.message  
-        );  
-  
-    }  
-  
-}  
-  
-  
+async function toggleHome() {
+    const enabled = $("homeEnabled").checked;
+    cmsContent.home_enabled = enabled;
+    $("homeStatusText").textContent = enabled ? "Home content is ON" : "Home content is OFF";
+    showToast(enabled ? "Home ON کر دیا گیا۔" : "Home OFF کر دیا گیا۔");
+    await loadHomePreview();
+}
+
+
 /* =========================================================  
    EDITOR FIELDS  
    ========================================================= */  
   
 function updateEditorFields() {  
   
-    const type =
-        $("itemType").value;
+    const type =  
+        $("itemType").value;  
+  
+    const imageTypes = [  
+        "image",  
+        "donation",  
+        "advertisement"  
+    ];  
+  
+    const videoTypes = [  
+        "video"  
+    ];  
 
-    const panel = $("selectedFeaturePanel");
-    if (panel) {
-        panel.style.display = type ? "" : "none";
-    }
+    const audioTypes = [  
+        "audio",  
+        "music"  
+    ];  
+  
+    const linkTypes = [  
+        "button",  
+        "link",  
+        "website",  
+        "youtube",  
+        "channel",  
+        "donation",  
+        "advertisement"  
+    ];  
+  
+    $("fieldImageUrl").style.display =  
+        imageTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldVideoUrl").style.display =  
+        videoTypes.includes(type)  
+            ? ""  
+            : "none";  
 
-    /* صرف متعلقہ fields دکھائیں؛ API/CRUD کے تمام field names برقرار ہیں۔ */
-    const messageTypes = [
-        "message",
-        "announcement",
-        "notification"
-    ];
-
-    const imageTypes = [
-        "image",
-        "donation",
-        "advertisement"
-    ];
-
-    const videoTypes = [
-        "video"
-    ];
-
-    const audioTypes = [
-        "audio"
-    ];
-
-    const linkTypes = [
-        "button",
-        "link",
-        "youtube",
-        "website",
-        "channel",
-        "donation",
-        "advertisement"
-    ];
-
-    const descriptionTypes = [
-        ...messageTypes,
-        "image",
-        "video",
-        "youtube",
-        "audio",
-        "button",
-        "link",
-        "donation",
-        "advertisement",
-        "website",
-        "channel"
-    ];
-
-    const buttonTextTypes = [
-        "button",
-        "donation",
-        "advertisement"
-    ];
-
-    $("fieldTitle").style.display =
-        type
-            ? ""
-            : "none";
-
-    $("fieldMessage").style.display =
-        messageTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldDescription").style.display =
-        descriptionTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldImageUrl").style.display =
-        imageTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldVideoUrl").style.display =
-        videoTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldAudioUrl").style.display =
-        audioTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldLinkUrl").style.display =
-        linkTypes.includes(type)
-            ? ""
-            : "none";
-
-    $("fieldButtonText").style.display =
-        buttonTextTypes.includes(type)
-            ? ""
-            : "none";
-
-    /* منتخب feature کے fields ہی visible رہیں؛ باقی مکمل hide رہیں۔ */
-    const featureFields = document.querySelectorAll(
-        "#fieldTitle, #fieldMessage, #fieldDescription, #fieldImageUrl, #fieldVideoUrl, #fieldAudioUrl, #fieldLinkUrl, #fieldButtonText"
-    );
-
-    featureFields.forEach(field => {
-        field.setAttribute(
-            "aria-hidden",
-            field.style.display === "none"
-                ? "true"
-                : "false"
-        );
-    });
-
-}
+    $("fieldAudioUrl").style.display =  
+        audioTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldLinkUrl").style.display =  
+        linkTypes.includes(type)  
+            ? ""  
+            : "none";  
+  
+    $("fieldButtonText").style.display =  
+        [  
+            "button",  
+            "donation",  
+            "advertisement"  
+        ].includes(type)  
+            ? ""  
+            : "none";  
+  
+}  
+  
+  
 /* =========================================================  
    BOX DESIGN  
    ========================================================= */  
@@ -2123,7 +1967,10 @@ function clearForm() {
     $("itemId").value = "";  
   
     $("itemType").value =  
-        "";  
+        "message";  
+  
+    $("itemOrder").value =  
+        getNextOrder();  
   
     $("itemTitle").value =  
         "";  
@@ -2250,6 +2097,11 @@ function editItem(id) {
         item.type ||  
         "message";  
   
+    $("itemOrder").value =  
+        item.order !== undefined  
+            ? item.order  
+            : 0;  
+  
     $("itemTitle").value =  
         item.title || "";  
   
@@ -2312,26 +2164,8 @@ function editItem(id) {
   
 async function saveItem() {  
   
-    const selectedType = $("itemType").value;
-    if (!selectedType) {
-        showToast("پہلے Content Type منتخب کریں۔");
-        $("itemType").focus();
-        return;
-    }
-  
     const id =  
         $("itemId").value.trim();  
-
-    const existingItem = id
-        ? cmsContent.items.find(
-            x => String(x.id) === String(id)
-        )
-        : null;
-
-    const itemOrder = existingItem &&
-        existingItem.order !== undefined
-            ? Number(existingItem.order)
-            : getNextOrder();
   
     const item = {  
   
@@ -2363,7 +2197,9 @@ async function saveItem() {
             $("buttonText").value.trim(),  
   
         order:  
-            itemOrder,
+            Number(  
+                $("itemOrder").value || 0  
+            ),  
   
         enabled:  
             $("itemEnabled").checked,  
@@ -2390,27 +2226,16 @@ async function saveItem() {
   
         let result;  
   
-        if (id) {  
-  
-            result = await api(  
-                "/api/admin/content/" +  
-                encodeURIComponent(id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify(item)  
-                }  
-            );  
-  
-        } else {  
-  
-            result = await api(  
-                "/api/admin/content",  
-                {  
-                    method: "POST",  
-                    body: JSON.stringify(item)  
-                }  
-            );  
-  
+        if (id) {
+            result = await api("/api/admin/content/update", {
+                method: "POST",
+                body: JSON.stringify({ ...item, id })
+            });
+        } else {
+            result = await api("/api/admin/content/save", {
+                method: "POST",
+                body: JSON.stringify(item)
+            });
         }  
   
         showToast(  
@@ -2447,14 +2272,10 @@ async function toggleItem(id) {
   
     try {  
   
-        await api(  
-            "/api/admin/content/" +  
-            encodeURIComponent(id) +  
-            "/toggle",  
-            {  
-                method: "PATCH"  
-            }  
-        );  
+        await api("/api/admin/content/toggle", {
+            method: "POST",
+            body: JSON.stringify({ id })
+        });  
   
         showToast(  
             "Status update ہو گیا۔"  
@@ -2545,13 +2366,10 @@ async function duplicateItem(id) {
   
     try {  
   
-        await api(  
-            "/api/admin/content",  
-            {  
-                method: "POST",  
-                body: JSON.stringify(copy)  
-            }  
-        );  
+        await api("/api/admin/content/save", {
+            method: "POST",
+            body: JSON.stringify(copy)
+        });  
   
         showToast(  
             "Content duplicate ہو گیا۔"  
@@ -2644,13 +2462,10 @@ async function moveToTrash(id) {
     };
 
     try {
-        await api(
-            "/api/admin/content/" + encodeURIComponent(id),
-            {
-                method: "PUT",
-                body: JSON.stringify(disabledItem)
-            }
-        );
+        await api("/api/admin/content/update", {
+            method: "POST",
+            body: JSON.stringify({ ...disabledItem, id })
+        });
 
         trash.push({
             deletedAt: new Date().toISOString(),
@@ -2701,13 +2516,10 @@ async function restoreTrash(index) {
     };
 
     try {
-        await api(
-            "/api/admin/content/" + encodeURIComponent(item.id),
-            {
-                method: "PUT",
-                body: JSON.stringify(restored)
-            }
-        );
+        await api("/api/admin/content/update", {
+            method: "POST",
+            body: JSON.stringify({ ...restored, id: item.id })
+        });
 
         trash.splice(index, 1);
         setTrash(trash);
@@ -2725,7 +2537,7 @@ async function restoreTrash(index) {
 }
 
   
-async function permanentDeleteTrash(index, skipConfirm = false) {
+async function permanentDeleteTrash(index) {
 
     const trash = getTrash();
     const record = trash[index];
@@ -2742,17 +2554,17 @@ async function permanentDeleteTrash(index, skipConfirm = false) {
 
     const title = item.title || "Untitled";
 
-    if (!skipConfirm && !confirm(
+    if (!confirm(
         "یہ Content مستقل طور پر Delete ہو جائے گا اور دوبارہ Restore نہیں ہو سکے گا.\n\n" +
         "کیا آپ واقعی اسے Permanent Delete کرنا چاہتے ہیں؟\n\n" +
         title
     )) return;
 
     try {
-        await api(
-            "/api/admin/content/" + encodeURIComponent(id),
-            { method: "DELETE" }
-        );
+        await api("/api/admin/content/delete", {
+            method: "POST",
+            body: JSON.stringify({ id })
+        });
 
         trash.splice(index, 1);
         setTrash(trash);
@@ -2797,10 +2609,10 @@ async function emptyTrash() {
         }
 
         try {
-            await api(
-                "/api/admin/content/" + encodeURIComponent(item.id),
-                { method: "DELETE" }
-            );
+            await api("/api/admin/content/delete", {
+                method: "POST",
+                body: JSON.stringify({ id: item.id })
+            });
         } catch (error) {
             console.error("Permanent delete failed for " + item.id, error);
             failed.push(record);
@@ -2833,61 +2645,132 @@ function renderTrash() {
 
     const container = $("trashList");
     const trash = getTrash();
+
     updateStats();
 
     if (!trash.length) {
         container.innerHTML =
-            '<div class="trash-row">' +
-                '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
-            '</div>';
+            '<div class="loading">Recycle Bin خالی ہے۔</div>';
         return;
     }
 
-    container.innerHTML =
-        '<div class="trash-row">' +
-            '<button class="btn btn-danger btn-small trash-empty-btn" onclick="emptyTrash()">Empty Recycle Bin</button>' +
-            trash.map((record, index) => {
-                const item = record.item || {};
-                return '<button class="trash-content-btn" title="' + escapeHtml(item.title || "Untitled") + '" onclick="openTrashAction(' + index + ')">' + escapeHtml(item.title || "Untitled") + '</button>';
-            }).join("") +
-        '</div>';
+    container.innerHTML = trash.map(
+        (record, index) => {
+            const item = record.item || {};
+
+            return (
+                '<div class="trash-card">' +
+                    '<div style="font-weight:800">' +
+                        escapeHtml(item.title || "Untitled") +
+                    '</div>' +
+                    '<div style="color:#888;font-size:11px;margin-top:5px">' +
+                        escapeHtml(item.type || "unknown") +
+                        " • " +
+                        escapeHtml(record.deletedAt || "") +
+                    '</div>' +
+                    '<div class="item-actions">' +
+                        '<button class="btn btn-success btn-small" onclick="restoreTrash(' +
+                            index +
+                        ')">↩️ Restore</button>' +
+                        '<button class="btn btn-danger btn-small" onclick="permanentDeleteTrash(' +
+                            index +
+                        ')">🗑️ Permanent Delete</button>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
+    ).join("");
+
 }
 
-
-let selectedTrashIndex = -1;
-
-function openTrashAction(index) {
-    const trash = getTrash();
-    const record = trash[index];
-    if (!record || !record.item) return;
-    selectedTrashIndex = index;
-    $("trashModalTitle").textContent = "Deleted Content: " + (record.item.title || "Untitled");
-    $("trashActionModal").classList.add("show");
-}
-
-function closeTrashAction(event) {
-    if (event && event.target !== $("trashActionModal")) return;
-    $("trashActionModal").classList.remove("show");
-    selectedTrashIndex = -1;
-}
-
-function confirmRestoreTrash() {
-    const index = selectedTrashIndex;
-    closeTrashAction({target: $("trashActionModal")});
-    if (index >= 0) restoreTrash(index);
-}
-
-async function confirmPermanentDeleteTrash() {
-    const index = selectedTrashIndex;
-    closeTrashAction({target: $("trashActionModal")});
-    if (index >= 0) await permanentDeleteTrash(index, true);
-}
-
-
+  
 function getFilteredItems() {  
   
-    const items =  
+    let items =  
         [...(cmsContent.items || [])];  
+  
+    const search =  
+        (  
+            $("searchItems").value ||  
+            ""  
+        )  
+        .trim()  
+        .toLowerCase();  
+  
+    const type =  
+        $("filterType").value;  
+  
+    const status =  
+        $("filterStatus").value;  
+  
+  
+    if (search) {  
+  
+        items =  
+            items.filter(item => {  
+  
+                const text = [  
+  
+                    item.title,  
+                    item.message,  
+                    item.description,  
+                    item.type,  
+                    item.link_url  
+  
+                ]  
+                .join(" ")  
+                .toLowerCase();  
+  
+                return text.includes(search);  
+  
+            });  
+  
+    }  
+  
+  
+    if (type !== "all") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.type === type  
+            );  
+  
+    }  
+  
+  
+    if (status === "enabled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.enabled !== false  
+            );  
+  
+    }  
+  
+  
+    if (status === "disabled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    item.enabled === false  
+            );  
+  
+    }  
+  
+  
+    if (status === "scheduled") {  
+  
+        items =  
+            items.filter(  
+                item =>  
+                    hasSchedule(item)  
+            );  
+  
+    }  
+  
   
     items.sort(  
         (a, b) =>  
@@ -2938,30 +2821,142 @@ function renderItems() {
    BUILD ITEM CARD  
    ========================================================= */  
   
-function buildItemCard(item) {
-
-    const enabled = item.enabled !== false;
-    const preview = item.message || item.description || "";
-
-    return (
-        '<div class="item-card" draggable="true" data-id="' + escapeHtml(item.id) + '">' +
-            '<div class="item-head">' +
-                '<div class="drag-handle" title="Drag">☷</div>' +
-                '<div class="item-main">' +
-                    '<div class="item-title">' + escapeHtml(item.title || "Untitled") + '</div>' +
-                    (preview ? '<div class="item-message">' + escapeHtml(String(preview).substring(0,300)) + '</div>' : '') +
-                '</div>' +
-            '</div>' +
-            '<div class="item-actions">' +
-                '<button class="btn btn-danger btn-small item-action-btn" onclick="moveToTrash(\'' + escapeHtml(item.id) + '\')">🗑️ Delete</button>' +
-                '<button class="btn btn-success btn-small item-action-btn" onclick="toggleItem(\'' + escapeHtml(item.id) + '\')">' + (enabled ? '🔴 Disable' : '🟢 Enable') + '</button>' +
-                '<button class="btn btn-primary btn-small item-action-btn" onclick="editItem(\'' + escapeHtml(item.id) + '\')">✏️ Edit</button>' +
-            '</div>' +
-        '</div>'
-    );
-}
-
-
+function buildItemCard(item) {  
+  
+    const enabled =  
+        item.enabled !== false;  
+  
+    const scheduled =  
+        hasSchedule(item);  
+  
+    let statusBadge =  
+        enabled  
+            ? '<span class="badge badge-green">🟢 Enabled</span>'  
+            : '<span class="badge badge-red">🔴 Disabled</span>';  
+  
+    if (scheduled) {  
+  
+        statusBadge +=  
+            '<span class="badge badge-purple">📅 Scheduled</span>';  
+  
+    }  
+  
+    const preview =  
+        item.message ||  
+        item.description ||  
+        item.link_url ||  
+        item.audio_url ||  
+        item.video_url ||  
+        item.image_url ||  
+        "";  
+  
+    return (  
+  
+        '<div' +  
+  
+            ' class="item-card"' +  
+  
+            ' draggable="true"' +  
+  
+            ' data-id="' +  
+                escapeHtml(item.id) +  
+            '"' +  
+  
+        '>' +  
+  
+            '<div class="item-head">' +  
+  
+                '<div class="drag-handle" title="Drag">' +  
+                    "☷" +  
+                '</div>' +  
+  
+                '<div class="item-main">' +  
+  
+                    '<div class="item-title">' +  
+  
+                        escapeHtml(  
+                            item.title ||  
+                            "Untitled"  
+                        ) +  
+  
+                    '</div>' +  
+  
+                    '<div class="item-meta">' +  
+  
+                        '<span class="badge">' +  
+  
+                            escapeHtml(  
+                                item.type ||  
+                                "unknown"  
+                            ) +  
+  
+                        '</span>' +  
+  
+                        '<span class="badge">' +  
+  
+                            "Order " +  
+  
+                            escapeHtml(  
+                                item.order ||  
+                                0  
+                            ) +  
+  
+                        '</span>' +  
+  
+                        statusBadge +  
+  
+                    '</div>' +  
+  
+                '</div>' +  
+  
+            '</div>' +  
+  
+            (  
+                preview  
+                    ? (  
+                        '<div class="item-preview">' +  
+                            escapeHtml(  
+                                String(preview)  
+                                    .substring(0, 300)  
+                            ) +  
+                        '</div>'  
+                    )  
+                    : ""  
+            ) +  
+  
+            '<div class="item-actions">' +  
+  
+                '<button class="btn btn-primary btn-small" onclick="editItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">✏️ Edit</button>' +  
+  
+                '<button class="btn btn-success btn-small" onclick="toggleItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">' +  
+                    (  
+                        enabled  
+                            ? "🔴 Disable"  
+                            : "🟢 Enable"  
+                    ) +  
+                '</button>' +  
+  
+                '<button class="btn btn-blue btn-small" onclick="duplicateItem(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">📋 Duplicate</button>' +  
+  
+                '<button class="btn btn-danger btn-small" onclick="moveToTrash(\'' +  
+                    escapeHtml(item.id) +  
+                '\')">🗑️ Delete</button>' +  
+  
+            '</div>' +  
+  
+        '</div>'  
+  
+    );  
+  
+}  
+  
+  
 /* =========================================================  
    DRAG & DROP  
    ========================================================= */  
@@ -3076,125 +3071,69 @@ function setupDragAndDrop() {
    REORDER  
    ========================================================= */  
   
-async function reorderItems(  
-    draggedId,  
-    targetId  
-) {  
-    const items = [...cmsContent.items];  
-    const fromIndex = items.findIndex(x => String(x.id) === String(draggedId));  
-    const toIndex = items.findIndex(x => String(x.id) === String(targetId));  
-    if (fromIndex < 0 || toIndex < 0) return;  
+async function reorderItems(draggedId, targetId) {
+    const items = [...cmsContent.items];
+    const fromIndex = items.findIndex(x => String(x.id) === String(draggedId));
+    const toIndex = items.findIndex(x => String(x.id) === String(targetId));
+    if (fromIndex < 0 || toIndex < 0) return;
+
+    const [moved] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, moved);
+
+    try {
+        await api("/api/admin/content/reorder", {
+            method: "POST",
+            body: JSON.stringify({ order: items.map(item => String(item.id)) })
+        });
+        cmsContent.items = items;
+        renderItems();
+        await loadHomePreview();
+        showToast("Content order update ہو گیا۔");
+    } catch (error) {
+        showToast("Order update failed: " + error.message);
+        await loadContent();
+    }
+}
+
+
   
-    const [moved] = items.splice(fromIndex, 1);  
-    items.splice(toIndex, 0, moved);  
-    items.forEach((item, index) => item.order = index + 1);  
-  
-    try {  
-        for (const item of items) {  
-            await api(  
-                "/api/admin/content/" + encodeURIComponent(item.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
-                        type: item.type || "message",  
-                        title: item.title || "",  
-                        message: item.message || "",  
-                        description: item.description || "",  
-                        image_url: item.image_url || "",  
-                        video_url: item.video_url || "",  
-                        audio_url: item.audio_url || "",  
-                        link_url: item.link_url || "",  
-                        button_text: item.button_text || "",  
-                        order: item.order,  
-                        enabled: item.enabled !== false,  
-                        style: item.style || {},  
-                        schedule: item.schedule || {}  
-                    })  
-                }  
-            );  
-        }  
-        cmsContent.items = items;  
-        renderItems();  
-        await loadHomePreview();  
-        showToast("Content order update ہو گیا۔");  
-    } catch (error) {  
-        showToast("Order update failed: " + error.message);  
-        await loadContent();  
-    }  
-}  
 
 
 /* =========================================================
    SAVE HOMEPAGE ORDER — FIXED
    ========================================================= */
 
-async function saveOrder() {  
-    const items = Array.from(document.querySelectorAll("#itemsList .item-card"));  
-    if (!items.length) {  
-        showToast("Save Order: کوئی Content موجود نہیں۔");  
-        return;  
-    }  
-  
-    const ids = items.map(item => String(item.dataset.id || "").trim());  
-    if (ids.some(id => !id)) {  
-        showToast("Save Order failed: کسی Content کا ID موجود نہیں۔");  
-        return;  
-    }  
-    if (new Set(ids).size !== ids.length) {  
-        showToast("Save Order failed: duplicate Content ID ملا۔");  
-        return;  
-    }  
-  
-    try {  
-        await getSession();  
-        const server = await api("/api/admin/content");  
-        const serverItems = Array.isArray(server && server.items) ? server.items : [];  
-        const serverMap = new Map(serverItems.map(item => [String(item.id), item]));  
-        const missing = ids.filter(id => !serverMap.has(id));  
-        if (missing.length) {  
-            throw new Error("Content list تازہ نہیں ہے۔ Refresh کرکے دوبارہ Order save کریں۔");  
-        }  
-  
-        /* ہر item کو الگ PUT کیا جاتا ہے؛ /reorder endpoint کی count validation استعمال نہیں ہوتی۔ */  
-        for (let index = 0; index < ids.length; index++) {  
-            const original = serverMap.get(ids[index]);  
-            await api(  
-                "/api/admin/content/" + encodeURIComponent(original.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
-                        type: original.type || "message",  
-                        title: original.title || "",  
-                        message: original.message || "",  
-                        description: original.description || "",  
-                        image_url: original.image_url || "",  
-                        video_url: original.video_url || "",  
-                        audio_url: original.audio_url || "",  
-                        link_url: original.link_url || "",  
-                        button_text: original.button_text || "",  
-                        order: index + 1,  
-                        enabled: original.enabled !== false,  
-                        style: original.style || {},  
-                        schedule: original.schedule || {}  
-                    })  
-                }  
-            );  
-        }  
-  
-        showToast("✓ Homepage order محفوظ ہو گیا۔");  
-        await loadContent();  
-        await loadHomePreview();  
-    } catch (error) {  
-        console.error(error);  
-        showToast("Order save failed: " + error.message);  
-    }  
-}  
+async function saveOrder() {
+    const items = Array.from(document.querySelectorAll("#itemsList .item-card"));
+    if (!items.length) {
+        showToast("Save Order: کوئی Content موجود نہیں۔");
+        return;
+    }
+    const ids = items.map(item => String(item.dataset.id || "").trim());
+    if (ids.some(id => !id)) {
+        showToast("Save Order failed: کسی Content کا ID موجود نہیں۔");
+        return;
+    }
+    if (new Set(ids).size !== ids.length) {
+        showToast("Save Order failed: duplicate Content ID ملا۔");
+        return;
+    }
+    try {
+        await api("/api/admin/content/reorder", {
+            method: "POST",
+            body: JSON.stringify({ order: ids })
+        });
+        showToast("✓ Homepage order محفوظ ہو گیا۔");
+        await loadContent();
+        await loadHomePreview();
+    } catch (error) {
+        console.error(error);
+        showToast("Order save failed: " + error.message);
+        await loadContent();
+    }
+}
 
 
-/* =========================================================  
-   SCHEDULE  
-   ========================================================= */  
-  
 function hasSchedule(item) {  
   
     const schedule =  
@@ -3791,44 +3730,18 @@ function buildPreviewCard(item) {
    MEDIA  
    ========================================================= */  
   
-async function loadMedia() {  
-  
-    const container =  
-        $("mediaList");  
-  
-    try {  
-  
-        const data =  
-            await api(  
-                "/api/admin/media"  
-            );  
-  
-        const media =  
-            Array.isArray(data)  
-                ? data  
-                : (  
-                    Array.isArray(data.media)  
-                        ? data.media  
-                        : []  
-                );  
-  
-        renderMedia(media);  
-  
+async function loadMedia() {
+    const container = $("mediaList");
+    try {
+        const media = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+        renderMedia(Array.isArray(media) ? media : []);
     } catch (error) {
-
-        // Error کو page کے اندر raw HTML/text کی صورت میں نہ دکھائیں۔
+        console.error(error);
         container.innerHTML = "";
-        showToast("Media load failed: " + error.message);
+    }
+}
 
-    }  
-  
-}  
-  
-  
-/* =========================================================  
-   RENDER MEDIA  
-   ========================================================= */  
-  
+
 function renderMedia(media) {  
   
     const container =  
@@ -4055,7 +3968,7 @@ async function uploadMedia() {
     try {  
   
         const result = await api(  
-            "/api/admin/media",  
+            "/api/admin/media/upload",  
             { method: "POST", body: form }  
         );  
   
@@ -4079,7 +3992,7 @@ async function uploadMedia() {
             else if (file.type.startsWith("audio/")) contentType = "audio";  
   
             await api(  
-                "/api/admin/content",  
+                "/api/admin/content/save",  
                 {  
                     method: "POST",  
                     body: JSON.stringify({  
@@ -4151,74 +4064,25 @@ function updateMediaMessageLabel() {
    DELETE MEDIA  
    ========================================================= */  
   
-async function deleteMedia(id) {  
-  
-    if (!id) {  
-        return;  
-    }  
-  
-    if (  
-        !confirm(  
-            "کیا یہ media delete کرنا ہے؟"  
-        )  
-    ) {  
-        return;  
-    }  
-  
-    try {  
-  
-        await api(  
-            "/api/admin/media/" +  
-            encodeURIComponent(id),  
-            {  
-                method: "DELETE"  
-            }  
-        );  
-  
-        showToast(  
-            "Media delete ہو گیا۔"  
-        );  
-  
-        await loadMedia();  
-  
-    } catch (error) {  
-  
-        showToast(  
-            "Delete failed: " +  
-            error.message  
-        );  
-  
-    }  
-  
-}  
-  
-  
-/* =========================================================  
-   SYSTEM STATUS  
-   ========================================================= */  
-  
-let systemStatusTimer = null;
-
-async function showSystemStatus() {
-    const output = $("systemStatus");
-    output.style.display = "block";
-    output.textContent = "Loading...";
+async function deleteMedia(id) {
+    if (!id) return;
+    if (!confirm("کیا یہ media list سے ہٹانا ہے؟")) return;
     try {
-        const data = await api("/api/admin/status");
-        output.textContent = JSON.stringify(data, null, 2);
+        const media = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+        const filtered = media.filter(file => String(file.id || file.key || file.name || "") !== String(id));
+        localStorage.setItem("mayotube_uploaded_media_v1", JSON.stringify(filtered));
+        showToast("Media list سے ہٹا دیا گیا۔ Backend میں media delete route موجود نہیں ہے۔");
+        await loadMedia();
     } catch (error) {
-        output.textContent = "System Status Error: " + error.message;
+        showToast("Delete failed: " + error.message);
     }
-    clearTimeout(systemStatusTimer);
-    systemStatusTimer = setTimeout(() => {
-        output.style.display = "none";
-        output.textContent = "";
-    }, 5000);
 }
+
 
 async function loadStatus() {
     const output = $("systemStatus");
-    if (output && output.style.display !== "none") await showSystemStatus();
+    if (!output) return;
+    output.textContent = "System Status endpoint backend میں موجود نہیں ہے۔\n\nContent, Toggle, Delete, Reorder اور Media Upload کے routes available ہیں۔";
 }
 
 
