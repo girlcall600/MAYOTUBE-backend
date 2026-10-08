@@ -174,6 +174,38 @@ def load_content(blob_url=None):
 
     if "home_enabled" not in data:
         data["home_enabled"] = data.get("enabled", True) is not False
+    else:
+        value = data.get("home_enabled")
+        if isinstance(value, str):
+            data["home_enabled"] = value.strip().lower() not in {
+                "false", "0", "no", "off", "disabled"
+            }
+        else:
+            data["home_enabled"] = value is not False
+
+    # Legacy content compatibility: older records may have stored
+    # enabled as 1/0 or as a string instead of a JSON boolean.
+    # Normalize those values in memory so old image/video/message posts
+    # can appear on Home and behave correctly in the Admin list.
+    normalized_items = []
+    for item in data["items"]:
+        if not isinstance(item, dict):
+            continue
+
+        if "enabled" not in item:
+            item["enabled"] = True
+        else:
+            value = item.get("enabled")
+            if isinstance(value, str):
+                item["enabled"] = value.strip().lower() not in {
+                    "false", "0", "no", "off", "disabled"
+                }
+            else:
+                item["enabled"] = bool(value)
+
+        normalized_items.append(item)
+
+    data["items"] = normalized_items
 
     data["count"] = len(
         data["items"]
@@ -1036,6 +1068,7 @@ def admin_status_compat():
         return error_response("Status unavailable", e)
 
 
+@app.post("/api/admin/media")
 @app.post("/api/admin/media/upload")
 def admin_media_upload():
     if not admin_required():
