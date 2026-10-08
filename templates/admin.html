@@ -1299,7 +1299,7 @@ async function api(path, options = {}) {
   
     const headers = {  
         ...(options.headers || {}),  
-        "Authorization": "Bearer " + adminToken  
+        "X-MAYOTUBE-ADMIN": adminToken  
     };  
   
     if (  
@@ -2297,19 +2297,12 @@ async function saveItem() {
   
         if (id) {  
   
-            result = await api(  
-                "/api/admin/content/" +  
-                encodeURIComponent(id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify(item)  
-                }  
-            );  
+            result = await api("/api/admin/content/update", { method: "POST", body: JSON.stringify({ ...item, id }) });  
   
         } else {  
   
             result = await api(  
-                "/api/admin/content",  
+                "/api/admin/content/save",  
                 {  
                     method: "POST",  
                     body: JSON.stringify(item)  
@@ -2352,14 +2345,7 @@ async function toggleItem(id) {
   
     try {  
   
-        await api(  
-            "/api/admin/content/" +  
-            encodeURIComponent(id) +  
-            "/toggle",  
-            {  
-                method: "PATCH"  
-            }  
-        );  
+        await api("/api/admin/content/toggle", { method: "POST", body: JSON.stringify({ id }) });  
   
         showToast(  
             "Status update ہو گیا۔"  
@@ -3164,119 +3150,46 @@ function setupDragAndDrop() {
    REORDER  
    ========================================================= */  
   
-async function reorderItems(  
-    draggedId,  
-    targetId  
-) {  
-    const items = [...cmsContent.items];  
-    const fromIndex = items.findIndex(x => String(x.id) === String(draggedId));  
-    const toIndex = items.findIndex(x => String(x.id) === String(targetId));  
-    if (fromIndex < 0 || toIndex < 0) return;  
-  
-    const [moved] = items.splice(fromIndex, 1);  
-    items.splice(toIndex, 0, moved);  
-    items.forEach((item, index) => item.order = index + 1);  
-  
-    try {  
-        for (const item of items) {  
-            await api(  
-                "/api/admin/content/" + encodeURIComponent(item.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
-                        type: item.type || "message",  
-                        title: item.title || "",  
-                        message: item.message || "",  
-                        description: item.description || "",  
-                        image_url: item.image_url || "",  
-                        video_url: item.video_url || "",  
-                        audio_url: item.audio_url || "",  
-                        link_url: item.link_url || "",  
-                        button_text: item.button_text || "",  
-                        order: item.order,  
-                        enabled: item.enabled !== false,  
-                        style: item.style || {},  
-                        schedule: item.schedule || {}  
-                    })  
-                }  
-            );  
-        }  
-        cmsContent.items = items;  
-        renderItems();  
-        await loadHomePreview();  
-        showToast("Content order update ہو گیا۔");  
-    } catch (error) {  
-        showToast("Order update failed: " + error.message);  
-        await loadContent();  
-    }  
-}  
+async function reorderItems(draggedId, targetId) {
+    const items = [...cmsContent.items];
+    const fromIndex = items.findIndex(x => String(x.id) === String(draggedId));
+    const toIndex = items.findIndex(x => String(x.id) === String(targetId));
+    if (fromIndex < 0 || toIndex < 0) return;
+    const [moved] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, moved);
+    const ids = items.map(item => String(item.id));
+    try {
+        await api("/api/admin/content/reorder", { method: "POST", body: JSON.stringify({ order: ids }) });
+        cmsContent.items = items.map((item, index) => ({ ...item, order: index + 1 }));
+        renderItems();
+        await loadHomePreview();
+        showToast("Content order update ہو گیا۔");
+    } catch (error) {
+        showToast("Order update failed: " + error.message);
+        await loadContent();
+    }
+}
 
 
 /* =========================================================
    SAVE HOMEPAGE ORDER — FIXED
    ========================================================= */
 
-async function saveOrder() {  
-    const items = Array.from(document.querySelectorAll("#itemsList .item-card"));  
-    if (!items.length) {  
-        showToast("Save Order: کوئی Content موجود نہیں۔");  
-        return;  
-    }  
-  
-    const ids = items.map(item => String(item.dataset.id || "").trim());  
-    if (ids.some(id => !id)) {  
-        showToast("Save Order failed: کسی Content کا ID موجود نہیں۔");  
-        return;  
-    }  
-    if (new Set(ids).size !== ids.length) {  
-        showToast("Save Order failed: duplicate Content ID ملا۔");  
-        return;  
-    }  
-  
-    try {  
-        await getSession();  
-        const server = await api("/api/admin/content");  
-        const serverItems = Array.isArray(server && server.items) ? server.items : [];  
-        const serverMap = new Map(serverItems.map(item => [String(item.id), item]));  
-        const missing = ids.filter(id => !serverMap.has(id));  
-        if (missing.length) {  
-            throw new Error("Content list تازہ نہیں ہے۔ Refresh کرکے دوبارہ Order save کریں۔");  
-        }  
-  
-        /* ہر item کو الگ PUT کیا جاتا ہے؛ /reorder endpoint کی count validation استعمال نہیں ہوتی۔ */  
-        for (let index = 0; index < ids.length; index++) {  
-            const original = serverMap.get(ids[index]);  
-            await api(  
-                "/api/admin/content/" + encodeURIComponent(original.id),  
-                {  
-                    method: "PUT",  
-                    body: JSON.stringify({  
-                        type: original.type || "message",  
-                        title: original.title || "",  
-                        message: original.message || "",  
-                        description: original.description || "",  
-                        image_url: original.image_url || "",  
-                        video_url: original.video_url || "",  
-                        audio_url: original.audio_url || "",  
-                        link_url: original.link_url || "",  
-                        button_text: original.button_text || "",  
-                        order: index + 1,  
-                        enabled: original.enabled !== false,  
-                        style: original.style || {},  
-                        schedule: original.schedule || {}  
-                    })  
-                }  
-            );  
-        }  
-  
-        showToast("✓ Homepage order محفوظ ہو گیا۔");  
-        await loadContent();  
-        await loadHomePreview();  
-    } catch (error) {  
-        console.error(error);  
-        showToast("Order save failed: " + error.message);  
-    }  
-}  
+async function saveOrder() {
+    const items = Array.isArray(cmsContent.items) ? cmsContent.items : [];
+    const ids = items.map(item => String(item.id || "").trim()).filter(Boolean);
+    if (!ids.length) { showToast("Save Order: کوئی Content موجود نہیں۔"); return; }
+    try {
+        await api("/api/admin/content/reorder", { method: "POST", body: JSON.stringify({ order: ids }) });
+        showToast("✓ Homepage order محفوظ ہو گیا۔");
+        await loadContent();
+        await loadHomePreview();
+    } catch (error) {
+        console.error(error);
+        showToast("Order update failed: " + error.message);
+        await loadContent();
+    }
+}
 
 
 /* =========================================================  
@@ -3879,40 +3792,15 @@ function buildPreviewCard(item) {
    MEDIA  
    ========================================================= */  
   
-async function loadMedia() {  
-  
-    const container =  
-        $("mediaList");  
-  
-    try {  
-  
-        const data =  
-            await api(  
-                "/api/admin/media"  
-            );  
-  
-        const media =  
-            Array.isArray(data)  
-                ? data  
-                : (  
-                    Array.isArray(data.media)  
-                        ? data.media  
-                        : []  
-                );  
-  
-        renderMedia(media);  
-  
-    } catch (error) {  
-  
-        container.innerHTML =  
-            '<div class="loading">' +  
-                escapeHtml(  
-                    error.message  
-                ) +  
-            '</div>';  
-  
-    }  
-  
+async function loadMedia() {
+    const container = $("mediaList");
+    if (!container) return;
+    try {
+        const media = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+        renderMedia(Array.isArray(media) ? media : []);
+    } catch (error) {
+        container.innerHTML = '<div class="loading">Media list unavailable.</div>';
+    }
 }  
   
   
@@ -4145,10 +4033,7 @@ async function uploadMedia() {
   
     try {  
   
-        const result = await api(  
-            "/api/admin/media",  
-            { method: "POST", body: form }  
-        );  
+        const result = await api("/api/admin/media/upload", { method: "POST", body: form });  
   
         const uploadedUrl = safePreviewUrl(  
             result && (  
@@ -4170,7 +4055,7 @@ async function uploadMedia() {
             else if (file.type.startsWith("audio/")) contentType = "audio";  
   
             await api(  
-                "/api/admin/content",  
+                "/api/admin/content/save",  
                 {  
                     method: "POST",  
                     body: JSON.stringify({  
@@ -4203,6 +4088,22 @@ async function uploadMedia() {
             showToast("Media upload ہو گیا۔");  
         }  
   
+        try {
+            const saved = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+            if (uploadedUrl) {
+                saved.unshift({ id: Date.now().toString(), url: uploadedUrl, filename: file.name, content_type: file.type, message });
+                localStorage.setItem("mayotube_uploaded_media_v1", JSON.stringify(saved.slice(0, 50)));
+            }
+        } catch (e) {}
+
+        try {
+            const saved = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+            if (uploadedUrl) {
+                saved.unshift({ id: Date.now().toString(), url: uploadedUrl, filename: file.name, content_type: file.type, message: message });
+                localStorage.setItem("mayotube_uploaded_media_v1", JSON.stringify(saved.slice(0, 50)));
+            }
+        } catch (e) {}
+
         $("mediaFile").value = "";  
         $("mediaMessage").value = "";  
         updateMediaMessageLabel();  
@@ -4242,48 +4143,17 @@ function updateMediaMessageLabel() {
    DELETE MEDIA  
    ========================================================= */  
   
-async function deleteMedia(id) {  
-  
-    if (!id) {  
-        return;  
-    }  
-  
-    if (  
-        !confirm(  
-            "کیا یہ media delete کرنا ہے؟"  
-        )  
-    ) {  
-        return;  
-    }  
-  
-    try {  
-  
-        await api(  
-            "/api/admin/media/" +  
-            encodeURIComponent(id),  
-            {  
-                method: "DELETE"  
-            }  
-        );  
-  
-        showToast(  
-            "Media delete ہو گیا۔"  
-        );  
-  
-        await loadMedia();  
-  
-    } catch (error) {  
-  
-        showToast(  
-            "Delete failed: " +  
-            error.message  
-        );  
-  
-    }  
-  
-}  
-  
-  
+async function deleteMedia(id) {
+    if (!id || !confirm("کیا یہ media list سے ہٹانا ہے؟")) return;
+    try {
+        const saved = JSON.parse(localStorage.getItem("mayotube_uploaded_media_v1") || "[]");
+        localStorage.setItem("mayotube_uploaded_media_v1", JSON.stringify(saved.filter(x => String(x.id) !== String(id))));
+        await loadMedia();
+        showToast("Media list سے ہٹا دیا گیا۔");
+    } catch (error) { showToast("Delete failed: " + error.message); }
+}
+
+
 /* =========================================================  
    SYSTEM STATUS  
    ========================================================= */  
