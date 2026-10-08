@@ -1364,11 +1364,15 @@ async function api(path, options = {}) {
   
     if (!response.ok) {  
   
-        throw new Error(  
+        const serverError =  
+            data.details ||  
             data.message ||  
             data.error ||  
             data.raw ||  
-            "Request failed"  
+            "Request failed";  
+
+        throw new Error(  
+            String(serverError)  
         );  
   
     }  
@@ -4365,7 +4369,7 @@ async function deleteMedia(id) {
         renderTrash();
 
     } catch (error) {
-        console.error(error);
+        console.error("Media delete error:", error);
         showToast("Delete failed: " + error.message);
     }
 
