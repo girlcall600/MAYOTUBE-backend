@@ -1071,16 +1071,48 @@ def admin_media_delete_compat(media_id):
                 data["count"] = len(items)
                 save_and_verify(data)
 
+        # Delete the exact Blob URL we found. Vercel Blob accepts either a
+        # pathname or a URL, but using the exact URL prevents a false-success
+        # when a pathname does not match the stored object.
         delete_method = getattr(client, "delete", None)
         if not callable(delete_method):
             raise RuntimeError("Installed Vercel Blob SDK does not provide delete()")
 
-        delete_method(pathname)
+        if not media_url:
+            raise RuntimeError(
+                "Media blob was not found before delete; nothing was deleted"
+            )
+
+        delete_method(media_url)
+
+        # Do not tell the Admin UI that deletion succeeded unless the Blob is
+        # actually gone. Vercel Blob's delete operation can otherwise return
+        # without an error when the target does not exist.
+        try:
+            client.head(media_url)
+        except Exception as verify_error:
+            verify_text = str(verify_error).lower()
+            not_found_markers = (
+                "not found",
+                "blobnotfound",
+                "404",
+                "does not exist"
+            )
+            if not any(marker in verify_text for marker in not_found_markers):
+                raise RuntimeError(
+                    "Media delete verification failed: " + str(verify_error)
+                )
+        else:
+            raise RuntimeError(
+                "Media delete request completed, but the Blob still exists"
+            )
 
         return jsonify({
             "success": True,
-            "message": "Media deleted successfully",
+            "deleted": True,
+            "message": "Media deleted and verified successfully",
             "pathname": pathname,
+            "url": media_url,
             "recycled_items": recycled_items
         })
 
