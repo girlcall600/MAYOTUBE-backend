@@ -331,27 +331,31 @@
 
     .stats-grid {  
         display: grid;  
-        grid-template-columns: repeat(4, 1fr);  
-        gap: 10px;  
+        grid-template-columns: repeat(4, minmax(0, 1fr));  
+        gap: 6px;  
     }  
 
     .stat {  
         background: #0e0e0e;  
         border: 1px solid #292929;  
-        border-radius: 12px;  
-        padding: 13px;  
+        border-radius: 9px;  
+        padding: 8px 4px;  
         text-align: center;  
+        min-width: 0;  
     }  
 
     .stat-number {  
-        font-size: 22px;  
+        font-size: 17px;  
         font-weight: 900;  
-        margin-bottom: 4px;  
+        margin-bottom: 2px;  
     }  
 
     .stat-label {  
         color: #888;  
-        font-size: 11px;  
+        font-size: 9px;  
+        white-space: nowrap;  
+        overflow: hidden;  
+        text-overflow: ellipsis;  
     }  
 
     /* =====================================================  
@@ -761,7 +765,8 @@
         }  
 
         .stats-grid {  
-            grid-template-columns: repeat(2, 1fr);  
+            grid-template-columns: repeat(4, minmax(0, 1fr));  
+            gap: 5px;  
         }  
 
         .media-grid {  
@@ -1151,22 +1156,18 @@
          SYSTEM STATUS  
          ================================================= -->
     <div class="admin-card">
-     <div class="card-title" onclick="showSystemStatus()" style="cursor:pointer;user-select:none;">
-      ⚙️ System Status <span style="font-size:11px;color:#777;font-weight:normal;">(Click to view for 5 seconds)</span>
-     </div>
-     <pre id="systemStatus" style="
-                display:none;
-                background:#080808;
-                border:1px solid #292929;
-                border-radius:10px;
-                padding:12px;
-                overflow:auto;
-                white-space:pre-wrap;
-                word-break:break-word;
-                color:#aaa;
-                font-size:11px;
-                margin-top:10px;
-            "></pre>
+     <div class="card-title">⚙️ System Status</div>
+     <pre id="systemStatus" style="  
+                background:#080808;  
+                border:1px solid #292929;  
+                border-radius:10px;  
+                padding:12px;  
+                overflow:auto;  
+                white-space:pre-wrap;  
+                word-break:break-word;  
+                color:#aaa;  
+                font-size:11px;  
+            ">Loading...</pre>
     </div>
    </div>
   </div>
@@ -4258,81 +4259,43 @@ async function deleteMedia(id) {
    SYSTEM STATUS  
    ========================================================= */  
   
-function loadStatus() {
-
-    /*
-       System Status کا کوئی backend endpoint استعمال نہیں ہوتا۔
-       Status اسی admin page میں پہلے سے loaded data سے تیار ہوتا ہے۔
-    */
-
-    const items =
-        Array.isArray(cmsContent.items)
-            ? cmsContent.items
-            : [];
-
-    const enabled =
-        items.filter(
-            item => item.enabled !== false
-        ).length;
-
-    const disabled =
-        items.length - enabled;
-
-    const status = {
-        success: true,
-        source: "local-admin-status",
-        backend_status: "Connected",
-        content_api: "Available",
-        content_total: items.length,
-        content_enabled: enabled,
-        content_disabled: disabled,
-        media_upload: "Available",
-        checked_at: new Date().toISOString()
-    };
-
-    const output =
-        $("systemStatus");
-
-    if (output) {
-        output.textContent =
-            JSON.stringify(
-                status,
-                null,
-                2
-            );
-    }
-
-    return status;
-}
-
-let systemStatusTimer = null;
-
-function showSystemStatus() {
-
-    const output =
-        $("systemStatus");
-
-    if (!output) {
-        return;
-    }
-
-    loadStatus();
-
-    output.style.display = "block";
-
-    if (systemStatusTimer) {
-        clearTimeout(systemStatusTimer);
-    }
-
-    systemStatusTimer =
-        setTimeout(
-            () => {
-                output.style.display = "none";
-            },
-            5000
-        );
-}
-
+async function loadStatus() {  
+  
+    const output =  
+        $("systemStatus");  
+  
+    try {  
+  
+        const data =  
+            await api(  
+                "/api/admin/status"  
+            );  
+  
+        output.textContent =  
+            JSON.stringify(  
+                data,  
+                null,  
+                2  
+            );  
+  
+    } catch (error) {  
+  
+        output.textContent =  
+            JSON.stringify(  
+                {  
+                    success: false,  
+                    error:  
+                        error.message  
+                },  
+                null,  
+                2  
+            );  
+  
+    }  
+  
+}  
+  
+  
 /* =========================================================  
    AUTO REFRESH PREVIEW  
    ========================================================= */  
