@@ -4338,6 +4338,10 @@ async function deleteMedia(id) {
             ? result.recycled_items
             : [];
 
+        if (result && result.deleted !== true) {
+            throw new Error("Server نے media deletion verify نہیں کی۔");
+        }
+
         if (recycledItems.length) {
             const trash = getTrash();
             for (const item of recycledItems) {
@@ -4350,9 +4354,9 @@ async function deleteMedia(id) {
                 }
             }
             setTrash(trash);
-            showToast("Media delete ہو گیا اور متعلقہ Content Recycle Bin میں منتقل ہو گیا۔");
+            showToast("Media واقعی delete ہو گیا اور متعلقہ Content Recycle Bin میں منتقل ہو گیا۔");
         } else {
-            showToast("Media delete ہو گیا۔");
+            showToast("Media واقعی delete ہو گیا۔");
         }
 
         await loadMedia();
