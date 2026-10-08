@@ -922,9 +922,6 @@ def admin_content_delete_compat(item_id):
         if len(new_items) == len(items):
             return jsonify({"error": "Content not found"}), 404
 
-        for index, item in enumerate(new_items, 1):
-            if isinstance(item, dict):
-                item["id"] = index
 
         data["items"] = new_items
         data["count"] = len(new_items)
@@ -1034,18 +1031,62 @@ def admin_media_delete_compat(media_id):
             pathname = "media/" + pathname
 
         client = blob_client()
+
+        # Find the public URL for this media before deleting it.
+        media_url = None
+        listing = client.list_objects(prefix=pathname)
+        for blob in getattr(listing, "blobs", []) or []:
+            blob_path = getattr(blob, "pathname", "") or ""
+            if blob_path == pathname:
+                media_url = getattr(blob, "url", None)
+                break
+
+        # If this media is used by Homepage Content, disable it and return
+        # the original records so the Admin UI can place them in Recycle Bin.
+        recycled_items = []
+        if media_url:
+            data = load_content()
+            items = data.get("items", [])
+            if not isinstance(items, list):
+                items = []
+
+            changed = False
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+
+                references_media = any(
+                    str(item.get(field) or "") == str(media_url)
+                    for field in ("image_url", "video_url", "audio_url")
+                )
+
+                if references_media:
+                    original = json.loads(json.dumps(item, ensure_ascii=False))
+                    recycled_items.append(original)
+                    item["enabled"] = False
+                    changed = True
+
+            if changed:
+                data["items"] = items
+                data["count"] = len(items)
+                save_and_verify(data)
+
         delete_method = getattr(client, "delete", None)
         if not callable(delete_method):
             raise RuntimeError("Installed Vercel Blob SDK does not provide delete()")
 
         delete_method(pathname)
+
         return jsonify({
             "success": True,
             "message": "Media deleted successfully",
-            "pathname": pathname
+            "pathname": pathname,
+            "recycled_items": recycled_items
         })
+
     except Exception as e:
         return error_response("Media delete failed", e)
+
 
 
 @app.get("/api/admin/status")
