@@ -1,3 +1,2 @@
 Flask
 vercel
-yt-dlp
