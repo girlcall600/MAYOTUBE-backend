@@ -320,6 +320,174 @@ def error_response(message, error):
     }), 500
 
 
+
+# -----------------------------------------------------------------------------
+# VIDEO DOWNLOAD API
+# These routes expose available single-file formats (audio + video) and redirect
+# to the selected format URL. Large media is not proxied through Vercel Functions.
+# -----------------------------------------------------------------------------
+
+from urllib.parse import urlparse
+import ipaddress
+import socket
+
+
+def _validate_video_source(source_url):
+    """Accept public HTTP(S) URLs and reject local/private network targets."""
+    if not isinstance(source_url, str) or len(source_url) > 4096:
+        return False
+
+    parsed = urlparse(source_url.strip())
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        return False
+
+    host = parsed.hostname.lower().rstrip(".")
+    if host in {"localhost", "localhost.localdomain"} or host.endswith(".local"):
+        return False
+
+    # Reject literal private, loopback, link-local, multicast, and reserved IPs.
+    try:
+        ip = ipaddress.ip_address(host.strip("[]"))
+        if not ip.is_global:
+            return False
+    except ValueError:
+        # Also reject hostnames that currently resolve to any non-public address.
+        try:
+            addresses = socket.getaddrinfo(host, parsed.port or (443 if parsed.scheme == "https" else 80))
+            if not addresses:
+                return False
+            for address in addresses:
+                ip = ipaddress.ip_address(address[4][0])
+                if not ip.is_global:
+                    return False
+        except (OSError, ValueError):
+            return False
+
+    return True
+
+
+def _extract_video_info(source_url):
+    import yt_dlp
+
+    options = {
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+        "noplaylist": True,
+        "socket_timeout": 15,
+        "extract_flat": False,
+    }
+    with yt_dlp.YoutubeDL(options) as ydl:
+        return ydl.extract_info(source_url, download=False)
+
+
+def _format_size_mb(size_bytes):
+    if not isinstance(size_bytes, (int, float)) or size_bytes <= 0:
+        return None
+    return round(size_bytes / (1024 * 1024), 2)
+
+
+@app.post("/api/get-download-links")
+def get_download_links():
+    """Return available direct formats that include both audio and video."""
+    body = request.get_json(silent=True) or {}
+    source_url = str(body.get("url", "")).strip()
+
+    if not _validate_video_source(source_url):
+        return jsonify({"error": "A valid public http/https video URL is required"}), 400
+
+    try:
+        info = _extract_video_info(source_url)
+        formats = []
+        seen = set()
+
+        for item in info.get("formats") or []:
+            if item.get("vcodec") in (None, "none") or item.get("acodec") in (None, "none"):
+                continue
+            if not item.get("url") or not item.get("format_id"):
+                continue
+
+            format_id = str(item["format_id"])
+            if format_id in seen:
+                continue
+            seen.add(format_id)
+
+            height = item.get("height")
+            resolution = item.get("resolution") or (f"{height}p" if height else "unknown")
+            size_bytes = item.get("filesize") or item.get("filesize_approx")
+
+            formats.append({
+                "format_id": format_id,
+                "ext": item.get("ext"),
+                "resolution": resolution,
+                "width": item.get("width"),
+                "height": height,
+                "fps": item.get("fps"),
+                "filesize_bytes": size_bytes,
+                "filesize_mb": _format_size_mb(size_bytes),
+                "has_audio": True,
+            })
+
+        formats.sort(key=lambda f: (
+            f.get("height") or 0,
+            f.get("fps") or 0,
+            f.get("filesize_bytes") or 0
+        ))
+
+        if not formats:
+            return jsonify({
+                "error": "No single-file audio+video formats were found for this URL",
+                "hint": "Some sources provide separate audio and video streams. Merging them reliably requires a dedicated download worker."
+            }), 422
+
+        return jsonify({
+            "title": info.get("title"),
+            "thumbnail": info.get("thumbnail"),
+            "duration_seconds": info.get("duration"),
+            "formats": formats,
+        })
+    except Exception as exc:
+        return jsonify({
+            "error": "Could not inspect video URL",
+            "details": str(exc)[:500]
+        }), 422
+
+
+@app.post("/api/download")
+def download_selected_format():
+    """Redirect to the exact selected format, without proxying the media."""
+    body = request.get_json(silent=True) or {}
+    source_url = str(body.get("url", "")).strip()
+    selected_id = str(body.get("format_id", "")).strip()
+
+    if not _validate_video_source(source_url) or not selected_id:
+        return jsonify({"error": "Valid url and format_id are required"}), 400
+
+    try:
+        info = _extract_video_info(source_url)
+        for item in info.get("formats") or []:
+            if str(item.get("format_id", "")) != selected_id:
+                continue
+
+            if item.get("vcodec") in (None, "none") or item.get("acodec") in (None, "none"):
+                return jsonify({"error": "Selected format does not contain both audio and video"}), 422
+
+            target = item.get("url")
+            if not target:
+                break
+
+            # Do not accept arbitrary client-supplied target URLs; only redirect
+            # to the URL resolved by yt-dlp for the chosen format.
+            return redirect(target, code=302)
+
+        return jsonify({"error": "Selected format was not found; refresh the available qualities"}), 404
+    except Exception as exc:
+        return jsonify({
+            "error": "Could not resolve selected format",
+            "details": str(exc)[:500]
+        }), 422
+
+
 @app.get("/")
 def home():
     return jsonify({
