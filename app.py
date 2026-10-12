@@ -4,7 +4,9 @@ import hmac
 import urllib.request
 import time
 import secrets
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
+
+import yt_dlp
 
 from flask import (
     Flask,
@@ -335,6 +337,159 @@ def health():
         "service": "MAYOTUBE backend",
         "blob_configured": bool(BLOB_TOKEN)
     })
+
+
+# Video format information for the Android quality-selection popup.
+@app.post("/get-download-links")
+@app.post("/api/get-download-links")
+def get_download_links():
+    body = request.get_json(silent=True) or {}
+    video_url = str(body.get("url", "")).strip()
+
+    if not video_url:
+        return jsonify({"error": "Video URL is required"}), 400
+
+    try:
+        parsed = urlparse(video_url)
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+    except Exception:
+        parsed = None
+        hostname = ""
+
+    allowed_hosts = ("youtube.com", "youtu.be", "youtube-nocookie.com")
+    if (
+        parsed is None
+        or parsed.scheme not in ("http", "https")
+        or not hostname
+        or not any(
+            hostname == host or hostname.endswith("." + host)
+            for host in allowed_hosts
+        )
+    ):
+        return jsonify({"error": "Please provide a valid YouTube video URL"}), 400
+
+    options = {
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+        "noplaylist": True,
+        "socket_timeout": 12,
+        "extractor_retries": 1,
+        "retries": 1,
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+
+        raw_formats = info.get("formats") or []
+        if not raw_formats:
+            return jsonify({
+                "success": True,
+                "title": info.get("title") or "Video",
+                "formats": []
+            })
+
+        def size_of(fmt):
+            size = fmt.get("filesize") or fmt.get("filesize_approx")
+            try:
+                return int(size) if size else None
+            except (TypeError, ValueError):
+                return None
+
+        video_formats = []
+        audio_formats = []
+        combined_formats = []
+
+        for fmt in raw_formats:
+            if not fmt.get("url"):
+                continue
+            vcodec = fmt.get("vcodec")
+            acodec = fmt.get("acodec")
+            has_video = vcodec not in (None, "none")
+            has_audio = acodec not in (None, "none")
+
+            if has_video and has_audio:
+                combined_formats.append(fmt)
+            elif has_video and fmt.get("height"):
+                video_formats.append(fmt)
+            elif has_audio and not has_video:
+                audio_formats.append(fmt)
+
+        def best_by_size(formats):
+            return max(
+                formats,
+                key=lambda f: (
+                    size_of(f) is not None,
+                    size_of(f) or 0,
+                    f.get("tbr") or 0
+                ),
+                default=None
+            )
+
+        best_audio = best_by_size(audio_formats)
+        audio_size = size_of(best_audio) if best_audio else None
+
+        available_heights = sorted({
+            int(f["height"])
+            for f in (video_formats + combined_formats)
+            if f.get("height")
+        }, reverse=True)
+
+        results = []
+        for height in available_heights:
+            combined_at_height = [
+                f for f in combined_formats
+                if f.get("height") and int(f["height"]) == height
+            ]
+            video_at_height = [
+                f for f in video_formats
+                if f.get("height") and int(f["height"]) == height
+            ]
+
+            chosen = best_by_size(combined_at_height)
+            selector = f"best[height<={height}][vcodec!=none][acodec!=none]"
+
+            if chosen:
+                size_bytes = size_of(chosen)
+            else:
+                chosen_video = best_by_size(video_at_height)
+                selector = f"bestvideo[height<={height}]+bestaudio/best[height<={height}]"
+                video_size = size_of(chosen_video) if chosen_video else None
+                size_bytes = (
+                    video_size + audio_size
+                    if video_size is not None and audio_size is not None
+                    else None
+                )
+
+            results.append({
+                "quality": f"{height}p",
+                "size_mb": round(size_bytes / (1024 * 1024), 2) if size_bytes is not None else None,
+                "filesize_bytes": size_bytes,
+                "format_selector": selector,
+                "has_audio": True
+            })
+
+        if audio_formats:
+            results.append({
+                "quality": "Audio",
+                "size_mb": round(audio_size / (1024 * 1024), 2) if audio_size is not None else None,
+                "filesize_bytes": audio_size,
+                "format_selector": "bestaudio/best",
+                "has_audio": True
+            })
+
+        return jsonify({
+            "success": True,
+            "title": info.get("title") or "Video",
+            "formats": results
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Could not retrieve video formats. YouTube may be temporarily blocking requests.",
+            "details": str(e)[:300]
+        }), 502
 
 
 @app.get("/api/home-content")
